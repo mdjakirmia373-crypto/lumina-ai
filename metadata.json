@@ -1,0 +1,6 @@
+{
+  "name": "AI Content Studio - Free AI Image & Voice Generator",
+  "description": "Generate stunning AI images and realistic voiceovers for free with custom styles, aspect ratios, and voice controls in Bengali & English.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
