@@ -13,7 +13,12 @@ import {
   AlertCircle,
   Eye,
   Trash2,
-  X
+  X,
+  ArrowRight,
+  SendHorizontal,
+  Layers,
+  Palette,
+  Ratio
 } from 'lucide-react';
 import { Language, GeneratedImage } from '../types';
 import { STYLE_PRESETS, ASPECT_RATIOS, SAMPLE_PROMPTS } from '../utils/presets';
@@ -298,35 +303,69 @@ export const ImageStudio: React.FC<ImageStudioProps> = ({
             </div>
           </div>
 
-          {/* Textarea */}
-          <div className="relative">
+          {/* Clean Input Box with embedded Arrow Send / Generate button */}
+          <div className="relative group">
             <textarea
               value={prompt}
               onChange={(e) => setPrompt(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                  e.preventDefault();
+                  if (prompt.trim() && !isLoading) {
+                    handleGenerate();
+                  }
+                }
+              }}
               rows={3}
-              className="w-full p-4 pr-10 bg-slate-900/90 border border-slate-700/80 rounded-2xl focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 text-slate-100 placeholder-slate-500 text-sm transition"
+              className="w-full p-4 pr-16 bg-slate-900/95 border-2 border-slate-700/80 rounded-2xl focus:outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/20 text-slate-100 placeholder-slate-500 text-sm transition shadow-inner resize-none"
               placeholder={
                 lang === 'bn'
-                  ? 'উদাহরণ: একটি কিউট বিড়াল চশমা পরে লাইব্রেরিতে বই পড়ছে, সিনেমাটিক লাইটিং, 8K...'
-                  : 'Example: A photorealistic cute cat wearing glasses reading an ancient book in a warm library, cinematic lighting, 8k...'
+                  ? 'কী ছবি তৈরি করতে চান লিখুন... (যেমন: একটি কিউট বিড়াল চশমা পরে বই পড়ছে)'
+                  : 'Describe what you want to create... (Press Enter or click the arrow button to generate)'
               }
             />
-            {prompt && (
+
+            {/* Embedded Arrow Generate Action Button */}
+            <div className="absolute right-3 bottom-3.5 flex items-center gap-2">
+              {prompt && !isLoading && (
+                <button
+                  type="button"
+                  onClick={() => setPrompt('')}
+                  className="text-slate-500 hover:text-slate-300 p-1.5 rounded-lg hover:bg-slate-800 transition"
+                  title="Clear"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              )}
+              
               <button
-                onClick={() => setPrompt('')}
-                className="absolute top-3 right-3 text-slate-500 hover:text-slate-300 p-1"
-                title="Clear prompt"
+                type="button"
+                onClick={() => handleGenerate()}
+                disabled={isLoading || !prompt.trim()}
+                className={`p-3 rounded-xl transition-all duration-300 flex items-center justify-center shadow-lg ${
+                  isLoading
+                    ? 'bg-slate-700 text-slate-400 cursor-not-allowed'
+                    : prompt.trim()
+                    ? 'bg-gradient-to-r from-indigo-500 via-purple-600 to-pink-500 text-white hover:scale-105 active:scale-95 shadow-indigo-500/40 cursor-pointer animate-pulse'
+                    : 'bg-slate-800 text-slate-500 cursor-not-allowed'
+                }`}
+                title={lang === 'bn' ? 'তীর বাটনে চাপ দিয়ে ছবি তৈরি করুন' : 'Generate Image (Click arrow)'}
               >
-                <X className="w-4 h-4" />
+                {isLoading ? (
+                  <div className="w-5 h-5 border-2 border-white/80 border-t-transparent rounded-full animate-spin" />
+                ) : (
+                  <SendHorizontal className="w-5 h-5 transform -rotate-12 transition-transform group-hover:translate-x-0.5" />
+                )}
               </button>
-            )}
+            </div>
           </div>
         </div>
 
-        {/* Quick Sample Prompts */}
+        {/* Quick Sample Prompts Category Chips */}
         <div className="space-y-1.5">
-          <span className="text-[11px] font-medium text-slate-400">
-            {lang === 'bn' ? '💡 দ্রুত ব্যবহারের জন্য আইডিয়া প্রম্পট:' : '💡 Quick Inspiration Prompts:'}
+          <span className="text-[11px] font-medium text-slate-400 flex items-center gap-1.5">
+            <span>💡</span>
+            <span>{lang === 'bn' ? 'রেডিমেড আইডিয়া (ক্লিক করে সহজে ট্রাই করুন):' : 'Ready Prompts (Click to try):'}</span>
           </span>
           <div className="flex flex-wrap gap-1.5">
             {SAMPLE_PROMPTS.map((sample, idx) => (
@@ -334,72 +373,87 @@ export const ImageStudio: React.FC<ImageStudioProps> = ({
                 key={idx}
                 type="button"
                 onClick={() => setPrompt(lang === 'bn' ? sample.bn : sample.en)}
-                className="text-xs text-left bg-slate-800/60 hover:bg-slate-800 text-slate-300 hover:text-white px-3 py-1.5 rounded-xl border border-slate-700/50 transition-colors line-clamp-1 max-w-full"
+                className="text-xs text-left bg-slate-800/70 hover:bg-indigo-900/40 hover:text-indigo-200 hover:border-indigo-500/50 text-slate-300 px-3 py-1.5 rounded-xl border border-slate-700/60 transition-all line-clamp-1 max-w-full"
               >
-                {lang === 'bn' ? sample.bn.slice(0, 38) + '...' : sample.en.slice(0, 42) + '...'}
+                {lang === 'bn' ? sample.bn.slice(0, 36) + '...' : sample.en.slice(0, 40) + '...'}
               </button>
             ))}
           </div>
         </div>
 
-        {/* Style Selection */}
-        <div className="space-y-2">
-          <label className="text-xs font-semibold text-slate-300">
-            {lang === 'bn' ? 'আর্ট স্টাইল নির্বাচন করুন (Style Presets)' : 'Choose Art Style'}
-          </label>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-            {STYLE_PRESETS.map((preset) => {
-              const isSelected = selectedStyle === preset.id;
-              return (
-                <button
-                  key={preset.id}
-                  type="button"
-                  onClick={() => setSelectedStyle(preset.id)}
-                  className={`p-2.5 rounded-xl text-left border text-xs font-medium transition-all flex items-center gap-2 ${
-                    isSelected
-                      ? 'bg-indigo-600/25 border-indigo-500 text-white shadow-md shadow-indigo-500/10'
-                      : 'bg-slate-900/60 border-slate-800/80 text-slate-400 hover:text-slate-200 hover:border-slate-700'
-                  }`}
-                >
-                  <span className={`w-2 h-2 rounded-full ${isSelected ? 'bg-indigo-400' : 'bg-slate-600'}`} />
-                  <span className="truncate">
-                    {lang === 'bn' ? preset.nameBn : preset.nameEn}
-                  </span>
-                </button>
-              );
-            })}
+        {/* Categories Section - Clean Tabs & Grid */}
+        <div className="space-y-4 pt-2">
+          {/* Style Selection */}
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <label className="text-xs font-semibold text-slate-300 flex items-center gap-1.5">
+                <Palette className="w-3.5 h-3.5 text-indigo-400" />
+                <span>{lang === 'bn' ? 'ক্যাটাগরি / আর্ট স্টাইল (Style Presets)' : 'Categories & Art Style'}</span>
+              </label>
+              <span className="text-[11px] text-indigo-400 font-medium">
+                {STYLE_PRESETS.find(s => s.id === selectedStyle)?.[lang === 'bn' ? 'nameBn' : 'nameEn']}
+              </span>
+            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+              {STYLE_PRESETS.map((preset) => {
+                const isSelected = selectedStyle === preset.id;
+                return (
+                  <button
+                    key={preset.id}
+                    type="button"
+                    onClick={() => setSelectedStyle(preset.id)}
+                    className={`p-2.5 rounded-xl text-left border text-xs font-medium transition-all flex items-center gap-2 ${
+                      isSelected
+                        ? 'bg-gradient-to-r from-indigo-600/30 to-purple-600/30 border-indigo-400 text-white shadow-md shadow-indigo-500/20'
+                        : 'bg-slate-900/60 border-slate-800/80 text-slate-400 hover:text-slate-200 hover:border-slate-700 hover:bg-slate-800/50'
+                    }`}
+                  >
+                    <span className={`w-2 h-2 rounded-full shrink-0 ${isSelected ? 'bg-indigo-400 ring-2 ring-indigo-400/30' : 'bg-slate-600'}`} />
+                    <span className="truncate">
+                      {lang === 'bn' ? preset.nameBn : preset.nameEn}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
           </div>
-        </div>
 
-        {/* Aspect Ratio Selection */}
-        <div className="space-y-2">
-          <label className="text-xs font-semibold text-slate-300">
-            {lang === 'bn' ? 'ছবির সাইজ ও অনুপাত (Aspect Ratio)' : 'Image Aspect Ratio'}
-          </label>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-            {ASPECT_RATIOS.map((ratio) => {
-              const isSelected = selectedRatio === ratio.id;
-              return (
-                <button
-                  key={ratio.id}
-                  type="button"
-                  onClick={() => setSelectedRatio(ratio.id)}
-                  className={`p-3 rounded-xl border text-left transition-all ${
-                    isSelected
-                      ? 'bg-indigo-600/25 border-indigo-500 text-white shadow-md'
-                      : 'bg-slate-900/60 border-slate-800/80 text-slate-400 hover:text-slate-200 hover:border-slate-700'
-                  }`}
-                >
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="font-bold text-xs">{ratio.label}</span>
-                    <span className="text-[10px] text-slate-400">{ratio.ratio}</span>
-                  </div>
-                  <p className="text-[10px] text-slate-500 truncate">
-                    {lang === 'bn' ? ratio.descriptionBn : ratio.descriptionEn}
-                  </p>
-                </button>
-              );
-            })}
+          {/* Aspect Ratio Selection */}
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <label className="text-xs font-semibold text-slate-300 flex items-center gap-1.5">
+                <Ratio className="w-3.5 h-3.5 text-purple-400" />
+                <span>{lang === 'bn' ? 'ছবির সাইজ ও মাপ (Aspect Ratio)' : 'Image Aspect Ratio'}</span>
+              </label>
+              <span className="text-[11px] text-purple-400 font-medium">
+                {selectedRatio}
+              </span>
+            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+              {ASPECT_RATIOS.map((ratio) => {
+                const isSelected = selectedRatio === ratio.id;
+                return (
+                  <button
+                    key={ratio.id}
+                    type="button"
+                    onClick={() => setSelectedRatio(ratio.id)}
+                    className={`p-3 rounded-xl border text-left transition-all ${
+                      isSelected
+                        ? 'bg-gradient-to-r from-purple-600/30 to-pink-600/30 border-purple-400 text-white shadow-md shadow-purple-500/20'
+                        : 'bg-slate-900/60 border-slate-800/80 text-slate-400 hover:text-slate-200 hover:border-slate-700 hover:bg-slate-800/50'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="font-bold text-xs">{ratio.label}</span>
+                      <span className="text-[10px] text-slate-400">{ratio.ratio}</span>
+                    </div>
+                    <p className="text-[10px] text-slate-400 truncate">
+                      {lang === 'bn' ? ratio.descriptionBn : ratio.descriptionEn}
+                    </p>
+                  </button>
+                );
+              })}
+            </div>
           </div>
         </div>
 
