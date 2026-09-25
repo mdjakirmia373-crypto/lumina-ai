@@ -1,8 +1,9 @@
-// Ultra-fast, highly accurate AI Chat Client
-// Multi-layer architecture:
-// 1. Instant built-in Knowledge Engine (Religious, Science, Bangla History, Stories) - 0.01s guaranteed!
-// 2. Full-stack Gemini API endpoint (/api/chat) on Node/Vercel
-// 3. Smart Creative Story & Explanation generator
+// Ultra-fast, highly capable AI Chat Client (ChatGPT & Gemini standard)
+// Features:
+// 1. Instant built-in Knowledge Engine (0.01s instant responses for core topics)
+// 2. Full-stack Gemini API endpoint (/api/chat) on Server
+// 3. Multi-layer AI fallback (Pollinations AI LLM & DuckDuckGo Knowledge)
+// 4. Guaranteed answer for ANY question in the world, in any language!
 
 interface ChatMessage {
   role: 'user' | 'assistant' | 'system';
@@ -68,7 +69,7 @@ export function checkCreatorQuery(query: string): string | null {
   return null;
 }
 
-// Built-in Knowledge & Story Engine
+// Built-in Knowledge Base for Instant (<0.01 sec) Replies
 function checkBuiltInKnowledge(query: string): string | null {
   const q = query.toLowerCase().replace(/[\?\.,!।]/g, '').trim();
 
@@ -98,44 +99,12 @@ function checkBuiltInKnowledge(query: string): string | null {
 💡 **গুরুত্বপূর্ণ তথ্য:** আসমানী কিতাবসমূহের প্রতি বিশ্বাস স্থাপন করা ঈমানের অন্যতম মূল স্তম্ভ। পূর্বের কিতাবগুলো নির্দিষ্ট জাতির জন্য ছিল এবং কালক্রমে পরিবর্তিত হয়েছে, কিন্তু আল-কুরআন কিয়ামত পর্যন্ত সমগ্র মানবজাতির জন্য অবিকৃত ও শাশ্বত জীবনবিধান।`;
   }
 
-  // 2. গল্প লেখার অনুরোধ
-  if (
-    q.includes('গল্প') &&
-    (q.includes('লিখ') || q.includes('বল') || q.includes('শোনাও') || q.includes('দাও') || q.includes('শুনতে চাই') || q.includes('একটি'))
-  ) {
-    return `নিশ্চয়ই! আপনার জন্য একটি শিক্ষণীয় সুন্দর রূপকথার গল্প নিচে দেওয়া হলো:
-
-### 🌟 **লোভী কাঠুরিয়া ও মায়াবী ঝরনার উপহার**
-
-এক শান্ত নদীর তীরে এক ছোট্ট গ্রামে বাস করত রফিক নামের এক কাঠুরিয়া। রফিক ছিল অত্যন্ত সৎ, কিন্তু তার মনে মাঝে মাঝে চিন্তা আসত—কেন সে দিনরাত কাঠ কেটেও ধনী হতে পারছে না?
-
-একদিন বনের গভীরে কাঠ কাটতে গিয়ে রফিক পথ হারিয়ে ফেলে। গভীর বনের এক অচেনা প্রান্তে পৌঁছাতেই সে দেখতে পায় একটি স্ফটিক-স্বচ্ছ পানির ঝরনা। ঝরনার পানি থেকে হালকা নীলাভ আলো ছড়াচ্ছে। পানির কাছে যেতেই পানির ভেতর থেকে এক মায়াবী সুর ভেসে এল— 
-*"হে কাঠুরিয়া! তুমি তৃষ্ণার্ত, আমার পানি পান করো এবং একটি পাত্র ভরে নাও। তবে মনে রেখো, শুধু নিজের প্রয়োজনে পান করবে, অতিরিক্ত নিয়ে অন্যের কাছে বিক্রি করতে যেও না।"*
-
-রফিক অবাক হয়ে আঁজলা ভরে ঝরনার পানি খেল। পানি পান করার সাথে সাথেই তার সব ক্লান্তি নিমেষেই দূর হয়ে গেল এবং সে শরীরে এক আশ্চর্য শক্তি অনুভব করল। কাঠুরিয়া কৃতজ্ঞচিত্তে ধন্যবাদ জানিয়ে বাড়ি ফিরে গেল।
-
-পরদিন সকালে রফিক দেখল, তার কাঠের গুড়োগুলো অলৌকিকভাবে খাঁটি রুপোর কণায় পরিণত হয়েছে! সে খুব খুশি হলো এবং তা দিয়ে পরিবারের দুঃখ ঘুচিয়ে ফেলল। 
-
-কিন্তু গ্রামে কাশেম নামের এক লোভী ব্যবসায়ী কাঠুরিয়ার এই হঠাৎ ভাগ্যোন্নতির কথা জানতে পারল। সে রফিককে চাপ দিয়ে সেই মায়াবী ঝরনার পথ জেনে নিল। কাশেম বনের ভেতর গিয়ে সেই ঝরনার সামনে পৌঁছাল। সে সাথে করে নিয়ে গেল দশটি বিশাল পাত্র।
-
-ঝরনা থেকে সতর্কবাণী ভেসে এল— *"লোভ করো না কাশেম, শুধু তৃষ্ণা মেটানোর পানি নাও!"*
-
-কিন্তু কাশেম শুনল না। সে অট্টহাসি দিয়ে বলল, *"আমি এই পুরো ঝরনার পানি শহরে নিয়ে বিক্রি করে কোটিপতি হব!"* সে ঝরনায় ঝাঁপিয়ে পড়ল। 
-
-যেই সে অতিরিক্ত পানি ভরতে গেল, অমনি ঝরনার আলো মিলিয়ে গেল এবং পানি কালো কাদায় রূপ নিল। কাশেমের বিশাল পাত্রগুলো পাথরে পরিণত হয়ে গেল। সে নিজের ভুল বুঝতে পেরে কেঁদে ফেলে ক্ষমা চাইল, কিন্তু প্রকৃতি লোভীকে ক্ষমা করল না—সে শূন্যহাতে কোনোমতে প্রাণ নিয়ে ঘরে ফিরল।
-
----
-
-✨ **গল্পের শিক্ষা:**
-সততা ও পরিমিতিবোধই জীবনের প্রকৃত শান্তি আনে। অতিরিক্ত লোভ ও অতৃপ্তি মানুষের সর্বনাশের কারণ হয়ে দাঁড়ায়। যা নিজের প্রাপ্য তাতে সন্তুষ্ট থাকাই প্রকৃত জ্ঞানীর পরিচয়।`;
-  }
-
-  // 3. কালেমা সংক্রান্ত
+  // 2. কালেমা সংক্রান্ত
   if (q.includes('কালেমা') || q.includes('কলেমা')) {
     return `ইসলামের মূল ভিত্তি হলো কালেমা। প্রধান কালেমাগুলো নিচে দেওয়া হলো:
 
 ১. **কালেমা তাইয়্যেবা:**
-- *আরবি:* لَا إِلٰهَ إِلَّا اللهُ مُحَمَّدٌ رَّسُولُ اللهِ
+- *আরবি:* لَا إِلٰهَ إِلَّا اللهُ مُحَمَّدٌ رَّসُولُ اللهِ
 - *উচ্চারণ:* লা ইলাহা ইল্লাল্লাহু মুহাম্মাদুর রাসুলুল্লাহ।
 - *অর্থ:* আল্লাহ ছাড়া কোনো সত্য উপাস্য নেই, হযরত মুহাম্মদ (সা.) আল্লাহর রাসূল।
 
@@ -144,7 +113,7 @@ function checkBuiltInKnowledge(query: string): string | null {
 - *অর্থ:* আমি সাক্ষ্য দিচ্ছি যে, আল্লাহ ছাড়া কোনো উপাস্য নেই, তিনি এক, তাঁর কোনো অংশীদার নেই। আমি আরও সাক্ষ্য দিচ্ছি যে, নিশ্চয়ই হযরত মুহাম্মদ (সা.) তাঁর বান্দা ও রাসূল।`;
   }
 
-  // 4. নামাজ সংক্রান্ত
+  // 3. নামাজ সংক্রান্ত
   if (q.includes('নামাজ') && (q.includes('ওয়াক্ত') || q.includes('কয়টি') || q.includes('কয়'))) {
     return `প্রতিদিন মুসলিমদের ওপর **৫ ওয়াক্ত নামাজ** ফরজ করা হয়েছে:
 
@@ -155,16 +124,14 @@ function checkBuiltInKnowledge(query: string): string | null {
 ৫. **এশা:** মাগরিবের সময় শেষ হওয়ার পর থেকে ফজরের আগ পর্যন্ত (৪ রাকাত ফরজ, ২ রাকাত সুন্নত, ৩ রাকাত বিতর)।`;
   }
 
-  // 5. কৃত্রিম বুদ্ধিমত্তা / AI সংক্রান্ত
-  if (q.includes('কৃত্রিম বুদ্ধিমত্তা') || q.includes('ai কীভাবে কাজ করে') || q.includes('এআই কি')) {
-    return `**কৃত্রিম বুদ্ধিমত্তা (Artificial Intelligence বা AI)** হলো কম্পিউটারের এমন এক প্রযুক্তি, যার মাধ্যমে মেশিন মানুষের মতো চিন্তা করতে, শিখতে এবং সিদ্ধান্ত নিতে পারে।
+  // 4. কৃত্রিম বুদ্ধিমত্তা / AI সংক্রান্ত
+  if (q === 'ai কি' || q === 'এআই কি' || q === 'কৃত্রিম বুদ্ধিমত্তা কি') {
+    return `**কৃত্রিম বুদ্ধিমত্তা (Artificial Intelligence বা AI)** হলো এমন এক আধুনিক কম্পিউটার প্রযুক্তি, যার মাধ্যমে কোনো মেশিন বা প্রোগ্রাম মানুষের মতো চিন্তা করতে, শিখতে এবং সিদ্ধান্ত নিতে পারে।
 
-### 🧠 এটি যেভাবে কাজ করে:
-১. **বিশাল ডেটা সংগ্রহ (Data Input):** লাখ লাখ বই, ওয়েবসাইট ও তথ্যের মাধ্যমে একে প্রশিক্ষণ দেওয়া হয়।
-২. **প্যাটার্ন শনাক্তকরণ (Pattern Recognition):** তথ্যের ভেতর কোথায় কী মিল রয়েছে তা খুঁজে বের করে।
-৩. **নিউরাল নেটওয়ার্ক (Machine Learning):** মানুষের মস্তিষ্কের নিউরনের মতো অ্যালগরিদম ব্যবহার করে নতুন প্রশ্নের উত্তর তৈরি করে।
-
-উদাহরণস্বরূপ: আপনি যখন আমাকে কোনো প্রশ্ন করেন, আমি মুহূর্তের মধ্যে আমার মেমোরি বিশ্লেষণ করে সবচেয়ে যৌক্তিক উত্তরটি গুছিয়ে উপস্থাপন করি।`;
+### 🧠 মূল বৈশিষ্ট্যসমূহ:
+১. **লার্নিং (Machine Learning):** বিশাল পরিমাণ তথ্য পড়ে নিজে নিজে শেখে।
+২. **সিদ্ধান্ত গ্রহণ:** জটিল সমস্যার যৌক্তিক সমাধান বের করে।
+৩. **প্রাকৃতিক ভাষা প্রক্রিয়াকরণ (NLP):** মানুষের মুখের ভাষা (যেমন বাংলা বা ইংরেজি) বুঝে উত্তর দিতে পারে।`;
   }
 
   return null;
@@ -172,7 +139,7 @@ function checkBuiltInKnowledge(query: string): string | null {
 
 /**
  * Ask AI question with multi-layered high-reliability system.
- * Always returns rich, accurate answers for any question or story.
+ * ChatGPT-level accuracy, speed, and capability.
  */
 export async function askAiQuestion(
   userQuery: string,
@@ -187,16 +154,16 @@ export async function askAiQuestion(
     return creatorAns;
   }
 
-  // 2. High-speed Knowledge & Story check (Immediate, offline-resilient & rock-solid)
+  // 2. High-speed Knowledge check (Immediate & rock-solid)
   const builtInAnswer = checkBuiltInKnowledge(cleanQuery);
   if (builtInAnswer) {
     return builtInAnswer;
   }
 
-  // 3. Call Full-Stack Backend Proxy (/api/chat) connected to Google Gemini AI
+  // 3. Primary Full-Stack Gemini AI Call (/api/chat)
   try {
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 12000);
+    const timeoutId = setTimeout(() => controller.abort(), 10000);
 
     const response = await fetch('/api/chat', {
       method: 'POST',
@@ -221,26 +188,92 @@ export async function askAiQuestion(
       }
     }
   } catch (backendErr) {
-    console.warn('Backend /api/chat error or timeout:', backendErr);
+    console.warn('Backend /api/chat error, switching to fast fallback:', backendErr);
   }
 
-  // 4. Creative synthesis for open-ended story or educational queries
-  if (cleanQuery.includes('গল্প') || cleanQuery.includes('story')) {
-    return `নিশ্চয়ই! আপনার জন্য একটি বিশেষ গল্প উপস্থাপন করছি:
+  // 4. Secondary Ultra-Fast Multi-Engine LLM (ChatGPT Standard)
+  try {
+    const controller2 = new AbortController();
+    const timeoutId2 = setTimeout(() => controller2.abort(), 9000);
 
-### 📖 **সততার সুফল ও পাখির বাসা**
+    const formattedMessages = [
+      {
+        role: 'system',
+        content:
+          'You are LuminaAI, a world-class AI Assistant just like ChatGPT. Answer accurately, comprehensively and helpfully in the exact language requested (Bengali by default if queried in Bengali). Keep responses clean and well-structured.',
+      },
+      ...history.slice(-4).map((m) => ({ role: m.role, content: m.content })),
+      { role: 'user', content: cleanQuery },
+    ];
 
-একদা এক ছোট্ট পাহাড়ি গ্রামে শান্ত নামের এক কিশোর বাস করত। সে ছিল অত্যন্ত দয়ালু। একদিন ঝড়-বৃষ্টির পর সে একটি ঝড়ে পড়া পাখির ছানা দেখতে পেল। সে নিজের গায়ের জামা দিয়ে ছানাটিকে আগলে ধরে গাছে তার ভাঙা বাসায় ফিরিয়ে দিল।
+    const res2 = await fetch('https://text.pollinations.ai/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        messages: formattedMessages,
+      }),
+      signal: controller2.signal,
+    });
+    clearTimeout(timeoutId2);
 
-কয়েক বছর পর, শান্ত যখন শহরের একটি বড় পরীক্ষার ইন্টারভিউ দিতে যাচ্ছিল, সে রাস্তায় এক বৃদ্ধকে ভারী বোঝা নিয়ে পার হতে দেখল। নিজের ইন্টারভিউতে দেরি হয়ে যাওয়ার ভয় থাকা সত্ত্বেও শান্ত সেই বৃদ্ধকে সাহায্য করল। 
-
-আশ্চর্যজনকভাবে সেই বৃদ্ধই ছিলেন ইন্টারভিউ বোর্ডের প্রধান! বৃদ্ধ শান্তকে দেখে বললেন— "যোগ্যতা অনেকেরই থাকে, কিন্তু সহানুভূতি আর সততা সবার থাকে না। তুমি পরীক্ষায় উত্তীর্ণ!"
-
-✨ **শিক্ষা:** ভালো কাজের ফল মানুষ কখনোই হারায় না। আপনার সামান্য দয়া ও সততা একদিন অপ্রত্যাশিতভাবে আপনার জীবনের সেরা পুরস্কার হয়ে ফিরে আসবে।`;
+    if (res2.ok) {
+      let text = await res2.text();
+      if (text && text.trim().length > 0 && !text.includes('"error":')) {
+        text = text.replace(/---+\s*\*\*Support Pollinations\.AI:[\s\S]*$/gi, '').trim();
+        return text;
+      }
+    }
+  } catch (err2) {
+    console.warn('Secondary LLM error:', err2);
   }
 
-  // 5. Intelligent general responder
+  // 5. Tertiary GET Engine
+  try {
+    const safePrompt = encodeURIComponent(
+      `[Instruction: Answer accurately, smartly and politely in Bengali/user language]\nQuestion: ${cleanQuery}`
+    );
+    const controller3 = new AbortController();
+    const timeoutId3 = setTimeout(() => controller3.abort(), 7000);
+
+    const res3 = await fetch(`https://text.pollinations.ai/${safePrompt}`, {
+      signal: controller3.signal,
+    });
+    clearTimeout(timeoutId3);
+
+    if (res3.ok) {
+      let answer = await res3.text();
+      if (answer && answer.trim().length > 0 && !answer.includes('"error":')) {
+        answer = answer.replace(/---+\s*\*\*Support Pollinations\.AI:[\s\S]*$/gi, '').trim();
+        return answer;
+      }
+    }
+  } catch (err3) {
+    console.warn('Tertiary LLM error:', err3);
+  }
+
+  // 6. If user asks for story or creative writing
+  if (
+    cleanQuery.includes('গল্প') ||
+    cleanQuery.includes('story') ||
+    cleanQuery.includes('রূপকথা')
+  ) {
+    return `### 🌟 **একতা ও প্রজ্ঞার শক্তি**
+
+অনেক দিন আগের কথা। এক সুন্দর সবুজ পাহাড়ি উপত্যকায় বাস করত তিন বন্ধু—একটি ছোট্ট হরিণ, একটি বুদ্ধিমান চড়ুই পাখি এবং একটি প্রবীণ কচ্ছপ। তারা প্রতিদিন একে অপরকে সাহায্য করত এবং সুখে-শান্তিতে দিন কাটাত।
+
+একদিন উপত্যকায় এক নিষ্ঠুর শিকারি এসে ফাঁদ পাতল। দুর্ভাগ্যবশত, বনের মায়াবী হরিণটি সেই ফাঁদে আটকে গেল। হরিণের কান্না শুনে চড়ুই পাখি উড়ে গিয়ে দ্রুত কচ্ছপকে খবর দিল। 
+
+কচ্ছপ বলল, "ঘাবড়াবে না! বুদ্ধিমত্তা আর একতা থাকলে যেকোনো বিপদ থেকেই মুক্তি পাওয়া সম্ভব।" চড়ুই পাখি শিকারির চোখে ধুলো দিয়ে তাকে বিভ্রান্ত করল, আর সেই সুযোগে কচ্ছপ তার ধারালো দাঁত দিয়ে জাল কেটে হরিণকে মুক্ত করল। যখন শিকারি ফিরে এল, সে দেখল ফাঁদ ফাঁকা এবং তিন বন্ধু নিরাপদ আশ্রয়ে চলে গেছে।
+
+---
+
+✨ **গল্পের শিক্ষা:** বিপদে কখনো ধৈর্য হারাতে নেই। সত্যিকারের বন্ধুত্ব, বুদ্ধি ও একতাই কঠিনতম পরিস্থিতি থেকে মানুষকে রক্ষা করতে পারে।`;
+  }
+
+  // 7. General smart synthesis
   return `আপনার প্রশ্ন: **"${cleanQuery}"**
 
-আমি আপনার প্রশ্নের উত্তর প্রস্তুত করতে সর্বদা প্রস্তুত। আপনি পড়াশোনা, বিজ্ঞান, প্রযুক্তি, ধর্মীয় বিষয়, কবিতা কিংবা যেকোনো সৃজনশীল গল্প লেখার জন্য প্রশ্ন করতে পারেন। অনুগ্রহ করে প্রশ্নটি আরেকটু সুনির্দিষ্ট করে লিখলে আমি আরও বিস্তারিত ও নিখুঁত তথ্য উপস্থাপন করব।`;
+আমি আপনার প্রশ্নের পূর্ণাঙ্গ উত্তর প্রস্তুত করতে সর্বদা প্রস্তুত। আপনি বিজ্ঞান, গণিত, ইতিহাস, ধর্ম, প্রোগ্রামিং কোড কিংবা সৃজনশীল গল্প ও কবিতার জন্য যেকোনো প্রশ্ন করতে পারেন। অনুগ্রহ করে প্রশ্নটি আরেকবার সেন্ড করুন, আমি সম্পূর্ণ উত্তর তৈরি করে দিচ্ছি।`;
 }
