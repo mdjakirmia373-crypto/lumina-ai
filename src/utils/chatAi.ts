@@ -1,5 +1,5 @@
-// Ultra-fast multi-engine AI Chat Client (ChatGPT-level response speed & intelligence)
-// Features: Instant creator query response, high-speed streaming / multiple redundant free LLM endpoints
+// Ultra-fast, highly accurate AI Chat Client powered by Google Gemini API
+// Supports in-depth answers, story writing, coding, science, history, religion, and all languages
 
 interface ChatMessage {
   role: 'user' | 'assistant' | 'system';
@@ -65,14 +65,9 @@ export function checkCreatorQuery(query: string): string | null {
   return null;
 }
 
-const SYSTEM_INSTRUCTION = `You are LuminaAI, a world-class AI Assistant like ChatGPT.
-You answer any question accurately, logically, helpfully, and with high intelligence.
-Respond in the exact language the user asks in (Bangla, English, Arabic, Hindi, etc.).
-Keep answers organized with clear headings and bullet points where helpful.`;
-
 /**
- * Ask AI question with high-speed multi-provider fallbacks.
- * Delivers answers in 1-2 seconds reliably.
+ * Ask AI question with Google Gemini API backend proxy.
+ * Capable of writing rich stories, solving questions, religious queries, etc.
  */
 export async function askAiQuestion(
   userQuery: string,
@@ -87,75 +82,45 @@ export async function askAiQuestion(
     return creatorAns;
   }
 
-  // 2. High-speed primary provider: Pollinations OpenAI text pipeline with quick timeout
+  // 2. Call Full-Stack Backend Proxy (/api/chat) connected to Google Gemini AI
   try {
-    const formattedMessages = [
-      { role: 'system', content: SYSTEM_INSTRUCTION },
-      ...history.slice(-4).map((m) => ({ role: m.role, content: m.content })),
-      { role: 'user', content: cleanQuery },
-    ];
-
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 6000); // 6 sec timeout for speed
+    const timeoutId = setTimeout(() => controller.abort(), 18000); // 18 seconds for deep creative stories
 
-    const res = await fetch('https://text.pollinations.ai/', {
+    const response = await fetch('/api/chat', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        messages: formattedMessages,
-        model: 'openai',
-        jsonMode: false,
+        prompt: cleanQuery,
+        history: history.slice(-6).map((m) => ({
+          role: m.role,
+          content: m.content,
+        })),
       }),
       signal: controller.signal,
     });
     clearTimeout(timeoutId);
 
-    if (res.ok) {
-      const text = await res.text();
-      if (text && text.trim().length > 0 && !text.includes('Error:')) {
-        return text.trim();
+    if (response.ok) {
+      const data = await response.json();
+      if (data && data.reply && typeof data.reply === 'string' && data.reply.trim().length > 0) {
+        return data.reply.trim();
       }
     }
-  } catch (err) {
-    console.warn('Provider 1 failed or took too long, switching to fast backup:', err);
+  } catch (backendErr) {
+    console.warn('Backend /api/chat error or timeout:', backendErr);
   }
 
-  // 3. Fast Backup Provider: Direct Pollinations Fast Search / Mistral
-  try {
-    const controller2 = new AbortController();
-    const timeoutId2 = setTimeout(() => controller2.abort(), 6000);
-
-    const safePrompt = encodeURIComponent(
-      `[Instruction: You are LuminaAI. Answer concisely, accurately and helpfully in the user's language]\nQuestion: ${cleanQuery}`
-    );
-    const backupUrl = `https://text.pollinations.ai/${safePrompt}?model=mistral&system=${encodeURIComponent(
-      SYSTEM_INSTRUCTION
-    )}`;
-
-    const res2 = await fetch(backupUrl, { signal: controller2.signal });
-    clearTimeout(timeoutId2);
-
-    if (res2.ok) {
-      const answer = await res2.text();
-      if (answer && answer.trim().length > 0 && !answer.includes('Error:')) {
-        return answer.trim();
-      }
-    }
-  } catch (err2) {
-    console.warn('Backup provider 2 failed:', err2);
-  }
-
-  // 4. Third Fast Knowledge Provider: Wikipedia Instant API for factual knowledge
+  // 3. Fallback to Wikipedia Instant Search for factual queries (e.g. Asmani Kitab, History)
   try {
     const isEnglish = /^[A-Za-z0-9\s\?\,\.\!\-]+$/.test(cleanQuery);
     const wikiLang = isEnglish ? 'en' : 'bn';
-    const wikiUrl = `https://${wikiLang}.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(
-      cleanQuery.replace(/[?।!]/g, '').trim()
-    )}`;
+    const cleanSearch = cleanQuery.replace(/[?।!]/g, '').trim();
+    const wikiUrl = `https://${wikiLang}.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(cleanSearch)}`;
 
-    const wikiRes = await fetch(wikiUrl, { signal: AbortSignal.timeout(3500) });
+    const wikiRes = await fetch(wikiUrl, { signal: AbortSignal.timeout(4000) });
     if (wikiRes.ok) {
       const wikiData = await wikiRes.json();
       if (wikiData.extract) {
@@ -166,8 +131,7 @@ export async function askAiQuestion(
     console.warn('Wikipedia fallback skipped:', wikiErr);
   }
 
-  // 5. Friendly informative response if all network endpoints are slow or restricted
-  return `আপনার প্রশ্ন: "${cleanQuery}"
+  return `আপনার প্রশ্নের জন্য ধন্যবাদ!
 
-আমি আপনার প্রশ্নের সঠিক ও চমৎকার উত্তর প্রস্তুত করতে পারছি। অনুগ্রহ করে ইন্টারনেট সংযোগটি স্বাভাবিক থাকলে আরেকবার সেন্ড করুন, কিংবা প্রশ্নটি আরো বিস্তারিত লিখুন।`;
+আমি বর্তমানে আপনার অনুরোধটি প্রসেস করতে সামান্য অসুবিধায় পড়েছি। অনুগ্রহ করে কয়েক সেকেন্ড অপেক্ষা করে পুনরায় প্রশ্নটি সেন্ড করুন।`;
 }

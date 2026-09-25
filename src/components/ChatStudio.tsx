@@ -9,10 +9,6 @@ import {
   Check, 
   RefreshCw, 
   MessageSquare,
-  HelpCircle,
-  Code2,
-  BookOpen,
-  Lightbulb,
   Zap
 } from 'lucide-react';
 import { Language } from '../types';
@@ -28,24 +24,6 @@ interface Message {
   content: string;
   timestamp: Date;
 }
-
-const SAMPLE_QUESTIONS_BN = [
-  'তোমাকে কে বানিয়েছে?',
-  'কৃত্রিম বুদ্ধিমত্তা (AI) কীভাবে কাজ করে সহজ ভাষায় বুঝিয়ে বলো',
-  'পড়াশোনায় মন বসানোর ৫টি সেরা বৈজ্ঞানিক উপায় কী কী?',
-  'অনলাইন থেকে আয় করার কয়েকটি সেরা ও নির্ভরযোগ্য উপায় বলো',
-  'মহাবিশ্ব কত বড় এবং ব্ল্যাকহোল কী?',
-  'বাংলাদেশের স্বাধীনতা যুদ্ধ কত সালে এবং কীভাবে হয়েছিল?',
-];
-
-const SAMPLE_QUESTIONS_EN = [
-  'Who made you?',
-  'Explain quantum computing in simple words',
-  'How to improve focus and productivity when studying?',
-  'Write a professional email asking for a meeting',
-  'Top 5 emerging technologies in 2026',
-  'Give me healthy daily routine habits',
-];
 
 export const ChatStudio: React.FC<ChatStudioProps> = ({ lang }) => {
   const [messages, setMessages] = useState<Message[]>([
@@ -181,31 +159,8 @@ export const ChatStudio: React.FC<ChatStudioProps> = ({ lang }) => {
         )}
       </div>
 
-      {/* Suggested Quick Question Chips */}
-      {messages.length <= 2 && (
-        <div className="space-y-2">
-          <div className="flex items-center gap-1.5 text-xs font-semibold text-slate-400">
-            <Lightbulb className="w-3.5 h-3.5 text-amber-400" />
-            <span>{lang === 'bn' ? 'জনপ্রিয় প্রশ্ন (ক্লিক করে উত্তর জানুন):' : 'Popular Questions to Ask:'}</span>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-            {(lang === 'bn' ? SAMPLE_QUESTIONS_BN : SAMPLE_QUESTIONS_EN).map((q, idx) => (
-              <button
-                key={idx}
-                type="button"
-                onClick={() => handleSend(q)}
-                className="text-left text-xs p-3 rounded-xl bg-slate-900/80 hover:bg-indigo-950/40 border border-slate-800 hover:border-indigo-500/40 text-slate-300 hover:text-white transition group flex items-start gap-2.5 shadow-sm"
-              >
-                <HelpCircle className="w-4 h-4 text-indigo-400 shrink-0 mt-0.5 group-hover:scale-110 transition-transform" />
-                <span className="line-clamp-2 leading-relaxed">{q}</span>
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
-
       {/* Chat Messages Container */}
-      <div className="glass-card rounded-2xl border border-slate-800 bg-slate-950/80 p-3 sm:p-5 h-[460px] sm:h-[500px] overflow-y-auto space-y-4 shadow-inner flex flex-col">
+      <div className="glass-card rounded-2xl border border-slate-800 bg-slate-950/80 p-3 sm:p-5 h-[480px] sm:h-[540px] overflow-y-auto space-y-4 shadow-inner flex flex-col">
         {messages.map((msg) => {
           const isUser = msg.role === 'user';
           return (
