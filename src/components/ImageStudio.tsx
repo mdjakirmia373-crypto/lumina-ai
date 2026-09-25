@@ -104,22 +104,29 @@ export const ImageStudio: React.FC<ImageStudioProps> = ({
     // Automatically translate Bengali prompts to English so the AI image model understands precisely
     const translatedPrompt = await translatePromptToEnglish(cleanPrompt);
 
-    // Combine prompt with style suffix
+    // Combine prompt with style suffix and strict anti-watermark negative parameters
     let finalPrompt = translatedPrompt;
     if (styleObj && styleObj.promptSuffix) {
       finalPrompt += styleObj.promptSuffix;
     }
-    if (negativePrompt.trim()) {
-      const translatedNegative = await translatePromptToEnglish(negativePrompt.trim());
-      finalPrompt += ` [negative: ${translatedNegative}]`;
-    }
+    
+    // Always append strict anti-watermark and clean rendering instructions
+    finalPrompt += ', highly detailed, masterpiece, clean image, high definition';
+    
+    const baseNegative = 'watermark, logo, text, banner, copyright, signature, stamp, label, blurry, cropped, low quality, bad anatomy, deformed';
+    const combinedNegative = negativePrompt.trim() 
+      ? `${baseNegative}, ${await translatePromptToEnglish(negativePrompt.trim())}` 
+      : baseNegative;
+
+    finalPrompt += ` [negative: ${combinedNegative}]`;
 
     // Step indicators
     const stepTimer1 = setTimeout(() => setLoadingStep(2), 1200);
     const stepTimer2 = setTimeout(() => setLoadingStep(3), 2600);
 
     const encodedPrompt = encodeURIComponent(finalPrompt);
-    const generatedUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=${ratioObj.width}&height=${ratioObj.height}&seed=${activeSeed}&nologo=true&model=flux`;
+    // Explicitly add nologo=true, nofeed=true, and model=flux for watermark-free crystal clear generation
+    const generatedUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=${ratioObj.width}&height=${ratioObj.height}&seed=${activeSeed}&nologo=true&nofeed=true&model=flux`;
 
     // Preload image
     const img = new Image();
@@ -381,20 +388,22 @@ export const ImageStudio: React.FC<ImageStudioProps> = ({
           </div>
         </div>
 
-        {/* Categories Section - Clean Tabs & Grid */}
-        <div className="space-y-4 pt-2">
+        {/* Categories Section - Gemini Inspired Sleek Cards */}
+        <div className="space-y-5 pt-2">
           {/* Style Selection */}
-          <div className="space-y-2">
+          <div className="space-y-2.5">
             <div className="flex items-center justify-between">
-              <label className="text-xs font-semibold text-slate-300 flex items-center gap-1.5">
-                <Palette className="w-3.5 h-3.5 text-indigo-400" />
-                <span>{lang === 'bn' ? 'ক্যাটাগরি / আর্ট স্টাইল (Style Presets)' : 'Categories & Art Style'}</span>
+              <label className="text-xs font-semibold text-slate-200 flex items-center gap-2">
+                <div className="w-5 h-5 rounded-md bg-blue-500/20 text-blue-400 flex items-center justify-center">
+                  <Palette className="w-3.5 h-3.5" />
+                </div>
+                <span>{lang === 'bn' ? 'আর্ট স্টাইল ক্যাটাগরি' : 'Art Style Categories'}</span>
               </label>
-              <span className="text-[11px] text-indigo-400 font-medium">
+              <span className="text-[11px] font-semibold text-blue-400 bg-blue-500/10 px-2.5 py-0.5 rounded-full border border-blue-500/20">
                 {STYLE_PRESETS.find(s => s.id === selectedStyle)?.[lang === 'bn' ? 'nameBn' : 'nameEn']}
               </span>
             </div>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
               {STYLE_PRESETS.map((preset) => {
                 const isSelected = selectedStyle === preset.id;
                 return (
@@ -402,14 +411,16 @@ export const ImageStudio: React.FC<ImageStudioProps> = ({
                     key={preset.id}
                     type="button"
                     onClick={() => setSelectedStyle(preset.id)}
-                    className={`p-2.5 rounded-xl text-left border text-xs font-medium transition-all flex items-center gap-2 ${
+                    className={`p-3 rounded-2xl text-left border text-xs font-medium transition-all duration-200 flex items-center gap-2.5 group cursor-pointer ${
                       isSelected
-                        ? 'bg-gradient-to-r from-indigo-600/30 to-purple-600/30 border-indigo-400 text-white shadow-md shadow-indigo-500/20'
-                        : 'bg-slate-900/60 border-slate-800/80 text-slate-400 hover:text-slate-200 hover:border-slate-700 hover:bg-slate-800/50'
+                        ? 'bg-gradient-to-r from-blue-600/25 via-indigo-600/25 to-purple-600/25 border-blue-400 text-white shadow-lg shadow-blue-500/10 ring-1 ring-blue-400/40'
+                        : 'bg-slate-900/70 border-slate-800 text-slate-400 hover:text-slate-100 hover:border-slate-700 hover:bg-slate-800/60'
                     }`}
                   >
-                    <span className={`w-2 h-2 rounded-full shrink-0 ${isSelected ? 'bg-indigo-400 ring-2 ring-indigo-400/30' : 'bg-slate-600'}`} />
-                    <span className="truncate">
+                    <span className={`w-2.5 h-2.5 rounded-full shrink-0 transition-transform duration-200 ${
+                      isSelected ? 'bg-gradient-to-r from-blue-400 to-indigo-400 ring-4 ring-blue-500/30 scale-110' : 'bg-slate-700 group-hover:bg-slate-500'
+                    }`} />
+                    <span className="truncate font-semibold">
                       {lang === 'bn' ? preset.nameBn : preset.nameEn}
                     </span>
                   </button>
@@ -419,17 +430,19 @@ export const ImageStudio: React.FC<ImageStudioProps> = ({
           </div>
 
           {/* Aspect Ratio Selection */}
-          <div className="space-y-2">
+          <div className="space-y-2.5">
             <div className="flex items-center justify-between">
-              <label className="text-xs font-semibold text-slate-300 flex items-center gap-1.5">
-                <Ratio className="w-3.5 h-3.5 text-purple-400" />
-                <span>{lang === 'bn' ? 'ছবির সাইজ ও মাপ (Aspect Ratio)' : 'Image Aspect Ratio'}</span>
+              <label className="text-xs font-semibold text-slate-200 flex items-center gap-2">
+                <div className="w-5 h-5 rounded-md bg-purple-500/20 text-purple-400 flex items-center justify-center">
+                  <Ratio className="w-3.5 h-3.5" />
+                </div>
+                <span>{lang === 'bn' ? 'ছবির মাপ ও ফ্রেম সাইজ' : 'Image Aspect Ratio'}</span>
               </label>
-              <span className="text-[11px] text-purple-400 font-medium">
+              <span className="text-[11px] font-semibold text-purple-400 bg-purple-500/10 px-2.5 py-0.5 rounded-full border border-purple-500/20">
                 {selectedRatio}
               </span>
             </div>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
               {ASPECT_RATIOS.map((ratio) => {
                 const isSelected = selectedRatio === ratio.id;
                 return (
@@ -437,15 +450,17 @@ export const ImageStudio: React.FC<ImageStudioProps> = ({
                     key={ratio.id}
                     type="button"
                     onClick={() => setSelectedRatio(ratio.id)}
-                    className={`p-3 rounded-xl border text-left transition-all ${
+                    className={`p-3 rounded-2xl border text-left transition-all duration-200 cursor-pointer ${
                       isSelected
-                        ? 'bg-gradient-to-r from-purple-600/30 to-pink-600/30 border-purple-400 text-white shadow-md shadow-purple-500/20'
-                        : 'bg-slate-900/60 border-slate-800/80 text-slate-400 hover:text-slate-200 hover:border-slate-700 hover:bg-slate-800/50'
+                        ? 'bg-gradient-to-r from-purple-600/25 via-pink-600/25 to-indigo-600/25 border-purple-400 text-white shadow-lg shadow-purple-500/10 ring-1 ring-purple-400/40'
+                        : 'bg-slate-900/70 border-slate-800 text-slate-400 hover:text-slate-100 hover:border-slate-700 hover:bg-slate-800/60'
                     }`}
                   >
                     <div className="flex items-center justify-between mb-1">
-                      <span className="font-bold text-xs">{ratio.label}</span>
-                      <span className="text-[10px] text-slate-400">{ratio.ratio}</span>
+                      <span className="font-bold text-xs tracking-wide">{ratio.label}</span>
+                      <span className={`text-[10px] px-1.5 py-0.2 rounded font-semibold ${
+                        isSelected ? 'bg-purple-500/30 text-purple-200' : 'bg-slate-800 text-slate-500'
+                      }`}>{ratio.ratio}</span>
                     </div>
                     <p className="text-[10px] text-slate-400 truncate">
                       {lang === 'bn' ? ratio.descriptionBn : ratio.descriptionEn}

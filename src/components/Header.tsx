@@ -1,12 +1,12 @@
 import React from 'react';
-import { Sparkles, Globe, Zap, History, Image as ImageIcon, Mic, MessageSquare } from 'lucide-react';
+import { Sparkles, Globe, Zap, History, Image as ImageIcon, Mic, MessageSquare, Eraser } from 'lucide-react';
 import { Language } from '../types';
 
 interface HeaderProps {
   lang: Language;
   onToggleLang: () => void;
-  activeTab: 'image' | 'voice' | 'chat' | 'history';
-  onTabChange: (tab: 'image' | 'voice' | 'chat' | 'history') => void;
+  activeTab: 'image' | 'voice' | 'chat' | 'bg-remover' | 'history';
+  onTabChange: (tab: 'image' | 'voice' | 'chat' | 'bg-remover' | 'history') => void;
   historyCount: number;
 }
 
@@ -38,13 +38,13 @@ export const Header: React.FC<HeaderProps> = ({
               </span>
             </div>
             <p className="text-[11px] text-slate-400 hidden sm:block">
-              {lang === 'bn' ? 'লুমিনা এআই · ফ্রি ইমেজ, ভয়েস ও চ্যাট' : 'LuminaAI · Free Image, Voice & Chat'}
+              {lang === 'bn' ? 'লুমিনা এআই · অল-ইন-ওয়ান ক্রিয়েটিভ স্টুডিও' : 'LuminaAI · All-in-One AI Studio'}
             </p>
           </div>
         </div>
 
         {/* Center Navigation Shortcuts (Desktop) */}
-        <div className="hidden md:flex items-center gap-1 bg-slate-900/80 border border-slate-800 p-1 rounded-xl">
+        <div className="hidden lg:flex items-center gap-1 bg-slate-900/80 border border-slate-800 p-1 rounded-xl">
           <button
             onClick={() => onTabChange('image')}
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 ${
@@ -70,6 +70,18 @@ export const Header: React.FC<HeaderProps> = ({
           </button>
 
           <button
+            onClick={() => onTabChange('bg-remover')}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 ${
+              activeTab === 'bg-remover'
+                ? 'bg-emerald-600 text-white shadow-md shadow-emerald-600/30'
+                : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
+            }`}
+          >
+            <Eraser className="w-3.5 h-3.5 text-emerald-400" />
+            <span>{lang === 'bn' ? 'ব্যাকগ্রাউন্ড রিমুভার' : 'BG Remover'}</span>
+          </button>
+
+          <button
             onClick={() => onTabChange('chat')}
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 ${
               activeTab === 'chat'
@@ -78,7 +90,7 @@ export const Header: React.FC<HeaderProps> = ({
             }`}
           >
             <MessageSquare className="w-3.5 h-3.5" />
-            <span>{lang === 'bn' ? 'এআই প্রশ্ন-উত্তর' : 'AI Chat Q&A'}</span>
+            <span>{lang === 'bn' ? 'এআই চ্যাট' : 'AI Chat'}</span>
           </button>
 
           <button

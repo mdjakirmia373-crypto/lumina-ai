@@ -1,6 +1,6 @@
 {
-  "name": "AI Content Studio - Free AI Image & Voice Generator",
-  "description": "Generate stunning AI images, realistic voiceovers, and get instant answers with AI Chat in Bengali & English.",
+  "name": "AI Content Studio - Free AI Image, Voice & BG Remover",
+  "description": "Generate stunning AI images, realistic voiceovers, remove photo/video backgrounds, and chat in Bengali & English.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

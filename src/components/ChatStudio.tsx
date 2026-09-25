@@ -30,21 +30,21 @@ interface Message {
 }
 
 const SAMPLE_QUESTIONS_BN = [
-  'বাংলাদেশের স্বাধীনতা যুদ্ধ কত সালে এবং কীভাবে হয়েছিল?',
+  'তোমাকে কে বানিয়েছে?',
   'কৃত্রিম বুদ্ধিমত্তা (AI) কীভাবে কাজ করে সহজ ভাষায় বুঝিয়ে বলো',
   'পড়াশোনায় মন বসানোর ৫টি সেরা বৈজ্ঞানিক উপায় কী কী?',
   'অনলাইন থেকে আয় করার কয়েকটি সেরা ও নির্ভরযোগ্য উপায় বলো',
   'মহাবিশ্ব কত বড় এবং ব্ল্যাকহোল কী?',
-  'একটি আকর্ষণীয় ফেসবুক পোস্ট বা ভিডিওর স্ক্রিপ্ট লিখে দাও',
+  'বাংলাদেশের স্বাধীনতা যুদ্ধ কত সালে এবং কীভাবে হয়েছিল?',
 ];
 
 const SAMPLE_QUESTIONS_EN = [
+  'Who made you?',
   'Explain quantum computing in simple words',
   'How to improve focus and productivity when studying?',
   'Write a professional email asking for a meeting',
   'Top 5 emerging technologies in 2026',
   'Give me healthy daily routine habits',
-  'Explain the theory of relativity simply',
 ];
 
 export const ChatStudio: React.FC<ChatStudioProps> = ({ lang }) => {
@@ -146,22 +146,24 @@ export const ChatStudio: React.FC<ChatStudioProps> = ({ lang }) => {
 
   return (
     <div className="space-y-4">
-      {/* Top Banner Card */}
-      <div className="glass-card p-4 rounded-2xl border border-slate-800 bg-gradient-to-r from-indigo-950/40 via-purple-950/30 to-slate-900/50 flex flex-wrap items-center justify-between gap-3 shadow-lg">
+      {/* Top Banner Card - Gemini Style */}
+      <div className="glass-card p-4 sm:p-5 rounded-3xl border border-slate-800/80 bg-gradient-to-r from-blue-950/40 via-purple-950/30 to-slate-900/60 flex flex-wrap items-center justify-between gap-3 shadow-xl backdrop-blur-xl">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white shadow-md shadow-indigo-500/25">
-            <MessageSquare className="w-5 h-5" />
+          <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-pink-500 flex items-center justify-center text-white shadow-lg shadow-indigo-500/30">
+            <Sparkles className="w-5 h-5 animate-pulse" />
           </div>
           <div>
             <h2 className="text-base font-bold text-slate-100 flex items-center gap-2">
-              <span>{lang === 'bn' ? 'স্মার্ট এআই চ্যাট অ্যাসিস্ট্যান্ট' : 'Smart AI Chat Assistant'}</span>
+              <span className="bg-gradient-to-r from-blue-400 via-purple-300 to-pink-300 bg-clip-text text-transparent">
+                {lang === 'bn' ? 'লুমিনা এআই চ্যাট (ChatGPT & Gemini স্টাইল)' : 'LuminaAI Smart Chat (Gemini Style)'}
+              </span>
               <span className="text-[10px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-2 py-0.5 rounded-full font-bold animate-pulse">
-                {lang === 'bn' ? 'অনলাইন ও ফ্রি' : 'Live & Free'}
+                {lang === 'bn' ? '১ সেকেন্ডে উত্তর' : 'Instant Reply'}
               </span>
             </h2>
             <p className="text-xs text-slate-400">
               {lang === 'bn'
-                ? 'বাংলা, ইংরেজি, আরবি, হিন্দিসহ যেকোনো ভাষায় প্রশ্ন করুন ও তৎক্ষণাৎ সঠিক উত্তর পান'
+                ? 'বাংলা, ইংরেজি, আরবি, হিন্দিসহ পৃথিবীর যেকোনো ভাষায় প্রশ্ন করুন ও তৎক্ষণাৎ সঠিক উত্তর পান'
                 : 'Ask in any language (Bangla, English, Arabic, Hindi, etc.) & get instant answers'}
             </p>
           </div>

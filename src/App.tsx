@@ -4,6 +4,7 @@ import { AdBanner } from './components/AdBanner';
 import { ImageStudio } from './components/ImageStudio';
 import { VoiceStudio } from './components/VoiceStudio';
 import { ChatStudio } from './components/ChatStudio';
+import { BgRemoverStudio } from './components/BgRemoverStudio';
 import { HistoryGallery } from './components/HistoryGallery';
 import { Footer } from './components/Footer';
 import { Language, GeneratedImage, VoiceHistoryItem } from './types';
@@ -17,7 +18,8 @@ import {
   Sliders, 
   CheckCircle2, 
   Layers,
-  MessageSquare
+  MessageSquare,
+  Eraser
 } from 'lucide-react';
 
 const STORAGE_KEY_IMAGES = 'ai_studio_images_v1';
@@ -30,7 +32,7 @@ export default function App() {
     return saved === 'en' ? 'en' : 'bn';
   });
 
-  const [activeTab, setActiveTab] = useState<'image' | 'voice' | 'chat' | 'history'>('image');
+  const [activeTab, setActiveTab] = useState<'image' | 'voice' | 'chat' | 'bg-remover' | 'history'>('image');
 
   const [recentImages, setRecentImages] = useState<GeneratedImage[]>(() => {
     try {
@@ -141,50 +143,62 @@ export default function App() {
           </p>
         </div>
 
-        {/* Navigation Tabs (Image / Voice / Chat / History) */}
-        <div className="flex justify-center p-1.5 bg-slate-900/90 border border-slate-800 rounded-2xl max-w-xl mx-auto mb-8 shadow-inner overflow-x-auto gap-1">
+        {/* Navigation Tabs (Image / Voice / BG Remover / Chat / History) - Gemini inspired sleek navigation */}
+        <div className="flex justify-center p-1.5 bg-slate-900/90 border border-slate-800/80 rounded-2xl max-w-3xl mx-auto mb-8 shadow-xl backdrop-blur-xl gap-1.5 overflow-x-auto">
           <button
             onClick={() => setActiveTab('image')}
-            className={`flex-1 min-w-[100px] py-2.5 px-3 rounded-xl font-bold text-xs sm:text-sm transition-all duration-300 flex items-center justify-center gap-1.5 sm:gap-2 cursor-pointer ${
+            className={`flex-1 min-w-[110px] py-3 px-3 rounded-xl font-bold text-xs sm:text-sm transition-all duration-300 flex items-center justify-center gap-1.5 cursor-pointer ${
               activeTab === 'image'
-                ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg shadow-indigo-600/30'
-                : 'text-slate-400 hover:text-white'
+                ? 'bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-white shadow-lg shadow-indigo-600/30 ring-1 ring-white/20'
+                : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
             }`}
           >
-            <ImageIcon className="w-4 h-4 shrink-0" />
+            <ImageIcon className="w-4 h-4 shrink-0 text-indigo-300" />
             <span className="truncate">{lang === 'bn' ? 'টেক্সট টু ইমেজ' : 'Text to Image'}</span>
           </button>
 
           <button
             onClick={() => setActiveTab('voice')}
-            className={`flex-1 min-w-[100px] py-2.5 px-3 rounded-xl font-bold text-xs sm:text-sm transition-all duration-300 flex items-center justify-center gap-1.5 sm:gap-2 cursor-pointer ${
+            className={`flex-1 min-w-[110px] py-3 px-3 rounded-xl font-bold text-xs sm:text-sm transition-all duration-300 flex items-center justify-center gap-1.5 cursor-pointer ${
               activeTab === 'voice'
-                ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg shadow-indigo-600/30'
-                : 'text-slate-400 hover:text-white'
+                ? 'bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-white shadow-lg shadow-indigo-600/30 ring-1 ring-white/20'
+                : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
             }`}
           >
-            <Mic className="w-4 h-4 shrink-0" />
+            <Mic className="w-4 h-4 shrink-0 text-purple-300" />
             <span className="truncate">{lang === 'bn' ? 'টেক্সট টু ভয়েস' : 'Text to Voice'}</span>
           </button>
 
           <button
-            onClick={() => setActiveTab('chat')}
-            className={`flex-1 min-w-[110px] py-2.5 px-3 rounded-xl font-bold text-xs sm:text-sm transition-all duration-300 flex items-center justify-center gap-1.5 sm:gap-2 cursor-pointer ${
-              activeTab === 'chat'
-                ? 'bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white shadow-lg shadow-indigo-600/30'
-                : 'text-slate-400 hover:text-white'
+            onClick={() => setActiveTab('bg-remover')}
+            className={`flex-1 min-w-[130px] py-3 px-3 rounded-xl font-bold text-xs sm:text-sm transition-all duration-300 flex items-center justify-center gap-1.5 cursor-pointer ${
+              activeTab === 'bg-remover'
+                ? 'bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 text-white shadow-lg shadow-emerald-600/30 ring-1 ring-white/20'
+                : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
             }`}
           >
-            <MessageSquare className="w-4 h-4 shrink-0 text-pink-400" />
-            <span className="truncate">{lang === 'bn' ? 'এআই প্রশ্ন-উত্তর' : 'AI Chat Q&A'}</span>
+            <Eraser className="w-4 h-4 shrink-0 text-emerald-400" />
+            <span className="truncate">{lang === 'bn' ? 'ব্যাকগ্রাউন্ড রিমুভার' : 'BG Remover'}</span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab('chat')}
+            className={`flex-1 min-w-[110px] py-3 px-3 rounded-xl font-bold text-xs sm:text-sm transition-all duration-300 flex items-center justify-center gap-1.5 cursor-pointer ${
+              activeTab === 'chat'
+                ? 'bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 text-white shadow-lg shadow-purple-600/30 ring-1 ring-white/20'
+                : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+            }`}
+          >
+            <Sparkles className="w-4 h-4 shrink-0 text-pink-300 animate-pulse" />
+            <span className="truncate">{lang === 'bn' ? 'এআই চ্যাট' : 'AI Chat'}</span>
           </button>
 
           <button
             onClick={() => setActiveTab('history')}
-            className={`px-3 py-2.5 rounded-xl font-semibold text-xs sm:text-sm transition-all duration-300 flex items-center justify-center gap-1.5 cursor-pointer shrink-0 ${
+            className={`px-3 py-3 rounded-xl font-semibold text-xs sm:text-sm transition-all duration-300 flex items-center justify-center gap-1.5 cursor-pointer shrink-0 ${
               activeTab === 'history'
-                ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg shadow-indigo-600/30'
-                : 'text-slate-400 hover:text-white'
+                ? 'bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-white shadow-lg shadow-indigo-600/30 ring-1 ring-white/20'
+                : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
             }`}
             title="View History / গ্যালারি"
           >
@@ -212,12 +226,17 @@ export default function App() {
           />
         )}
 
-        {/* Tab 3: AI Chat Q&A Studio */}
+        {/* Tab 3: Background Remover Studio */}
+        {activeTab === 'bg-remover' && (
+          <BgRemoverStudio lang={lang} />
+        )}
+
+        {/* Tab 4: AI Chat Q&A Studio */}
         {activeTab === 'chat' && (
           <ChatStudio lang={lang} />
         )}
 
-        {/* Tab 4: History Gallery */}
+        {/* Tab 5: History Gallery */}
         {activeTab === 'history' && (
           <HistoryGallery
             lang={lang}
