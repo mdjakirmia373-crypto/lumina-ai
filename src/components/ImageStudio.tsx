@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import { Language, GeneratedImage } from '../types';
 import { STYLE_PRESETS, ASPECT_RATIOS, SAMPLE_PROMPTS } from '../utils/presets';
+import { translatePromptToEnglish } from '../utils/translator';
 
 interface ImageStudioProps {
   lang: Language;
@@ -95,13 +96,17 @@ export const ImageStudio: React.FC<ImageStudioProps> = ({
     const styleObj = STYLE_PRESETS.find(s => s.id === selectedStyle);
     const ratioObj = ASPECT_RATIOS.find(r => r.id === selectedRatio) || ASPECT_RATIOS[0];
 
+    // Automatically translate Bengali prompts to English so the AI image model understands precisely
+    const translatedPrompt = await translatePromptToEnglish(cleanPrompt);
+
     // Combine prompt with style suffix
-    let finalPrompt = cleanPrompt;
+    let finalPrompt = translatedPrompt;
     if (styleObj && styleObj.promptSuffix) {
       finalPrompt += styleObj.promptSuffix;
     }
     if (negativePrompt.trim()) {
-      finalPrompt += ` [negative: ${negativePrompt.trim()}]`;
+      const translatedNegative = await translatePromptToEnglish(negativePrompt.trim());
+      finalPrompt += ` [negative: ${translatedNegative}]`;
     }
 
     // Step indicators
