@@ -46,3 +46,11 @@ export interface VoiceHistoryItem {
   lang: string;
   timestamp: number;
 }
+
+export interface UserAccount {
+  id: string;
+  name: string;
+  email: string;
+  password?: string;
+  createdAt: number;
+}
