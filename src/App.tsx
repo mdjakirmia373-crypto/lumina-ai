@@ -3,6 +3,7 @@ import { Header } from './components/Header';
 import { AdBanner } from './components/AdBanner';
 import { ImageStudio } from './components/ImageStudio';
 import { VoiceStudio } from './components/VoiceStudio';
+import { ChatStudio } from './components/ChatStudio';
 import { HistoryGallery } from './components/HistoryGallery';
 import { Footer } from './components/Footer';
 import { Language, GeneratedImage, VoiceHistoryItem } from './types';
@@ -15,7 +16,8 @@ import {
   Palette, 
   Sliders, 
   CheckCircle2, 
-  Layers 
+  Layers,
+  MessageSquare
 } from 'lucide-react';
 
 const STORAGE_KEY_IMAGES = 'ai_studio_images_v1';
@@ -28,7 +30,7 @@ export default function App() {
     return saved === 'en' ? 'en' : 'bn';
   });
 
-  const [activeTab, setActiveTab] = useState<'image' | 'voice' | 'history'>('image');
+  const [activeTab, setActiveTab] = useState<'image' | 'voice' | 'chat' | 'history'>('image');
 
   const [recentImages, setRecentImages] = useState<GeneratedImage[]>(() => {
     try {
@@ -139,35 +141,47 @@ export default function App() {
           </p>
         </div>
 
-        {/* Navigation Tabs (Image / Voice / History) */}
-        <div className="flex justify-center p-1.5 bg-slate-900/90 border border-slate-800 rounded-2xl max-w-md mx-auto mb-8 shadow-inner">
+        {/* Navigation Tabs (Image / Voice / Chat / History) */}
+        <div className="flex justify-center p-1.5 bg-slate-900/90 border border-slate-800 rounded-2xl max-w-xl mx-auto mb-8 shadow-inner overflow-x-auto gap-1">
           <button
             onClick={() => setActiveTab('image')}
-            className={`w-1/2 py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer ${
+            className={`flex-1 min-w-[100px] py-2.5 px-3 rounded-xl font-bold text-xs sm:text-sm transition-all duration-300 flex items-center justify-center gap-1.5 sm:gap-2 cursor-pointer ${
               activeTab === 'image'
                 ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg shadow-indigo-600/30'
                 : 'text-slate-400 hover:text-white'
             }`}
           >
-            <ImageIcon className="w-4 h-4" />
-            <span>{lang === 'bn' ? 'টেক্সট টু ইমেজ' : 'Text to Image'}</span>
+            <ImageIcon className="w-4 h-4 shrink-0" />
+            <span className="truncate">{lang === 'bn' ? 'টেক্সট টু ইমেজ' : 'Text to Image'}</span>
           </button>
 
           <button
             onClick={() => setActiveTab('voice')}
-            className={`w-1/2 py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer ${
+            className={`flex-1 min-w-[100px] py-2.5 px-3 rounded-xl font-bold text-xs sm:text-sm transition-all duration-300 flex items-center justify-center gap-1.5 sm:gap-2 cursor-pointer ${
               activeTab === 'voice'
                 ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg shadow-indigo-600/30'
                 : 'text-slate-400 hover:text-white'
             }`}
           >
-            <Mic className="w-4 h-4" />
-            <span>{lang === 'bn' ? 'টেক্সট টু ভয়েস' : 'Text to Voice'}</span>
+            <Mic className="w-4 h-4 shrink-0" />
+            <span className="truncate">{lang === 'bn' ? 'টেক্সট টু ভয়েস' : 'Text to Voice'}</span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab('chat')}
+            className={`flex-1 min-w-[110px] py-2.5 px-3 rounded-xl font-bold text-xs sm:text-sm transition-all duration-300 flex items-center justify-center gap-1.5 sm:gap-2 cursor-pointer ${
+              activeTab === 'chat'
+                ? 'bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white shadow-lg shadow-indigo-600/30'
+                : 'text-slate-400 hover:text-white'
+            }`}
+          >
+            <MessageSquare className="w-4 h-4 shrink-0 text-pink-400" />
+            <span className="truncate">{lang === 'bn' ? 'এআই প্রশ্ন-উত্তর' : 'AI Chat Q&A'}</span>
           </button>
 
           <button
             onClick={() => setActiveTab('history')}
-            className={`px-3 py-2.5 rounded-xl font-semibold text-xs sm:text-sm transition-all duration-300 flex items-center justify-center gap-1.5 cursor-pointer ${
+            className={`px-3 py-2.5 rounded-xl font-semibold text-xs sm:text-sm transition-all duration-300 flex items-center justify-center gap-1.5 cursor-pointer shrink-0 ${
               activeTab === 'history'
                 ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg shadow-indigo-600/30'
                 : 'text-slate-400 hover:text-white'
@@ -198,7 +212,12 @@ export default function App() {
           />
         )}
 
-        {/* Tab 3: History Gallery */}
+        {/* Tab 3: AI Chat Q&A Studio */}
+        {activeTab === 'chat' && (
+          <ChatStudio lang={lang} />
+        )}
+
+        {/* Tab 4: History Gallery */}
         {activeTab === 'history' && (
           <HistoryGallery
             lang={lang}
@@ -216,7 +235,7 @@ export default function App() {
         </div>
 
         {/* Features Showcase Highlights */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 my-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 my-8">
           <div className="glass-card p-5 rounded-2xl border border-slate-800 space-y-2">
             <div className="w-9 h-9 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400">
               <Zap className="w-5 h-5" />
@@ -226,8 +245,8 @@ export default function App() {
             </h3>
             <p className="text-xs text-slate-400 leading-relaxed">
               {lang === 'bn'
-                ? 'কোনো ক্রেডিট কার্ড বা মাসিক ফি নেই। যত খুশি ছবি ও ভয়েসওভার তৈরি করুন।'
-                : 'No credit card or recurring fees required. Generate art and voiceovers freely.'}
+                ? 'কোনো ক্রেডিট কার্ড বা মাসিক ফি নেই। যত খুশি ছবি, ভয়েস ও চ্যাট ব্যবহার করুন।'
+                : 'No credit card or recurring fees required. Unlimited images, voices and chats.'}
             </p>
           </div>
 
@@ -256,6 +275,20 @@ export default function App() {
               {lang === 'bn'
                 ? 'সুস্পষ্ট বাংলা উচ্চারণ, গতি ও পিচ নিয়ন্ত্রণ এবং সরাসরি অডিও ডাউনলোড সুবিধা।'
                 : 'Natural Bangla and English accents with speed, pitch controls and audio file download.'}
+            </p>
+          </div>
+
+          <div className="glass-card p-5 rounded-2xl border border-slate-800 space-y-2">
+            <div className="w-9 h-9 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
+              <MessageSquare className="w-5 h-5" />
+            </div>
+            <h3 className="text-sm font-bold text-slate-200">
+              {lang === 'bn' ? 'তাৎক্ষণিক সঠিক উত্তর' : 'Instant AI Q&A'}
+            </h3>
+            <p className="text-xs text-slate-400 leading-relaxed">
+              {lang === 'bn'
+                ? 'যেকোনো সাধারণ জ্ঞান, পড়াশোনা, টেকনোলজি বা জীবনযাত্রার সঠিক উত্তর এক সেকেন্ডে।'
+                : 'Ask any question on science, study, tech or life and get accurate instant replies.'}
             </p>
           </div>
         </div>

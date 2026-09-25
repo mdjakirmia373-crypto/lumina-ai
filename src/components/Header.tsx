@@ -1,12 +1,12 @@
 import React from 'react';
-import { Sparkles, Globe, Zap, History, Image as ImageIcon, Mic } from 'lucide-react';
+import { Sparkles, Globe, Zap, History, Image as ImageIcon, Mic, MessageSquare } from 'lucide-react';
 import { Language } from '../types';
 
 interface HeaderProps {
   lang: Language;
   onToggleLang: () => void;
-  activeTab: 'image' | 'voice' | 'history';
-  onTabChange: (tab: 'image' | 'voice' | 'history') => void;
+  activeTab: 'image' | 'voice' | 'chat' | 'history';
+  onTabChange: (tab: 'image' | 'voice' | 'chat' | 'history') => void;
   historyCount: number;
 }
 
@@ -38,7 +38,7 @@ export const Header: React.FC<HeaderProps> = ({
               </span>
             </div>
             <p className="text-[11px] text-slate-400 hidden sm:block">
-              {lang === 'bn' ? 'লুমিনা এআই · ফ্রি ইমেজ ও ভয়েস ক্রিয়েটর' : 'LuminaAI · Free Image & Voice Generator'}
+              {lang === 'bn' ? 'লুমিনা এআই · ফ্রি ইমেজ, ভয়েস ও চ্যাট' : 'LuminaAI · Free Image, Voice & Chat'}
             </p>
           </div>
         </div>
@@ -67,6 +67,18 @@ export const Header: React.FC<HeaderProps> = ({
           >
             <Mic className="w-3.5 h-3.5" />
             <span>{lang === 'bn' ? 'টেক্সট টু ভয়েস' : 'Text to Voice'}</span>
+          </button>
+
+          <button
+            onClick={() => onTabChange('chat')}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 ${
+              activeTab === 'chat'
+                ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-md shadow-indigo-600/30'
+                : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
+            }`}
+          >
+            <MessageSquare className="w-3.5 h-3.5" />
+            <span>{lang === 'bn' ? 'এআই প্রশ্ন-উত্তর' : 'AI Chat Q&A'}</span>
           </button>
 
           <button
