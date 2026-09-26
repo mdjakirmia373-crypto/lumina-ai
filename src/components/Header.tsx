@@ -9,6 +9,7 @@ import {
   ShieldCheck
 } from 'lucide-react';
 import { Language, UserAccount } from '../types';
+import { LumiqraLogo } from './LumiqraLogo';
 
 interface HeaderProps {
   lang: Language;
@@ -47,21 +48,9 @@ export const Header: React.FC<HeaderProps> = ({
           {/* Brand */}
           <div 
             onClick={() => onTabChange('image')} 
-            className="flex items-center space-x-2.5 cursor-pointer group"
+            className="cursor-pointer group"
           >
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-600/25 group-hover:scale-105 transition-transform duration-200">
-              <Sparkles className="w-4 h-4 text-white animate-pulse" />
-            </div>
-            <div>
-              <div className="flex items-center gap-1.5">
-                <span className="text-lg font-extrabold tracking-tight gradient-text">
-                  Lumiqra
-                </span>
-                <span className="text-[9px] uppercase font-bold tracking-wider px-1.5 py-0.5 rounded bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
-                  AI
-                </span>
-              </div>
-            </div>
+            <LumiqraLogo size="md" />
           </div>
         </div>
 

@@ -23,7 +23,7 @@ interface AuthModalProps {
   allowClose?: boolean;
 }
 
-const STORAGE_USERS_KEY = 'lumina_ai_users_db_v1';
+const STORAGE_USERS_KEY = 'lumiqra_ai_users_db_v1';
 
 export const AuthModal: React.FC<AuthModalProps> = ({
   lang,

@@ -2,6 +2,7 @@ import React from 'react';
 import { Sparkles, Shield, Heart, Zap, FileText, Info, Mail, AlertTriangle } from 'lucide-react';
 import { Language } from '../types';
 import { PolicyTab } from './PolicyModal';
+import { LumiqraLogo } from './LumiqraLogo';
 
 interface FooterProps {
   lang: Language;
@@ -13,18 +14,13 @@ export const Footer: React.FC<FooterProps> = ({ lang, onOpenPolicy }) => {
     <footer className="border-t border-slate-800/80 bg-slate-950 py-10 mt-12 text-slate-400 text-xs">
       <div className="max-w-6xl mx-auto px-4 space-y-8">
         <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-          {/* Brand & info */}
-          <div className="flex flex-col items-center md:items-start space-y-2 text-center md:text-left">
-            <div className="flex items-center space-x-2">
-              <div className="w-7 h-7 rounded-lg bg-indigo-600 flex items-center justify-center">
-                <Sparkles className="w-4 h-4 text-white" />
-              </div>
-              <span className="text-base font-extrabold text-white">Lumiqra AI Studio</span>
-            </div>
-            <p className="text-slate-500 max-w-sm text-[11px]">
+          {/* Brand & info with official Lumiqra Logo */}
+          <div className="flex flex-col items-center md:items-start space-y-2.5 text-center md:text-left">
+            <LumiqraLogo size="sm" />
+            <p className="text-slate-400 max-w-sm text-[12px] leading-relaxed">
               {lang === 'bn'
-                ? 'Lumiqra AI - বাংলা ও ইংরেজির জন্য ১০০% ফ্রি এআই ইমেজ জেনারেটর, ভয়েসওভার ও স্মার্ট চ্যাট স্টুডিও।'
-                : 'Lumiqra AI - 100% Free AI Image, Voice & Chat Studio for creators worldwide.'}
+                ? 'Lumiqra AI (লুমিক্রা এআই) — বাংলা ও ইংরেজির জন্য ১০০% ফ্রি এআই ইমেজ জেনারেটর, ভয়েসওভার ও স্মার্ট চ্যাট সহকারী।'
+                : 'Lumiqra AI — 100% Free AI Image, Voice & Universal Chat Assistant for creators worldwide.'}
             </p>
           </div>
 
@@ -90,7 +86,7 @@ export const Footer: React.FC<FooterProps> = ({ lang, onOpenPolicy }) => {
           </div>
 
           <div className="text-center sm:text-right text-[11px] text-slate-500">
-            <p>© {new Date().getFullYear()} Lumiqra AI Studio. All rights reserved.</p>
+            <p>© {new Date().getFullYear()} Lumiqra AI. All rights reserved.</p>
           </div>
         </div>
       </div>

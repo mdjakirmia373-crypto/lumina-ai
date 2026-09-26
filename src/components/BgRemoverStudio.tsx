@@ -206,7 +206,7 @@ export const BgRemoverStudio: React.FC<BgRemoverStudioProps> = ({ lang }) => {
     if (!processedSrc) return;
     const a = document.createElement('a');
     a.href = processedSrc;
-    a.download = `lumina_nobg_${Date.now()}.png`;
+    a.download = `lumiqra_nobg_${Date.now()}.png`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);

@@ -177,7 +177,7 @@ async function startServer() {
   }
 
   app.listen(port, () => {
-    console.log(`LuminaAI Full-Stack Server running on port ${port}`);
+    console.log(`Lumiqra AI Full-Stack Server running on port ${port}`);
   });
 }
 

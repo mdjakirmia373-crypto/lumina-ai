@@ -14,6 +14,7 @@ import {
   Globe
 } from 'lucide-react';
 import { Language, UserAccount } from '../types';
+import { LumiqraLogo } from './LumiqraLogo';
 
 interface SidebarProps {
   lang: Language;
@@ -114,23 +115,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
       >
         {/* Top Header Logo */}
         <div className="p-5 border-b border-slate-800/80">
-          <div className="flex items-center space-x-3 group cursor-pointer" onClick={() => onTabChange('image')}>
-            <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-purple-600 flex items-center justify-center text-white shadow-lg shadow-indigo-600/30 group-hover:scale-105 transition-transform duration-200">
-              <Sparkles className="w-5 h-5 animate-pulse" />
-            </div>
-            <div>
-              <div className="flex items-center gap-1.5">
-                <span className="text-xl font-extrabold tracking-tight gradient-text">
-                  Lumiqra
-                </span>
-                <span className="text-[10px] uppercase font-bold tracking-wider px-1.5 py-0.5 rounded bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
-                  AI
-                </span>
-              </div>
-              <p className="text-[11px] text-slate-400">
-                {lang === 'bn' ? 'গুগল এআই স্টুডিও স্টাইল' : 'Google AI Studio Style'}
-              </p>
-            </div>
+          <div className="group cursor-pointer" onClick={() => onTabChange('image')}>
+            <LumiqraLogo size="md" />
+            <p className="text-[11px] text-slate-400 mt-2 pl-0.5">
+              {lang === 'bn' ? 'গুগল এআই স্টুডিও অনুপ্রাণিত ক্রিয়েটর' : 'Google AI Studio Inspired Suite'}
+            </p>
           </div>
         </div>
 
