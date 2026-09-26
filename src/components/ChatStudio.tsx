@@ -25,6 +25,34 @@ interface Message {
   timestamp: Date;
 }
 
+const SUGGESTED_PROMPTS = [
+  {
+    icon: '📖',
+    bn: 'পবিত্র কুরআনের আয়াতুল কুরসীর বাংলা অর্থ ও ফজিলত কি?',
+    en: 'What is the meaning and significance of Ayatul Kursi in the Quran?',
+  },
+  {
+    icon: '🌌',
+    bn: 'মহাবিশ্ব কিভাবে সৃষ্টি হয়েছে? বিজ্ঞান কি বলে?',
+    en: 'How was the universe created? What does science say?',
+  },
+  {
+    icon: '💻',
+    bn: 'নতুনদের জন্য প্রোগ্রামিং ও কোডিং শেখার সেরা উপায় কি?',
+    en: 'What is the best way for beginners to learn programming?',
+  },
+  {
+    icon: '📜',
+    bn: 'ধৈর্য ও সফলতার ওপর একটি শিক্ষণীয় গল্প বলো',
+    en: 'Tell an inspiring educational story about patience & perseverance.',
+  },
+  {
+    icon: '🌿',
+    bn: 'সুস্থ থাকতে প্রতিদিনের ৫টি গুরুত্বপূর্ণ স্বাস্থ্য পরামর্শ দাও',
+    en: 'Give 5 essential daily health tips to stay fit and energized.',
+  },
+];
+
 export const ChatStudio: React.FC<ChatStudioProps> = ({ lang }) => {
   const [messages, setMessages] = useState<Message[]>([
     {
@@ -32,8 +60,8 @@ export const ChatStudio: React.FC<ChatStudioProps> = ({ lang }) => {
       role: 'assistant',
       content:
         lang === 'bn'
-          ? 'আসসালামু আলাইকুম! আমি আপনার লুমিনা এআই (LuminaAI) চ্যাট অ্যাসিস্ট্যান্ট। আপনি বাংলা, ইংরেজি, আরবি, হিন্দি কিংবা পৃথিবীর যেকোনো ভাষায় প্রশ্ন করতে পারেন — আমি সাথে সাথে সেই ভাষাতেই সঠিক ও স্পষ্ট উত্তর দিয়ে দেব!'
-          : 'Hello! I am your LuminaAI Chat Assistant. You can ask me in ANY language (English, Bangla, Arabic, Hindi, Spanish, etc.) — I will answer accurately and instantly in that same language!',
+          ? 'আসসালামু আলাইকুম! আমি **লুমিক্রা এআই (Lumiqra AI)** — আপনার সর্বজ্ঞানী এআই সহায়ক।\n\n📖 **পবিত্র কুরআনুল কারীম:** ১১৪টি সূরার আয়াত, অর্থ, শানে নুযূল, তাফসীর, হাদীস ও ইসলামিক ইতিহাস।\n🌌 **মহাবিশ্ব ও বিজ্ঞান:** পদার্থবিজ্ঞান, রসায়ন, জীববিজ্ঞান, মহাকাশ, চিকিৎসা ও স্বাস্থ্য।\n💻 **প্রযুক্তি ও গণিত:** কম্পিউটার প্রোগ্রামিং (Python, JS, C++), কোডিং সমাধান ও গণিত।\n📜 **সাহিত্য ও সৃষ্টিশীলতা:** গল্প, কবিতা, প্রবন্ধ ও যেকোনো সৃজনশীল লেখালেখি।\n\nপৃথিবীর যেকোনো বিষয়ে যেকোনো ভাষায় প্রশ্ন করুন — আমি সর্বোচ্চ নির্ভুলতা ও সম্মানের সাথে বিস্তারিত উত্তর প্রস্তুত করে দেব!'
+          : 'Hello! I am **Lumiqra AI** — your universal, encyclopedic AI Assistant.\n\n📖 **The Holy Quran & Islamic Sciences:** Surahs, verses, tafseer, Hadith, and Islamic history.\n🌌 **Science & Cosmos:** Physics, astronomy, biology, chemistry, and health sciences.\n💻 **Coding & Mathematics:** Programming in Python, JavaScript, React, algorithms, and math problem-solving.\n📜 **Creative Writing:** Stories, poetry, essays, and translations in all languages.\n\nAsk me anything in any language — I am here to provide accurate, comprehensive, and well-structured answers!',
       timestamp: new Date(),
     },
   ]);
@@ -133,7 +161,7 @@ export const ChatStudio: React.FC<ChatStudioProps> = ({ lang }) => {
           <div>
             <h2 className="text-base font-bold text-slate-100 flex items-center gap-2">
               <span className="bg-gradient-to-r from-blue-400 via-purple-300 to-pink-300 bg-clip-text text-transparent">
-                {lang === 'bn' ? 'লুমিনা এআই চ্যাট (ChatGPT & Gemini স্টাইল)' : 'LuminaAI Smart Chat (Gemini Style)'}
+                {lang === 'bn' ? 'লুমিক্রা এআই চ্যাট (ChatGPT & Gemini স্টাইল)' : 'Lumiqra AI Smart Chat (Gemini Style)'}
               </span>
               <span className="text-[10px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-2 py-0.5 rounded-full font-bold animate-pulse">
                 {lang === 'bn' ? '১ সেকেন্ডে উত্তর' : 'Instant Reply'}
@@ -245,6 +273,25 @@ export const ChatStudio: React.FC<ChatStudioProps> = ({ lang }) => {
         )}
 
         <div ref={messagesEndRef} />
+      </div>
+
+      {/* Quick Suggested Knowledge Topics */}
+      <div className="flex items-center gap-1.5 overflow-x-auto py-1 px-1 scrollbar-none">
+        <span className="text-[10px] text-slate-500 uppercase font-bold tracking-wider shrink-0 px-1">
+          {lang === 'bn' ? 'জ্ঞানকোষের নমুনা:' : 'Knowledge Samples:'}
+        </span>
+        {SUGGESTED_PROMPTS.map((item, idx) => (
+          <button
+            key={idx}
+            type="button"
+            onClick={() => handleSend(lang === 'bn' ? item.bn : item.en)}
+            disabled={isLoading}
+            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-slate-900/90 hover:bg-indigo-600/20 border border-slate-800 hover:border-indigo-500/40 text-slate-300 hover:text-white text-xs whitespace-nowrap transition shadow-sm cursor-pointer disabled:opacity-50"
+          >
+            <span>{item.icon}</span>
+            <span className="truncate max-w-[220px]">{lang === 'bn' ? item.bn : item.en}</span>
+          </button>
+        ))}
       </div>
 
       {/* Input Box with Arrow Send Button */}

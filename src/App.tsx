@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Header } from './components/Header';
 import { Sidebar } from './components/Sidebar';
 import { AuthModal } from './components/AuthModal';
-import { AdBanner } from './components/AdBanner';
+import { PolicyModal, PolicyTab } from './components/PolicyModal';
+import { CookieBanner } from './components/CookieBanner';
 import { ImageStudio } from './components/ImageStudio';
 import { VoiceStudio } from './components/VoiceStudio';
 import { ChatStudio } from './components/ChatStudio';
@@ -21,7 +22,7 @@ import {
 const STORAGE_KEY_IMAGES = 'ai_studio_images_v1';
 const STORAGE_KEY_VOICES = 'ai_studio_voices_v1';
 const STORAGE_KEY_LANG = 'ai_studio_lang_v1';
-const STORAGE_CURRENT_USER_KEY = 'lumina_ai_current_user_v1';
+const STORAGE_CURRENT_USER_KEY = 'lumiqra_ai_current_user_v1';
 
 export default function App() {
   const [lang, setLang] = useState<Language>(() => {
@@ -32,7 +33,7 @@ export default function App() {
   const [activeTab, setActiveTab] = useState<'image' | 'voice' | 'chat' | 'bg-remover' | 'history'>('image');
   const [isSidebarMobileOpen, setIsSidebarMobileOpen] = useState(false);
 
-  // Authentication State
+  // Authentication State (Never force-block visitors or search engine bots)
   const [currentUser, setCurrentUser] = useState<UserAccount | null>(() => {
     try {
       const savedUser = localStorage.getItem(STORAGE_CURRENT_USER_KEY);
@@ -42,11 +43,16 @@ export default function App() {
     }
   });
 
-  // If user is not logged in, force open Auth modal on first visit
-  const [isAuthModalOpen, setIsAuthModalOpen] = useState<boolean>(() => {
-    const savedUser = localStorage.getItem(STORAGE_CURRENT_USER_KEY);
-    return !savedUser;
-  });
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState<boolean>(false);
+
+  // Policy Modal state for Google AdSense compliance
+  const [isPolicyModalOpen, setIsPolicyModalOpen] = useState(false);
+  const [policyTab, setPolicyTab] = useState<PolicyTab>('privacy');
+
+  const handleOpenPolicy = (tab: PolicyTab) => {
+    setPolicyTab(tab);
+    setIsPolicyModalOpen(true);
+  };
 
   const [recentImages, setRecentImages] = useState<GeneratedImage[]>(() => {
     try {
@@ -167,9 +173,6 @@ export default function App() {
           onToggleSidebar={() => setIsSidebarMobileOpen(!isSidebarMobileOpen)}
         />
 
-        {/* Top AdSense Banner */}
-        <AdBanner placement="top" format="leaderboard" />
-
         {/* Main Content Area */}
         <main className="max-w-4xl mx-auto w-full px-4 py-4 sm:py-6 flex-grow">
           {/* Hero Section */}
@@ -239,11 +242,6 @@ export default function App() {
             />
           )}
 
-          {/* Middle AdSense Banner */}
-          <div className="my-8">
-            <AdBanner placement="middle" format="responsive" />
-          </div>
-
           {/* Features Showcase Highlights */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 my-8">
             <div className="glass-card p-5 rounded-2xl border border-slate-800 space-y-2">
@@ -304,11 +302,25 @@ export default function App() {
           </div>
         </main>
 
-        {/* Bottom AdSense Banner */}
-        <AdBanner placement="bottom" format="leaderboard" />
+        {/* Footer with Google AdSense Compliant Links */}
+        <Footer 
+          lang={lang} 
+          onOpenPolicy={handleOpenPolicy} 
+        />
 
-        {/* Footer */}
-        <Footer lang={lang} />
+        {/* Mandatory Policy & Legal Modal */}
+        <PolicyModal
+          isOpen={isPolicyModalOpen}
+          onClose={() => setIsPolicyModalOpen(false)}
+          lang={lang}
+          initialTab={policyTab}
+        />
+
+        {/* Privacy & Cookie Consent Banner */}
+        <CookieBanner
+          lang={lang}
+          onOpenPrivacy={() => handleOpenPolicy('privacy')}
+        />
       </div>
     </div>
   );

@@ -209,7 +209,7 @@ export const ImageStudio: React.FC<ImageStudioProps> = ({
       const link = document.createElement('a');
       link.href = objectUrl;
       const cleanName = filenamePrompt.slice(0, 25).replace(/[^a-zA-Z0-9\u0980-\u09FF]/g, '_');
-      link.download = `LuminaAI_${cleanName || 'image'}_${Date.now()}.png`;
+      link.download = `LumiqraAI_${cleanName || 'image'}_${Date.now()}.png`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -219,7 +219,7 @@ export const ImageStudio: React.FC<ImageStudioProps> = ({
       const link = document.createElement('a');
       link.href = imgUrl;
       link.target = '_blank';
-      link.download = `LuminaAI_image_${Date.now()}.png`;
+      link.download = `LumiqraAI_image_${Date.now()}.png`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);

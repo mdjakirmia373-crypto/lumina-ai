@@ -142,8 +142,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           </div>
           <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight">
             {mode === 'signup'
-              ? (lang === 'bn' ? 'লুমিনা এআই-তে সাইন আপ করুন' : 'Create LuminaAI Account')
-              : (lang === 'bn' ? 'লুমিনা এআই-তে লগইন করুন' : 'Sign in to LuminaAI')}
+              ? (lang === 'bn' ? 'লুমিক্রা এআই-তে সাইন আপ করুন' : 'Create Lumiqra AI Account')
+              : (lang === 'bn' ? 'লুমিক্রা এআই-তে লগইন করুন' : 'Sign in to Lumiqra AI')}
           </h2>
           <p className="text-xs text-slate-400">
             {mode === 'signup'

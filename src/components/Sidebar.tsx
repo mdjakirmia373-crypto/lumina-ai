@@ -121,10 +121,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
             <div>
               <div className="flex items-center gap-1.5">
                 <span className="text-xl font-extrabold tracking-tight gradient-text">
-                  LuminaAI
+                  Lumiqra
                 </span>
-                <span className="text-[10px] uppercase font-bold tracking-wider px-1.5 py-0.5 rounded bg-blue-500/20 text-blue-300 border border-blue-500/30">
-                  STUDIO
+                <span className="text-[10px] uppercase font-bold tracking-wider px-1.5 py-0.5 rounded bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+                  AI
                 </span>
               </div>
               <p className="text-[11px] text-slate-400">

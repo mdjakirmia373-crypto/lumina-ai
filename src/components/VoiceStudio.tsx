@@ -265,7 +265,7 @@ export const VoiceStudio: React.FC<VoiceStudioProps> = ({
       const a = document.createElement('a');
       a.href = url;
       const cleanSnippet = cleanText.slice(0, 20).replace(/[^a-zA-Z0-9\u0980-\u09FF]/g, '_');
-      a.download = `LuminaAI_Voice_${cleanSnippet || 'audio'}_${Date.now()}.wav`;
+      a.download = `LumiqraAI_Voice_${cleanSnippet || 'audio'}_${Date.now()}.wav`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
