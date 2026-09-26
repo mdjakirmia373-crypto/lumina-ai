@@ -3,59 +3,91 @@ import { StylePreset, AspectRatioOption } from '../types';
 export const STYLE_PRESETS: StylePreset[] = [
   {
     id: 'none',
-    nameBn: 'ন্যাচারাল / ডিফল্ট',
+    nameBn: 'ন্যাচারাল / সাধারণ',
+    shortBn: 'ন্যাচারাল',
     nameEn: 'Natural / Default',
-    promptSuffix: ', clean crisp image, no watermark, no text, no logo',
+    shortEn: 'Natural',
+    tag: 'Clean',
+    promptSuffix: ', clean crisp image, natural colors, high quality, no watermark, no text, no logo',
     icon: 'Sparkles',
+    colorTheme: 'from-blue-500/20 to-cyan-500/20 text-cyan-400 border-cyan-500/40',
   },
   {
     id: 'photorealistic',
-    nameBn: 'ফটোরিয়ালিস্টিক (8K)',
-    nameEn: 'Photorealistic (8K)',
+    nameBn: 'ফটোরিয়ালিস্টিক',
+    shortBn: 'ফটোরিয়ালিস্টিক',
+    nameEn: 'Photorealistic',
+    shortEn: 'Photo 8K',
+    tag: '8K Ultra',
     promptSuffix: ', highly detailed, 8k resolution, photorealistic, cinematic lighting, sharp focus, professional photography, Hasselblad camera, clean composition, no watermark, no text, no logo',
     icon: 'Camera',
+    colorTheme: 'from-amber-500/20 to-orange-500/20 text-amber-400 border-amber-500/40',
   },
   {
     id: 'anime',
-    nameBn: 'অ্যানিমে / মাঙ্গা',
-    nameEn: 'Anime / Manga',
+    nameBn: 'অ্যানিমে ও মাঙ্গা',
+    shortBn: 'অ্যানিমে',
+    nameEn: 'Anime & Manga',
+    shortEn: 'Anime',
+    tag: 'Ghibli',
     promptSuffix: ', vibrant anime style, studio ghibli and makoto shinkai aesthetic, gorgeous line art, colorful aesthetic, high quality illustration, clean render, no watermark, no text, no logo',
     icon: 'Palette',
+    colorTheme: 'from-pink-500/20 to-rose-500/20 text-pink-400 border-pink-500/40',
   },
   {
     id: '3d-render',
-    nameBn: 'থ্রিডি পিক্সার স্টাইল',
+    nameBn: '৩ডি পিক্সার স্টাইল',
+    shortBn: '৩ডি পিক্সার',
     nameEn: '3D Pixar Style',
+    shortEn: '3D Pixar',
+    tag: 'Render',
     promptSuffix: ', cute 3D Pixar Disney animated movie character render, unreal engine 5, octane render, smooth volumetric lighting, adorable detailing, clean, no watermark, no signature, no logo',
     icon: 'Box',
+    colorTheme: 'from-purple-500/20 to-indigo-500/20 text-purple-400 border-purple-500/40',
   },
   {
     id: 'cyberpunk',
     nameBn: 'সাইবারপাঙ্ক নিয়ন',
+    shortBn: 'সাইবারপাঙ্ক',
     nameEn: 'Cyberpunk Neon',
+    shortEn: 'Cyberpunk',
+    tag: 'Neon Glow',
     promptSuffix: ', cyberpunk aesthetic, glowing neon lights, rain reflections, futuristic tech, synthwave vibes, dark atmospheric cinematic, clean, no watermark, no text, no logo',
     icon: 'Zap',
+    colorTheme: 'from-cyan-500/20 to-fuchsia-500/20 text-cyan-400 border-cyan-500/40',
   },
   {
     id: 'digital-art',
     nameBn: 'ডিজিটাল কনসেপ্ট আর্ট',
+    shortBn: 'কনসেপ্ট আর্ট',
     nameEn: 'Digital Concept Art',
+    shortEn: 'Digital Art',
+    tag: 'Concept',
     promptSuffix: ', epic digital concept art, trending on artstation, masterpiece, intricate details, vivid atmospheric colors, breathtaking composition, clean, no watermark, no text, no signature',
     icon: 'Brush',
+    colorTheme: 'from-emerald-500/20 to-teal-500/20 text-emerald-400 border-emerald-500/40',
   },
   {
     id: 'oil-painting',
-    nameBn: 'ভিন্টেজ অয়েল পেইন্টিং',
+    nameBn: 'ভিন্টেজ অয়েল পেইন্ট',
+    shortBn: 'অয়েল পেইন্ট',
     nameEn: 'Vintage Oil Painting',
+    shortEn: 'Oil Canvas',
+    tag: 'Classic',
     promptSuffix: ', classical oil on canvas painting, visible textured brushstrokes, fine art masterpiece, dramatic chiaroscuro lighting, clean canvas, no watermark, no text, no signature',
     icon: 'Feather',
+    colorTheme: 'from-yellow-600/20 to-amber-700/20 text-yellow-400 border-yellow-500/40',
   },
   {
     id: 'cinematic',
     nameBn: 'সিনেমাটিক ফিল্ম',
+    shortBn: 'সিনেমাটিক',
     nameEn: 'Cinematic Film',
+    shortEn: 'Cinematic',
+    tag: '35mm Film',
     promptSuffix: ', 35mm film still, Kodak Portra 400 color grading, cinematic depth of field, anamorphic lens flare, movie shot, pristine, no watermark, no text, no logo',
     icon: 'Film',
+    colorTheme: 'from-violet-500/20 to-sky-500/20 text-violet-400 border-violet-500/40',
   },
 ];
 
@@ -102,31 +134,79 @@ export const ASPECT_RATIOS: AspectRatioOption[] = [
   },
 ];
 
-export const SAMPLE_PROMPTS = [
+export interface SamplePromptItem {
+  id: string;
+  emoji: string;
+  labelBn: string;
+  labelEn: string;
+  bn: string;
+  en: string;
+  category: string;
+}
+
+export const SAMPLE_PROMPTS: SamplePromptItem[] = [
   {
+    id: 'tiger',
+    emoji: '🐅',
+    labelBn: 'সুন্দরবন বাঘ',
+    labelEn: 'Bengal Tiger',
     bn: 'সোনালী সূর্যাস্তে সুন্দরবনের গভীর অরণ্যে রাজকীয় রয়েল বেঙ্গল টাইগার, সিনেমাটিক লাইটিং, 8K',
     en: 'Royal Bengal Tiger walking gracefully in the golden sunset mist of Sundarbans mangrove forest, 8k cinematic lighting',
     category: 'Nature',
   },
   {
+    id: 'cyberpunk',
+    emoji: '🌆',
+    labelBn: 'সাইবার ঢাকা',
+    labelEn: 'Cyber Dhaka',
     bn: 'ভবিষ্যতের সাইবারপাঙ্ক ঢাকা শহর, উড়ন্ত রিকশা ও হাতিরঝিলে রঙিন নিয়ন আলোর প্রতিবিম্ব',
     en: 'Futuristic cyberpunk Dhaka metropolis in 2085, flying high-tech rickshaws, glowing neon reflections on the lake',
     category: 'Sci-Fi',
   },
   {
+    id: 'bride',
+    emoji: '👰',
+    labelBn: 'বাঙালি কনে',
+    labelEn: 'Bengali Bride',
     bn: 'ঐতিহ্যবাহী লাল বেনারসি শাড়ি পরিহিত হাসিমুখ বাঙালি কনে, রাজকীয় প্রতিকৃতি, সফট ড্রামাটিক আলো',
     en: 'A gorgeous Bengali bride wearing traditional red and gold Benarasi sari, royal wedding portrait, warm ambient lighting',
     category: 'Portrait',
   },
   {
+    id: 'cat',
+    emoji: '🐱',
+    labelBn: 'কিউট ক্যাফে বিড়াল',
+    labelEn: 'Cozy Cat Cafe',
     bn: 'একটি চশমা পরা কিউট তুলতুলে বিড়াল আরামদায়ক বইয়ের ক্যাফেতে কফি খাচ্ছে, 3D অ্যানিমেশন স্টাইল',
     en: 'A cute fluffy cat wearing spectacles sipping hot coffee in a cozy book cafe, cute 3D Pixar character style',
     category: '3D Art',
   },
   {
+    id: 'castle',
+    emoji: '🏰',
+    labelBn: 'আকাশ দুর্গ ও ড্রাগন',
+    labelEn: 'Sky Castle',
     bn: 'মেঘের ওপরে ভাসমান প্রাচীন দুর্গের ওপর রামধনু ও ড্রাগন, রূপকথার জাদুকরী ল্যান্ডস্কেপ',
     en: 'Mythical fantasy castle floating above pink and purple clouds with a friendly dragon, sunset dreamscape',
     category: 'Fantasy',
+  },
+  {
+    id: 'astronaut',
+    emoji: '🚀',
+    labelBn: 'মহাকাশচারী',
+    labelEn: 'Astronaut',
+    bn: 'দূরবর্তী গ্যালাক্সির রঙিন নীহারিকার সামনে ভাসমান স্পেসস্যুট পরা নভোচারী, মহাজাগতিক রহস্য',
+    en: 'An astronaut exploring an alien world under a colorful nebula and binary stars, cinematic space photography',
+    category: 'Sci-Fi',
+  },
+  {
+    id: 'rain',
+    emoji: '🌧️',
+    labelBn: 'বৃষ্টিভেজা গ্রাম',
+    labelEn: 'Monsoon Village',
+    bn: 'বৃষ্টিভেজা সবুজ বাংলাদেশের চিরচেনা শান্ত পল্লীগ্রাম, কাদামাটির পথ ও শাপলা ফোটা বিল',
+    en: 'Monsoon in a serene rural Bangladeshi village, rain drizzling over green paddy fields and water lilies, cinematic',
+    category: 'Nature',
   },
 ];
 

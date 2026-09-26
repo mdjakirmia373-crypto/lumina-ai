@@ -18,7 +18,13 @@ import {
   SendHorizontal,
   Layers,
   Palette,
-  Ratio
+  Ratio,
+  Camera,
+  Box,
+  Zap,
+  Brush,
+  Feather,
+  Film
 } from 'lucide-react';
 import { Language, GeneratedImage } from '../types';
 import { STYLE_PRESETS, ASPECT_RATIOS, SAMPLE_PROMPTS } from '../utils/presets';
@@ -252,6 +258,29 @@ export const ImageStudio: React.FC<ImageStudioProps> = ({
     }
   };
 
+  const renderStyleIcon = (iconName: string) => {
+    switch (iconName) {
+      case 'Sparkles':
+        return <Sparkles className="w-4 h-4" />;
+      case 'Camera':
+        return <Camera className="w-4 h-4" />;
+      case 'Palette':
+        return <Palette className="w-4 h-4" />;
+      case 'Box':
+        return <Box className="w-4 h-4" />;
+      case 'Zap':
+        return <Zap className="w-4 h-4" />;
+      case 'Brush':
+        return <Brush className="w-4 h-4" />;
+      case 'Feather':
+        return <Feather className="w-4 h-4" />;
+      case 'Film':
+        return <Film className="w-4 h-4" />;
+      default:
+        return <Sparkles className="w-4 h-4" />;
+    }
+  };
+
   return (
     <div className="space-y-8">
       {/* Lightbox Modal */}
@@ -368,30 +397,51 @@ export const ImageStudio: React.FC<ImageStudioProps> = ({
           </div>
         </div>
 
-        {/* Quick Sample Prompts Category Chips */}
-        <div className="space-y-1.5">
-          <span className="text-[11px] font-medium text-slate-400 flex items-center gap-1.5">
-            <span>💡</span>
-            <span>{lang === 'bn' ? 'রেডিমেড আইডিয়া (ক্লিক করে সহজে ট্রাই করুন):' : 'Ready Prompts (Click to try):'}</span>
-          </span>
-          <div className="flex flex-wrap gap-1.5">
-            {SAMPLE_PROMPTS.map((sample, idx) => (
+        {/* Quick Sample Prompts Ribbon: Sleek, horizontal swipeable chip list */}
+        <div className="space-y-2">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-semibold text-slate-300 flex items-center gap-1.5">
+              <span className="text-amber-400">💡</span>
+              <span>{lang === 'bn' ? 'রেডিমেড প্রম্পট আইডিয়া' : 'Quick Prompt Ideas'}</span>
+              <span className="hidden sm:inline text-[11px] text-slate-500 font-normal">
+                {lang === 'bn' ? '(ক্লিক করে ট্রাই করুন)' : '(Click to try)'}
+              </span>
+            </span>
+            <button
+              type="button"
+              onClick={handleSurpriseMe}
+              className="text-[11px] text-indigo-400 hover:text-indigo-300 flex items-center gap-1 bg-indigo-500/10 hover:bg-indigo-500/20 px-2 py-0.5 rounded-lg border border-indigo-500/20 transition cursor-pointer"
+            >
+              <RotateCw className="w-3 h-3" />
+              <span>{lang === 'bn' ? 'অন্য আইডিয়া' : 'Shuffle'}</span>
+            </button>
+          </div>
+
+          {/* Smooth horizontal scroll ribbon without massive screen clogging */}
+          <div className="flex items-center gap-2 overflow-x-auto pb-1.5 scrollbar-none snap-x -mx-1 px-1">
+            {SAMPLE_PROMPTS.map((sample) => (
               <button
-                key={idx}
+                key={sample.id}
                 type="button"
                 onClick={() => setPrompt(lang === 'bn' ? sample.bn : sample.en)}
-                className="text-xs text-left bg-slate-800/70 hover:bg-indigo-900/40 hover:text-indigo-200 hover:border-indigo-500/50 text-slate-300 px-3 py-1.5 rounded-xl border border-slate-700/60 transition-all line-clamp-1 max-w-full"
+                className="shrink-0 snap-start flex items-center gap-2 text-xs bg-slate-900/90 hover:bg-indigo-950/60 text-slate-300 hover:text-white px-3.5 py-2 rounded-xl border border-slate-800 hover:border-indigo-500/50 hover:shadow-md hover:shadow-indigo-500/10 transition-all duration-200 group active:scale-95 cursor-pointer"
+                title={lang === 'bn' ? sample.bn : sample.en}
               >
-                {lang === 'bn' ? sample.bn.slice(0, 36) + '...' : sample.en.slice(0, 40) + '...'}
+                <span className="text-base group-hover:scale-125 transition-transform duration-200">
+                  {sample.emoji}
+                </span>
+                <span className="font-medium whitespace-nowrap">
+                  {lang === 'bn' ? sample.labelBn : sample.labelEn}
+                </span>
               </button>
             ))}
           </div>
         </div>
 
-        {/* Categories Section - Gemini Inspired Sleek Cards */}
-        <div className="space-y-5 pt-2">
-          {/* Style Selection */}
-          <div className="space-y-2.5">
+        {/* Categories Section */}
+        <div className="space-y-6 pt-1">
+          {/* Style Selection - Professional Visual Studio Cards */}
+          <div className="space-y-3">
             <div className="flex items-center justify-between">
               <label className="text-xs font-semibold text-slate-200 flex items-center gap-2">
                 <div className="w-5 h-5 rounded-md bg-blue-500/20 text-blue-400 flex items-center justify-center">
@@ -403,6 +453,7 @@ export const ImageStudio: React.FC<ImageStudioProps> = ({
                 {STYLE_PRESETS.find(s => s.id === selectedStyle)?.[lang === 'bn' ? 'nameBn' : 'nameEn']}
               </span>
             </div>
+
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
               {STYLE_PRESETS.map((preset) => {
                 const isSelected = selectedStyle === preset.id;
@@ -411,18 +462,51 @@ export const ImageStudio: React.FC<ImageStudioProps> = ({
                     key={preset.id}
                     type="button"
                     onClick={() => setSelectedStyle(preset.id)}
-                    className={`p-3 rounded-2xl text-left border text-xs font-medium transition-all duration-200 flex items-center gap-2.5 group cursor-pointer ${
+                    className={`relative p-3 rounded-2xl text-left border transition-all duration-200 group cursor-pointer flex flex-col justify-between overflow-hidden ${
                       isSelected
-                        ? 'bg-gradient-to-r from-blue-600/25 via-indigo-600/25 to-purple-600/25 border-blue-400 text-white shadow-lg shadow-blue-500/10 ring-1 ring-blue-400/40'
-                        : 'bg-slate-900/70 border-slate-800 text-slate-400 hover:text-slate-100 hover:border-slate-700 hover:bg-slate-800/60'
+                        ? 'bg-gradient-to-br from-indigo-900/50 via-slate-900/90 to-purple-900/40 border-indigo-400/90 shadow-lg shadow-indigo-500/20 ring-2 ring-indigo-500/40'
+                        : 'bg-slate-900/80 border-slate-800 text-slate-300 hover:text-white hover:border-slate-700 hover:bg-slate-800/60'
                     }`}
                   >
-                    <span className={`w-2.5 h-2.5 rounded-full shrink-0 transition-transform duration-200 ${
-                      isSelected ? 'bg-gradient-to-r from-blue-400 to-indigo-400 ring-4 ring-blue-500/30 scale-110' : 'bg-slate-700 group-hover:bg-slate-500'
-                    }`} />
-                    <span className="truncate font-semibold">
-                      {lang === 'bn' ? preset.nameBn : preset.nameEn}
-                    </span>
+                    {/* Top Row: Icon Badge + Tag / Checkmark */}
+                    <div className="flex items-center justify-between w-full mb-2">
+                      <div className={`w-8 h-8 rounded-xl flex items-center justify-center transition-all ${
+                        isSelected
+                          ? 'bg-indigo-500 text-white shadow-md shadow-indigo-500/40 scale-105'
+                          : 'bg-slate-800/90 text-slate-400 group-hover:text-indigo-300 group-hover:bg-slate-700/80'
+                      }`}>
+                        {renderStyleIcon(preset.icon)}
+                      </div>
+
+                      <div className="flex items-center gap-1.5">
+                        {preset.tag && (
+                          <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-md uppercase tracking-wider ${
+                            isSelected
+                              ? 'bg-indigo-400/20 text-indigo-300 border border-indigo-400/30'
+                              : 'bg-slate-800/80 text-slate-400 border border-slate-700/60'
+                          }`}>
+                            {preset.tag}
+                          </span>
+                        )}
+                        {isSelected && (
+                          <div className="w-4 h-4 rounded-full bg-indigo-500 text-white flex items-center justify-center shadow-sm">
+                            <Check className="w-2.5 h-2.5 stroke-[3]" />
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Bottom Row: Style Name & Sub-label */}
+                    <div className="w-full">
+                      <div className={`font-semibold text-xs leading-snug transition-colors ${
+                        isSelected ? 'text-white' : 'text-slate-200 group-hover:text-white'
+                      }`}>
+                        {lang === 'bn' ? (preset.shortBn || preset.nameBn) : (preset.shortEn || preset.nameEn)}
+                      </div>
+                      <div className="text-[10px] text-slate-400 mt-0.5 truncate">
+                        {lang === 'bn' ? preset.nameEn : preset.nameBn}
+                      </div>
+                    </div>
                   </button>
                 );
               })}

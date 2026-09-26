@@ -4,8 +4,12 @@ export interface StylePreset {
   id: string;
   nameBn: string;
   nameEn: string;
+  shortBn?: string;
+  shortEn?: string;
+  tag?: string;
   promptSuffix: string;
   icon: string;
+  colorTheme?: string;
 }
 
 export interface AspectRatioOption {
