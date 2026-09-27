@@ -2,7 +2,7 @@
 // Features:
 // 1. Instant built-in Knowledge Engine (<0.001s response for Quran, Islam, Science, History, Creator)
 // 2. Full-stack Gemini API endpoint (/api/chat) on Server & Vercel
-// 3. Client-side browser AI engine (Puter.js) for static hosting like Vercel
+// 3. ZERO unwanted third-party popups (No Puter, No OAuth redirects)
 // 4. Guaranteed answer for ANY question in the world, in any language!
 
 interface ChatMessage {
@@ -175,7 +175,7 @@ export function checkUniversalKnowledge(rawQuery: string): string | null {
 - *অর্থ:* পাঠ করুন, আর আপনার প্রতিপালক পরম দয়ালু।
 ৪. **الَّذِي عَلَّمَ بِالْقَلَمِ** (আল্লাযী আল্লামা বিল ক্বালাম)
 - *অর্থ:* যিনি কলমের সাহায্যে শিক্ষা দিয়েছেন।
-৫. **عَلَّمَ الْإِنسَانَ مَا لَمْ يَعْلَمْ** (আল্লামাল ইনসানা মা লাম ইয়া'লাম)
+৫. **عَلَّمَ الْإِنسَانَ مَا লَمْ يَعْلَمْ** (আল্লামাল ইনসানা মা লাম ইয়া'লাম)
 - *অর্থ:* মানুষকে শিক্ষা দিয়েছেন যা সে জানত না।
 
 📍 **স্থান ও সময়:** মক্কার জাবালে নূর পর্বতের **হেরা গুহায়** ৬১০ খ্রিষ্টাব্দের পবিত্র রমজান মাসের শবে কদরের রাতে হযরত জিবরাইল (আ.)-এর মাধ্যমে বিশ্বনবী হযরত মুহাম্মদ (সা.)-এর ওপর এই আয়াতগুলো সর্বপ্রথম নাযিল হয়।`;
@@ -244,7 +244,7 @@ export function checkUniversalKnowledge(rawQuery: string): string | null {
 
 ১. **ফজর:** সুবহে সাদিক থেকে সূর্যোদয়ের পূর্ব পর্যন্ত (২ রাকাত সুন্নত, ২ রাকাত ফরজ)।
 ২. **যোহর:** দ্বিপ্রহরের পর থেকে আসরের ওয়াক্ত পর্যন্ত (৪ রাকাত সুন্নত, ৪ রাকাত ফরজ, ২ রাকাত সুন্নত, ২ রাকাত নফল)।
-৩. **আসর:** সূর্যের আলো হলুদ হওয়ার পূর্ব পর্যন্ত (৪ রাকাত ফরজ)।
+3. **আসর:** সূর্যের আলো হলুদ হওয়ার পূর্ব পর্যন্ত (৪ রাকাত ফরজ)।
 ৪. **মাগরিব:** সূর্যাস্তের পর থেকে পশ্চিম আকাশে লাল আভা থাকা পর্যন্ত (৩ রাকাত ফরজ, ২ রাকাত সুন্নত, ২ রাকাত নফল)।
 ৫. **এশা:** মাগরিবের সময় শেষ হওয়ার পর থেকে ফজরের আগ পর্যন্ত (৪ রাকাত ফরজ, ২ রাকাত সুন্নত, ৩ রাকাত বিতর)।`;
   }
@@ -259,7 +259,44 @@ export function checkUniversalKnowledge(rawQuery: string): string | null {
 ৪. **হযরত আজরাইল (আ.):** সৃষ্টির প্রাণ বা রূহ কবজ করার (মৃত্যুর) দায়িত্বে নিয়োজিত মালাকুল মাউত।`;
   }
 
-  // 11. বিজ্ঞান: পৃথিবী সূর্যের চারদিকে ঘোরে?
+  // 11. বিজ্ঞান: আলোর গতিবেগ
+  if (q.includes('আলোর গতি') || q.includes('speed of light')) {
+    return `শূন্যস্থানে আলোর গতিবেগ হলো প্রতি সেকেন্ডে প্রায় **২,৯৯,৭৯২,৪৫৮ মিটার** (প্রায় **৩ লক্ষ কিলোমিটার**)।
+
+⚡ **সহজ তথ্য:**
+* **প্রতি সেকেন্ডে:** প্রায় ৩,০০,০০০ কিলোমিটার
+* **প্রতি ঘণ্টায়:** প্রায় ১০৮ কোটি কিলোমিটার
+* **প্রতীক:** পদার্থবিজ্ঞানে একে **'c'** দ্বারা প্রকাশ করা হয়।
+* বিজ্ঞানী আলবার্ট আইনস্টাইনের আপেক্ষিকতা তত্ত্ব অনুযায়ী, মহাবিশ্বে কোনো বস্তু আলোর চেয়ে দ্রুত ভ্রমণ করতে পারে না।`;
+  }
+
+  // 12. বিজ্ঞান: সূর্য থেকে পৃথিবীতে আলো আসার সময়
+  if (
+    q.includes('সূর্য') &&
+    (q.includes('আলো আসতে') || q.includes('সময় লাগে') || q.includes('কত মিনিট') || q.includes('কত সময়'))
+  ) {
+    return `সূর্য থেকে পৃথিবীতে আলো পৌঁছাতে প্রায় **৮ মিনিট ২০ সেকেন্ড** (বা প্রায় ৫০০ সেকেন্ড) সময় লাগে।
+
+☀️ **কারণ ও বৈজ্ঞানিক তথ্য:**
+* **দূরত্ব:** সূর্য থেকে পৃথিবীর গড় দূরত্ব প্রায় **১৪ কোটি ৯৬ লক্ষ কিলোমিটার** (১৪৯.৬ মিলিয়ন কিমি)।
+* **আলোর গতি:** প্রতি সেকেন্ডে প্রায় ৩ লক্ষ কিলোমিটার।
+* দূরত্বকে আলোর গতি দিয়ে ভাগ করলে পাওয়া যায় প্রায় ৪৯৯ সেকেন্ড বা ৮ মিনিট ১৯-২০ সেকেন্ড।`;
+  }
+
+  // 13. বিজ্ঞান: মানবদেহে কয়টি হাড়
+  if (
+    (q.includes('মানবদেহ') || q.includes('মানুষের শরীর') || q.includes('শরীরে') || q.includes('দেহে')) &&
+    (q.includes('হাড়') || q.includes('অস্থি') || q.includes('কয়টি হাড়') || q.includes('কতটি হাড়'))
+  ) {
+    return `একজন প্রাপ্তবয়স্ক মানুষের শরীরে মোট **২০৬টি হাড়** থাকে।
+
+🦴 **হাড় সংক্রান্ত গুরুত্বপূর্ণ তথ্য:**
+* **শিশুদের হাড়:** জন্মের সময় একটি শিশুর শরীরে প্রায় **২৭০ থেকে ৩০০টি** নরম হাড় থাকে। বয়োবৃদ্ধির সাথে সাথে অনেক হাড় পরস্পরের সাথে জোড়া লেগে শেষ পর্যন্ত ২০৬টিতে পরিণত হয়।
+* **সবচেয়ে বড় ও শক্তিশালী হাড়:** উরুর হাড়, যার নাম **ফিমার (Femur)**।
+* **সবচেয়ে ছোট হাড়:** মানব কানের ভেতরের হাড়, যার নাম **স্টেপিস (Stapes)** (দৈর্ঘ্য মাত্র প্রায় ৩ মিলিমিটার)।`;
+  }
+
+  // 14. বিজ্ঞান: পৃথিবী সূর্যের চারদিকে ঘোরে
   if (
     (q.includes('সূর্য') && q.includes('পৃথিবী')) &&
     (q.includes('ঘোরে') || q.includes('ঘুরে') || q.includes('আবর্তন'))
@@ -268,38 +305,26 @@ export function checkUniversalKnowledge(rawQuery: string): string | null {
 
 🌍 **বৈজ্ঞানিক ব্যাখ্যা:**
 * পৃথিবী তার নিজ অক্ষের ওপর লাটিমের মতো ঘুরতে ঘুরতে (আহ্নিক গতি) সূর্যের চারদিকে একটি নির্দিষ্ট উপবৃত্তাকার কক্ষপথে পরিক্রমণ করে (বার্ষিক গতি)।
-* সূর্যকে একবার সম্পূর্ণ প্রদক্ষিণ করতে পৃথিবীর সময় লাগে প্রায় **৩৬৫ দিন ৫ ঘণ্টা ৪৮ মিনিট ৪৭ সেকেন্ড** (১ বছর)।
-* এই আবর্তনের ফলেই পৃথিবীতে দিন-রাত এবং ঋতু পরিবর্তন (গ্রীষ্ম, শীত, বর্ষা ইত্যাদি) ঘটে।
-* প্রাচীনকালে ভাবা হতো সূর্যই পৃথিবীর চারদিকে ঘোরে (ভূ-কেন্দ্রিক মতবাদ বা Geocentric model), তবে বিজ্ঞানী নিকোলাস কোপার্নিকাস ও গ্যালিলিওর আবিষ্কারে প্রমাণিত হয় যে সূর্য সৌরজগতের কেন্দ্রে অবস্থিত এবং পৃথিবীসহ অন্যান্য গ্রহ সূর্যকে প্রদক্ষিণ করে (সূর্য-কেন্দ্রিক মতবাদ বা Heliocentric model)।`;
+* সূর্যকে একবার সম্পূর্ণ প্রদক্ষিণ করতে পৃথিবীর সময় লাগে প্রায় **৩৬৫ দিন ৫ ঘণ্টা ৪৮ মিনিট ৪৭ সেকেন্ড** (১ সৌর বছর)।
+* এই আবর্তনের ফলেই পৃথিবীতে দিন-রাত এবং ঋতু পরিবর্তন (গ্রীষ্ম, শীত, বর্ষা ইত্যাদি) ঘটে।`;
   }
 
-  // 12. বিজ্ঞান: সূর্যগ্রহণ ও চন্দ্রগ্রহণ
-  if (q.includes('সূর্যগ্রহণ') || q.includes('সূর্য গ্রহণ')) {
-    return `**সূর্যগ্রহণ (Solar Eclipse)** একটি চমৎকার মহাজাগতিক ঘটনা। 
+  // 15. সাধারণ জ্ঞান: বাংলাদেশের রাজধানী
+  if (
+    q.includes('বাংলাদেশের রাজধানী') ||
+    q.includes('বাংলাদেশ এর রাজধানী') ||
+    q.includes('রাজধানীর নাম') ||
+    q.includes('capital of bangladesh')
+  ) {
+    return `গণপ্রজাতন্ত্রী বাংলাদেশের রাজধানী ও প্রধান প্রশাসনিক শহর হলো **ঢাকা (Dhaka)**।
 
-🌑 **সূর্যগ্রহণ কীভাবে ঘটে?**
-যখন চাঁদ তার নিজস্ব কক্ষপথে আবর্তন করতে করতে পৃথিবী ও সূর্যের মাঝখানে একই সরলরেখায় চলে আসে, তখন চাঁদের ছায়া পৃথিবীর ওপর পড়ে এবং কিছু সময়ের জন্য সূর্যের আলো পৃথিবীতে পৌঁছাতে পারে না। এই ঘটনাকে সূর্যগ্রহণ বলা হয়।
-
-### 🔍 সূর্যগ্রহণের প্রকারভেদ:
-১. **পূর্ণগ্রাস সূর্যগ্রহণ (Total Solar Eclipse):** চাঁদ সম্পূর্ণভাবে সূর্যকে ঢেকে ফেলে।
-২. **বলয়গ্রাস সূর্যগ্রহণ (Annular Solar Eclipse):** চাঁদের আকার সূর্যের তুলনায় ছোট মনে হয় এবং সূর্যের চারপাশ দিয়ে উজ্জ্বল আলোর বলয় বা আংটির মতো দেখা যায়।
-৩. **খণ্ডগ্রাস সূর্যগ্রহণ (Partial Solar Eclipse):** চাঁদ সূর্যের আংশিক অংশ ঢেকে দেয়।
-
-⚠️ *সতর্কতা:* খালি চোখে কখনোই সরাসরি সূর্যগ্রহণ দেখা উচিত নয়, এটি চোখের রেটিনার মারাত্মক ক্ষতি করতে পারে।`;
+🏙️ **ঢাকা সম্পর্কিত কিছু তথ্য:**
+* এটি বুড়িগঙ্গা নদীর তীরে অবস্থিত একটি প্রাচীন ও ঐতিহ্যবাহী মেগাসিটি।
+* ঢাকাকে **"মসজিদের শহর"** এবং বিশ্বজুড়ে রিকশার প্রাচুর্যের জন্য **"রিকশার রাজধানী"** বলা হয়।
+* বাংলাদেশের সরকার, জাতীয় সংসদ ভবন, সুপ্রিম কোর্ট ও প্রধান প্রধান প্রশাসনিক প্রতিষ্ঠানসমূহ ঢাকায় অবস্থিত।`;
   }
 
-  // 13. বিজ্ঞান: কৃত্রিম বুদ্ধিমত্তা / AI কি
-  if (q === 'ai কি' || q === 'এআই কি' || q === 'কৃত্রিম বুদ্ধিমত্তা কি' || q === 'what is ai') {
-    return `**কৃত্রিম বুদ্ধিমত্তা (Artificial Intelligence বা AI)** হলো কম্পিউটার বিজ্ঞানের এমন একটি আধুনিক শাখা, যার মাধ্যমে কোনো মেশিন, রোবট বা সফটওয়্যার মানুষের মতো চিন্তা করতে, শিখতে এবং সিদ্ধান্ত নিতে পারে।
-
-### 🧠 মূল স্তম্ভ ও কাজ:
-১. **লার্নিং (Machine Learning):** বিশাল পরিমাণ ডেটা পড়ে নিজে নিজে শিখে অভিজ্ঞতা বাড়ায়।
-২. **সিদ্ধান্ত গ্রহণ (Decision Making):** জটিল সমস্যা বিশ্লেষণ করে দ্রুত নিখুঁত সমাধান তৈরি করে।
-৩. **ন্যাচারাল ল্যাঙ্গুয়েজ প্রসেসিং (NLP):** মানুষের মুখের বা লেখার ভাষা (যেমন বাংলা, ইংরেজি) সঠিকভাবে বুঝতে ও উত্তর দিতে পারে।
-৪. **দৃষ্টি ও স্বীকৃতি (Computer Vision):** ছবি, মুখাবয়ব বা বস্তু চিনতে ও বুঝতে পারে।`;
-  }
-
-  // 14. সাধারণ জ্ঞান: বাংলাদেশ স্বাধীনতা
+  // 16. সাধারণ জ্ঞান: বাংলাদেশ স্বাধীনতা
   if (q.includes('বাংলাদেশ') && (q.includes('স্বাধীন') || q.includes('মুক্তিযুদ্ধ') || q.includes('বিজয়'))) {
     return `বাংলাদেশ একটি রক্তক্ষয়ী মহান মুক্তিযুদ্ধের মধ্য দিয়ে স্বাধীন ও সার্বভৌম রাষ্ট্র হিসেবে আত্মপ্রকাশ করে।
 
@@ -314,8 +339,24 @@ export function checkUniversalKnowledge(rawQuery: string): string | null {
 }
 
 /**
+ * Clean & format Wikipedia extract for conversational answer
+ */
+function formatWikiSummary(title: string, extract: string): string {
+  // Take first 3-4 clean sentences
+  const cleaned = extract
+    .replace(/\s*\([^)]*\)/g, '') // remove parentheticals
+    .replace(/\s+/g, ' ')
+    .trim();
+
+  const sentences = cleaned.split(/(?<=[।\.\?!])\s+/);
+  const coreInfo = sentences.slice(0, 4).join(' ');
+
+  return `### 💡 **${title}**\n\n${coreInfo}\n\n*(লুমিক্রা এআই উন্মুক্ত তথ্যভাণ্ডার থেকে সংকলিত)*`;
+}
+
+/**
  * Ask AI question with multi-layered high-reliability system.
- * Guaranteed to return an answer without failing or throwing error!
+ * Guaranteed to return an answer without EVER opening third-party popups or failing!
  */
 export async function askAiQuestion(
   userQuery: string,
@@ -373,20 +414,44 @@ export async function askAiQuestion(
     }
   }
 
-  // 4. Client-side browser AI engine (Puter.js) for Vercel and static hosting
-  if (typeof window !== 'undefined' && (window as any).puter?.ai?.chat) {
-    try {
-      const puterPrompt = `You are Lumiqra AI, an intelligent encyclopedic assistant created by Md. Jakir Hossain from Bangladesh. Answer with depth, complete facts and polite structure. Answer in Bengali if asked in Bengali, or English if asked in English.\n\nUser Question: ${cleanQuery}`;
-      const response = await (window as any).puter.ai.chat(puterPrompt, { model: 'gpt-4o-mini' }).catch(() => (window as any).puter.ai.chat(puterPrompt));
-      if (response) {
-        const replyText = typeof response === 'string' ? response : response?.message?.content || response?.text;
-        if (replyText && typeof replyText === 'string' && replyText.trim().length > 0) {
-          return replyText.trim();
+  // 4. Wikipedia Instant Knowledge Fallback (100% Free, NO Popups, NO Logins)
+  try {
+    const searchTerms = cleanQuery
+      .replace(/কি\b|কে\b|কখন\b|কোথায়\b|কেন\b|কী\b|কাকে\b|কয়টি\b|কতটি\b|বলুন\b|জানান\b|সংক্রান্ত\b|সম্পর্কে\b|সম্পর্কিত\b/gi, '')
+      .replace(/[\?\.,!।]/g, '')
+      .trim();
+
+    if (searchTerms.length >= 2) {
+      // Try Bengali Wikipedia first
+      const wikiUrl = `https://bn.wikipedia.org/w/api.php?action=query&format=json&prop=extracts&exintro=1&explaintext=1&origin=*&titles=${encodeURIComponent(
+        searchTerms
+      )}`;
+      const wikiRes = await fetch(wikiUrl);
+      if (wikiRes.ok) {
+        const wikiData = await wikiRes.json();
+        const pages = wikiData?.query?.pages || {};
+        const firstPageId = Object.keys(pages)[0];
+        if (firstPageId && firstPageId !== '-1' && pages[firstPageId]?.extract) {
+          return formatWikiSummary(pages[firstPageId].title, pages[firstPageId].extract);
         }
       }
-    } catch (puterErr) {
-      console.warn('Puter.js chat error:', puterErr);
+
+      // Try English Wikipedia if Bengali not found
+      const enWikiUrl = `https://en.wikipedia.org/w/api.php?action=query&format=json&prop=extracts&exintro=1&explaintext=1&origin=*&titles=${encodeURIComponent(
+        searchTerms
+      )}`;
+      const enRes = await fetch(enWikiUrl);
+      if (enRes.ok) {
+        const enData = await enRes.json();
+        const enPages = enData?.query?.pages || {};
+        const enPageId = Object.keys(enPages)[0];
+        if (enPageId && enPageId !== '-1' && enPages[enPageId]?.extract) {
+          return formatWikiSummary(enPages[enPageId].title, enPages[enPageId].extract);
+        }
+      }
     }
+  } catch (wikiErr) {
+    console.warn('Wikipedia fallback error:', wikiErr);
   }
 
   // 5. Intelligent Knowledge Synthesis Engine (Guarantees thoughtful response for any question)

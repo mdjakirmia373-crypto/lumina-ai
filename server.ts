@@ -161,6 +161,9 @@ app.post('/api/chat', async (req, res) => {
 
 // Serve frontend in production or development
 async function startServer() {
+  // Always serve public static files (robots.txt, sitemap.xml, google verification files)
+  app.use(express.static(path.resolve(__dirname, 'public')));
+
   if (process.env.NODE_ENV === 'production') {
     app.use(express.static(path.resolve(__dirname, 'dist')));
     app.get('*', (_req, res) => {
