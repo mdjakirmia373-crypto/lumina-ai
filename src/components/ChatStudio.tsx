@@ -53,32 +53,32 @@ const ACTIVE_CHAT_ID_KEY = 'lumiqra_ai_active_chat_id_v2';
 
 const WELCOME_STARTER_PROMPTS = [
   {
-    icon: '✨',
-    bn: 'লেখা লিখুন (প্রবন্ধ, গল্প বা পোস্ট)',
-    en: 'Write an article, story or post',
-    promptBn: 'অনলাইন কাজের সফলতা ও ফ্রিল্যান্সিং নিয়ে একটি সুন্দর ও প্রেরণাদায়ী লেখা লিখে দাও।',
-    promptEn: 'Write an engaging and inspiring article about freelance success.',
-  },
-  {
     icon: '📖',
-    bn: 'পবিত্র কুরআনের আয়াত ও অর্থ',
-    en: 'Quran Ayah & Meaning',
-    promptBn: 'পবিত্র কুরআনের আয়াতুল কুরসীর বাংলা অর্থ ও ফজিলত কি?',
-    promptEn: 'What is the meaning and virtue of Ayatul Kursi?',
-  },
-  {
-    icon: '💻',
-    bn: 'প্রোগ্রামিং ও কোডিং সমাধান',
-    en: 'Coding & Bug Fix',
-    promptBn: 'জাভাস্ক্রিপ্ট এবং পাইথন সহজে শেখার একটি সুন্দর গাইডলাইন দাও।',
-    promptEn: 'Give me a beginner-friendly roadmap to learn Python and JavaScript.',
+    bn: 'পবিত্র কুরআন ও নবীদের জীবনী',
+    en: 'Quran & Prophet Biographies',
+    promptBn: 'হযরত মুসা (আ.) এবং হযরত ঈসা (আ.)-এর জীবনের প্রধান ঘটনাবলী ও কুরআনিক শিক্ষা বিস্তারিত বলুন।',
+    promptEn: 'Tell me the comprehensive prophetic history and Quranic lessons of Prophet Musa (AS) and Isa (AS).',
   },
   {
     icon: '🌌',
-    bn: 'মহাবিশ্ব ও বিজ্ঞানের রহস্য',
-    en: 'Universe & Science Secrets',
-    promptBn: 'মহাবিশ্ব কীভাবে সৃষ্টি হয়েছে? বিজ্ঞান ও সৃষ্টিতত্ত্ব কী বলে?',
-    promptEn: 'How was the universe created according to modern astrophysics?',
+    bn: 'মহাবিশ্ব, সৃষ্টিতত্ত্ব ও বিজ্ঞান',
+    en: 'Universe, Creation & Science',
+    promptBn: 'মহাবিশ্ব সৃষ্টির সূচনা (Big Bang) ও পৃথিবীর ভূতাত্ত্বিক যুগসমূহ বিজ্ঞান ও ইতিহাসের আলোকে বুঝিয়ে বলুন।',
+    promptEn: 'Explain the origin of the universe (Big Bang) and the geologic eras of Earth from science and history.',
+  },
+  {
+    icon: '🏛️',
+    bn: 'প্রাচীন সভ্যতা ও বিশ্ব ইতিহাস',
+    en: 'Ancient Civilizations & History',
+    promptBn: 'মেসোপটেমিয়া ও প্রাচীন মিশরীয় সভ্যতার উত্থান-পতন এবং মানব ইতিহাসে তাদের অবদান বিশ্লেষণ করুন।',
+    promptEn: 'Analyze the rise and fall of Mesopotamian and Ancient Egyptian civilizations and their contributions to humankind.',
+  },
+  {
+    icon: '💻',
+    bn: 'প্রোগ্রামিং, গণিত ও প্রযুক্তি',
+    en: 'Programming, Math & Tech',
+    promptBn: 'পাইথন এবং কৃত্রিম বুদ্ধিমত্তা (AI) প্রোগ্রামিং শেখার জন্য একটি কার্যকর পূর্ণাঙ্গ রোডম্যাপ তৈরি করে দিন।',
+    promptEn: 'Provide an effective step-by-step roadmap to learn Python and modern Artificial Intelligence engineering.',
   },
 ];
 
@@ -504,8 +504,8 @@ export const ChatStudio: React.FC<ChatStudioProps> = ({
                   </h3>
                   <p className="text-xs sm:text-sm text-slate-400 max-w-md mx-auto leading-relaxed">
                     {lang === 'bn'
-                      ? 'নিচে যেকোনো বিষয়ে প্রশ্ন লিখুন, অথবা রেডিমেড বাটন চাপুন। ছবি আপলোড করে এডিটও করতে পারেন!'
-                      : 'Ask anything, upload images to edit, or choose a starter below.'}
+                      ? 'পবিত্র কুরআন ও নবীদের ইতিহাস, মহাবিশ্ব ও সভ্যতার সূচনা, আধুনিক বিজ্ঞান, কোডিং বা যেকোনো প্রশ্ন করুন।'
+                      : 'Ask about the Holy Quran, prophetic history, the cosmos, world civilizations, science & coding.'}
                   </p>
                 </div>
 
