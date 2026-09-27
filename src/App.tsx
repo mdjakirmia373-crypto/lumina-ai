@@ -9,8 +9,10 @@ import { VoiceStudio } from './components/VoiceStudio';
 import { ChatStudio } from './components/ChatStudio';
 import { BgRemoverStudio } from './components/BgRemoverStudio';
 import { HistoryGallery } from './components/HistoryGallery';
+import { AdminDashboard } from './components/AdminDashboard';
 import { Footer } from './components/Footer';
-import { Language, GeneratedImage, VoiceHistoryItem, UserAccount } from './types';
+import { Language, GeneratedImage, VoiceHistoryItem, UserAccount, AppTab } from './types';
+import { trackVisit } from './utils/analyticsTracker';
 import { 
   Sparkles, 
   Zap, 
@@ -30,8 +32,13 @@ export default function App() {
     return saved === 'en' ? 'en' : 'bn';
   });
 
-  const [activeTab, setActiveTab] = useState<'image' | 'voice' | 'chat' | 'bg-remover' | 'history'>('image');
+  const [activeTab, setActiveTab] = useState<AppTab>('image');
   const [isSidebarMobileOpen, setIsSidebarMobileOpen] = useState(false);
+
+  // Automatically track visits
+  useEffect(() => {
+    trackVisit();
+  }, []);
 
   // Authentication State (Never force-block visitors or search engine bots)
   const [currentUser, setCurrentUser] = useState<UserAccount | null>(() => {
@@ -239,6 +246,15 @@ export default function App() {
               onClearAllImages={handleClearImages}
               onClearAllVoices={handleClearVoices}
               onSelectImage={handleSelectImageFromHistory}
+            />
+          )}
+
+          {/* Tab 6: Admin Analytics Dashboard */}
+          {activeTab === 'admin' && (
+            <AdminDashboard
+              lang={lang}
+              currentUser={currentUser}
+              onOpenAuth={() => setIsAuthModalOpen(true)}
             />
           )}
 

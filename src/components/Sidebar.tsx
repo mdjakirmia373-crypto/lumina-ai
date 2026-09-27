@@ -11,16 +11,18 @@ import {
   ChevronRight,
   ShieldCheck,
   Zap,
-  Globe
+  Globe,
+  BarChart3,
+  Activity
 } from 'lucide-react';
-import { Language, UserAccount } from '../types';
+import { Language, UserAccount, AppTab } from '../types';
 import { LumiqraLogo } from './LumiqraLogo';
 
 interface SidebarProps {
   lang: Language;
   onToggleLang: () => void;
-  activeTab: 'image' | 'voice' | 'bg-remover' | 'chat' | 'history';
-  onTabChange: (tab: 'image' | 'voice' | 'bg-remover' | 'chat' | 'history') => void;
+  activeTab: AppTab;
+  onTabChange: (tab: AppTab) => void;
   currentUser: UserAccount | null;
   onLogout: () => void;
   onOpenAuth: () => void;
@@ -94,6 +96,17 @@ export const Sidebar: React.FC<SidebarProps> = ({
       color: 'from-amber-500 to-orange-600',
       activeRing: 'border-amber-500/80 bg-amber-500/10 text-white shadow-lg shadow-amber-500/15',
       iconColor: 'text-amber-400',
+    },
+    {
+      id: 'admin' as const,
+      labelBn: 'অ্যাডমিন ড্যাশবোর্ড',
+      labelEn: 'Admin Analytics',
+      subBn: 'ভিজিটর ও কাজের লাইভ হিসাব',
+      subEn: 'Visitor & Activity Metrics',
+      icon: BarChart3,
+      color: 'from-indigo-600 to-purple-600',
+      activeRing: 'border-indigo-500/80 bg-indigo-500/10 text-white shadow-lg shadow-indigo-500/15',
+      iconColor: 'text-indigo-400',
     },
   ];
 

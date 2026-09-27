@@ -29,6 +29,7 @@ import {
 import { Language, GeneratedImage } from '../types';
 import { STYLE_PRESETS, ASPECT_RATIOS, SAMPLE_PROMPTS } from '../utils/presets';
 import { translatePromptToEnglish } from '../utils/translator';
+import { trackImageGenerated } from '../utils/analyticsTracker';
 
 interface ImageStudioProps {
   lang: Language;
@@ -158,6 +159,7 @@ export const ImageStudio: React.FC<ImageStudioProps> = ({
       };
 
       setCurrentImage(newImgData);
+      trackImageGenerated(selectedStyle, cleanPrompt);
       onImageGenerated(newImgData);
     };
 

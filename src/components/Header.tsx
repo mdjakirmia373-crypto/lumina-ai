@@ -6,16 +6,17 @@ import {
   Menu, 
   User, 
   LogOut,
-  ShieldCheck
+  ShieldCheck,
+  BarChart3
 } from 'lucide-react';
-import { Language, UserAccount } from '../types';
+import { Language, UserAccount, AppTab } from '../types';
 import { LumiqraLogo } from './LumiqraLogo';
 
 interface HeaderProps {
   lang: Language;
   onToggleLang: () => void;
-  activeTab: 'image' | 'voice' | 'chat' | 'bg-remover' | 'history';
-  onTabChange: (tab: 'image' | 'voice' | 'chat' | 'bg-remover' | 'history') => void;
+  activeTab: AppTab;
+  onTabChange: (tab: AppTab) => void;
   currentUser: UserAccount | null;
   onOpenAuth: () => void;
   onLogout: () => void;
@@ -61,6 +62,20 @@ export const Header: React.FC<HeaderProps> = ({
             <Zap className="w-3 h-3 text-emerald-400 fill-emerald-400" />
             <span>100% Free</span>
           </div>
+
+          {/* Admin Analytics Quick Icon */}
+          <button
+            onClick={() => onTabChange('admin')}
+            className={`flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl border text-xs font-semibold transition cursor-pointer ${
+              activeTab === 'admin'
+                ? 'bg-indigo-600 text-white border-indigo-500 shadow-md shadow-indigo-600/30'
+                : 'bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-white border-slate-800'
+            }`}
+            title={lang === 'bn' ? 'অ্যাডমিন ড্যাশবোর্ড ও ভিজিটর মেট্রিক্স' : 'Admin & Analytics'}
+          >
+            <BarChart3 className="w-3.5 h-3.5 text-indigo-400" />
+            <span className="hidden md:inline">{lang === 'bn' ? 'অ্যাডমিন' : 'Admin'}</span>
+          </button>
 
           {/* Language Switcher */}
           <button

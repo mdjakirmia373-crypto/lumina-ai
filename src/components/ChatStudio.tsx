@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import { Language } from '../types';
 import { askAiQuestion } from '../utils/chatAi';
+import { trackChatMessage } from '../utils/analyticsTracker';
 
 interface ChatStudioProps {
   lang: Language;
@@ -91,6 +92,7 @@ export const ChatStudio: React.FC<ChatStudioProps> = ({ lang }) => {
       timestamp: new Date(),
     };
 
+    trackChatMessage(queryToSend.trim());
     setMessages((prev) => [...prev, userMessage]);
     setInput('');
     setIsLoading(true);

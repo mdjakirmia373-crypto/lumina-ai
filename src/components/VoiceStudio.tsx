@@ -19,6 +19,7 @@ import {
 import { Language, VoiceSettings, VoiceHistoryItem } from '../types';
 import { SAMPLE_VOICE_SCRIPTS } from '../utils/presets';
 import { isBengaliText, getSortedVoices, createWavBlob } from '../utils/audioUtils';
+import { trackVoiceGenerated } from '../utils/analyticsTracker';
 
 interface VoiceStudioProps {
   lang: Language;
@@ -187,10 +188,12 @@ export const VoiceStudio: React.FC<VoiceStudioProps> = ({
 
     // Save to voice history
     const chosenVoice = voices.find(v => v.voiceURI === selectedVoiceURI);
+    const chosenVoiceName = chosenVoice ? chosenVoice.name : 'Default Voice';
+    trackVoiceGenerated(chosenVoiceName, cleanText);
     onVoiceHistoryAdd({
       id: `voice_${Date.now()}`,
       text: cleanText,
-      voiceName: chosenVoice ? chosenVoice.name : 'Default Voice',
+      voiceName: chosenVoiceName,
       lang: chosenVoice ? chosenVoice.lang : (hasBengali ? 'bn-BD' : 'en-US'),
       timestamp: Date.now(),
     });

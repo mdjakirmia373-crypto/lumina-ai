@@ -17,6 +17,7 @@ import {
   Info
 } from 'lucide-react';
 import { Language } from '../types';
+import { trackBgRemoved } from '../utils/analyticsTracker';
 
 interface BgRemoverStudioProps {
   lang: Language;
@@ -184,9 +185,11 @@ export const BgRemoverStudio: React.FC<BgRemoverStudioProps> = ({ lang }) => {
             compCtx.fillRect(0, 0, width, height);
             compCtx.drawImage(canvas, 0, 0);
             setProcessedSrc(compositeCanvas.toDataURL('image/png'));
+            trackBgRemoved(activeMode, fileName);
           }
         } else {
           setProcessedSrc(canvas.toDataURL('image/png'));
+          trackBgRemoved(activeMode, fileName);
         }
       } catch (err) {
         console.error('Bg removal error:', err);

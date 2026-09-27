@@ -51,6 +51,8 @@ export interface VoiceHistoryItem {
   timestamp: number;
 }
 
+export type AppTab = 'image' | 'voice' | 'bg-remover' | 'chat' | 'history' | 'admin';
+
 export interface UserAccount {
   id: string;
   name: string;
