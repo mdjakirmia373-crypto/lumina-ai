@@ -265,6 +265,7 @@ export const ChatStudio: React.FC<ChatStudioProps> = ({
 
     const userText = query || (lang === 'bn' ? 'এই ছবিটি দেখুন এবং এডিট করার পরামর্শ দিন।' : 'Analyze and help edit this image.');
     const userImg = attachedImage;
+    const targetChatId = activeConversation.id;
 
     const userMsg: ChatMessageItem = {
       id: 'user_' + Date.now(),
@@ -280,16 +281,19 @@ export const ChatStudio: React.FC<ChatStudioProps> = ({
       ? (userText.length > 25 ? userText.substring(0, 25) + '...' : userText)
       : activeConversation.title;
 
-    const updatedMessages = [...activeConversation.messages, userMsg];
+    const historyForContext = [...activeConversation.messages, userMsg].slice(-6).map((m) => ({
+      role: m.role,
+      content: m.content,
+    }));
 
     setConversations((prev) =>
       prev.map((c) =>
-        c.id === activeConversation.id
+        c.id === targetChatId
           ? {
               ...c,
               title: updatedTitle,
               updatedAt: Date.now(),
-              messages: updatedMessages,
+              messages: [...c.messages, userMsg],
             }
           : c
       )
@@ -307,11 +311,7 @@ export const ChatStudio: React.FC<ChatStudioProps> = ({
           ? `আপনার ছবিটি সফলভাবে গৃহীত হয়েছে! 🎨\n\n**ছবির ওপর যা যা করতে পারেন:**\n1. **ব্যাকগ্রাউন্ড রিমুভ:** আপনি 'Bg Remover' স্টুডিওতে এটি ব্যবহার করে মুহূর্তেই ব্যাকগ্রাউন্ড মুছে ফেলতে পারেন।\n2. **নতুন স্টাইলে এআই রূপান্তর:** এই ছবিকে আরও উন্নত বা ভিন্ন আর্ট স্টাইলে রূপান্তর করতে প্রম্পট লিখুন।\n\nআপনি এই ছবিতে ঠিক কী পরিবর্তন করতে চান? (যেমন: ব্যাকগ্রাউন্ড বদলানো, আলো বাড়ানো, অথবা সাইবারপাঙ্ক স্টাইল দেওয়া)`
           : `Image successfully received! 🎨\n\n**What you can do with this image:**\n1. **Remove Background:** Open 'Bg Remover' studio to remove backdrop instantly.\n2. **AI Style Transfer:** Tell me how you would like to edit or transform this artwork.\n\nWhat specific edits would you like to make to this image?`;
       } else {
-        const historyContext = updatedMessages.slice(-6).map((m) => ({
-          role: m.role,
-          content: m.content,
-        }));
-        replyText = await askAiQuestion(userText, historyContext);
+        replyText = await askAiQuestion(userText, historyForContext);
       }
 
       const aiMsg: ChatMessageItem = {
@@ -323,7 +323,7 @@ export const ChatStudio: React.FC<ChatStudioProps> = ({
 
       setConversations((prev) =>
         prev.map((c) =>
-          c.id === activeConversation.id
+          c.id === targetChatId
             ? {
                 ...c,
                 updatedAt: Date.now(),
@@ -344,7 +344,7 @@ export const ChatStudio: React.FC<ChatStudioProps> = ({
       };
       setConversations((prev) =>
         prev.map((c) =>
-          c.id === activeConversation.id
+          c.id === targetChatId
             ? { ...c, messages: [...c.messages, errorMsg] }
             : c
         )

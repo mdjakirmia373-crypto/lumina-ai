@@ -139,12 +139,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       }
     }
 
-    return res.status(503).json({
-      error: 'GEMINI_API_KEY_UNAVAILABLE',
+    // High Quality Instant Fallback on Vercel if GEMINI_API_KEY is not configured
+    return res.json({
+      reply: `আপনার প্রশ্ন: **"${cleanPrompt}"**\n\nলুমিক্রা এআই (Lumiqra AI) আপনার সার্বিক সহায়তায় প্রস্তুত। Vercel এ ফুল AI উত্তর পেতে Vercel Environment Variables এ \`GEMINI_API_KEY\` যুক্ত করে দিন।`,
     });
   } catch (error: any) {
     console.error('Vercel API error:', error);
     return res.status(500).json({ error: error.message || 'Internal server error' });
   }
 }
-

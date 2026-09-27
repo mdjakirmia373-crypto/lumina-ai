@@ -1,8 +1,7 @@
 // Ultra-fast, highly capable Universal AI Chat Client (ChatGPT & Gemini standard)
 // 1. Direct server /api/chat with Gemini SDK
-// 2. Client-side Gemini fallback with import.meta.env.VITE_GEMINI_API_KEY if available
-// 3. Built-in high-precision Instant Knowledge Engine for Islamic, Scientific, General Knowledge & Greetings
-// 4. Instant Wikipedia Search & Universal Knowledge Synthesis (Ensuring EVERY question gets answered)
+// 2. Built-in high-precision Instant Knowledge Engine for Islamic, Scientific, General Knowledge & Greetings
+// 3. Instant Wikipedia Search & Universal Knowledge Synthesis (Ensuring EVERY question gets answered)
 
 export interface ChatMessage {
   id?: string;
@@ -149,7 +148,7 @@ function formatWikiSummary(title: string, extract: string): string {
   const sentences = cleaned.split(/(?<=[।\.\?!])\s+/);
   const coreInfo = sentences.slice(0, 4).join(' ');
 
-  return `### 💡 **${title}**\n\n${coreInfo}\n\n*(লুমিক্রা এআই নলেজ ইঞ্জিন)*`;
+  return `### 💡 **${title}**\n\n${coreInfo}`;
 }
 
 // Ask AI Question: Guaranteed multi-tiered response engine
@@ -197,7 +196,7 @@ export async function askAiQuestion(
     console.warn('Backend /api/chat error:', backendErr);
   }
 
-  // 4. Wikipedia Instant Knowledge Fallback (Clean search)
+  // 4. Wikipedia Instant Knowledge Fallback (Clean search with GET)
   try {
     const searchTerms = cleanQuery
       .replace(/কি\b|কে\b|কখন\b|কোথায়\b|কেন\b|কী\b|কাকে\b|কয়টি\b|কতটি\b|বলুন\b|জানান\b|সংক্রান্ত\b|সম্পর্কে\b|সম্পর্কিত\b/gi, '')
@@ -251,5 +250,5 @@ export async function askAiQuestion(
     return `এখানে আপনার কোডিং অনুসন্ধানের জন্য একটি উদাহরণ কাঠামো:\n\n\`\`\`javascript\n// সমস্যা সমাধানের নমুনা কোড\nfunction solve(input) {\n  if (!input) return null;\n  return input.trim();\n}\nconsole.log(solve("Lumiqra AI Ready"));\n\`\`\`\n\nআপনার নির্দিষ্ট কোডিং সমস্যা বা ত্রুটিটি এখানে পেস্ট করুন, আমি সঠিক সমাধান লিখে দেব!`;
   }
 
-  return `আপনার প্রশ্ন: **"${cleanQuery}"**\n\nলুমিক্রা এআই (Lumiqra AI) আপনার সার্বিক সহায়তায় প্রস্তুত।\n\n💡 **টিপস:**\n- আপনি পবিত্র কুরআন, বিজ্ঞান, ইতিহাস, গণিত, কোডিং বা যেকোনো বিষয়ে সুনির্দিষ্ট প্রশ্ন করতে পারেন।\n- যেকোনো ভাষায় (বাংলা, ইংরেজি, আরবি ইত্যাদি) স্পষ্ট বিস্তারিত উত্তর পাওয়া যাবে।`;
+  return `আপনার প্রশ্ন: **"${cleanQuery}"**\n\nলুমিক্রা এআই (Lumiqra AI) আপনার সার্বিক সহায়তায় প্রস্তুত। আপনি পবিত্র কুরআন, বিজ্ঞান, ইতিহাস, গণিত, কোডিং বা যেকোনো বিষয়ে সুনির্দিষ্ট প্রশ্ন করতে পারেন — যেকোনো ভাষায় (বাংলা, ইংরেজি ইত্যাদি) বিস্তারিত উত্তর পাবেন।`;
 }
