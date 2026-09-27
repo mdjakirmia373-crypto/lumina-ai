@@ -181,32 +181,34 @@ export default function App() {
         />
 
         {/* Main Content Area */}
-        <main className="max-w-4xl mx-auto w-full px-4 py-4 sm:py-6 flex-grow">
-          {/* Hero Section */}
-          <div className="text-center mb-6 space-y-3">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-300 text-xs font-semibold mb-1">
-              <Sparkles className="w-3.5 h-3.5 text-blue-400" />
-              <span>{lang === 'bn' ? 'গুগল এআই স্টুডিও অনুপ্রাণিত ক্রিয়েটর' : 'Google AI Studio Inspired Suite'}</span>
+        <main className={`w-full flex-grow ${activeTab === 'chat' ? 'px-2 sm:px-4 py-2 flex flex-col h-[calc(100vh-65px)]' : 'max-w-4xl mx-auto px-4 py-4 sm:py-6'}`}>
+          {/* Hero Section (Hidden when in pure full-screen chat tab) */}
+          {activeTab !== 'chat' && (
+            <div className="text-center mb-6 space-y-3">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-300 text-xs font-semibold mb-1">
+                <Sparkles className="w-3.5 h-3.5 text-blue-400" />
+                <span>{lang === 'bn' ? 'গুগল এআই স্টুডিও অনুপ্রাণিত ক্রিয়েটর' : 'Google AI Studio Inspired Suite'}</span>
+              </div>
+
+              <h1 className="text-3xl sm:text-4xl md:text-5xl font-black leading-tight tracking-tight">
+                {lang === 'bn' ? (
+                  <>
+                    সহজেই তৈরি করুন <span className="gradient-text">এআই ইমেজ, ভয়েস ও চ্যাট</span>
+                  </>
+                ) : (
+                  <>
+                    Effortlessly Generate <span className="gradient-text">AI Images, Voice & Chat</span>
+                  </>
+                )}
+              </h1>
+
+              <p className="text-slate-400 text-xs sm:text-sm md:text-base max-w-xl mx-auto leading-relaxed">
+                {lang === 'bn'
+                  ? 'বাম পাশের মেনু থেকে যেকোনো স্টুডিও ক্যাটাগরি বেছে নিন এবং এক ক্লিকে সেরা কাজ সম্পন্ন করুন।'
+                  : 'Select any studio category from the left sidebar and unleash studio-grade AI generation.'}
+              </p>
             </div>
-
-            <h1 className="text-3xl sm:text-4xl md:text-5xl font-black leading-tight tracking-tight">
-              {lang === 'bn' ? (
-                <>
-                  সহজেই তৈরি করুন <span className="gradient-text">এআই ইমেজ, ভয়েস ও চ্যাট</span>
-                </>
-              ) : (
-                <>
-                  Effortlessly Generate <span className="gradient-text">AI Images, Voice & Chat</span>
-                </>
-              )}
-            </h1>
-
-            <p className="text-slate-400 text-xs sm:text-sm md:text-base max-w-xl mx-auto leading-relaxed">
-              {lang === 'bn'
-                ? 'বাম পাশের মেনু থেকে যেকোনো স্টুডিও ক্যাটাগরি বেছে নিন এবং এক ক্লিকে সেরা কাজ সম্পন্ন করুন।'
-                : 'Select any studio category from the left sidebar and unleash studio-grade AI generation.'}
-            </p>
-          </div>
+          )}
 
           {/* Tab 1: Text to Image */}
           {activeTab === 'image' && (
@@ -234,7 +236,10 @@ export default function App() {
 
           {/* Tab 4: AI Chat Q&A Studio */}
           {activeTab === 'chat' && (
-            <ChatStudio lang={lang} />
+            <ChatStudio 
+              lang={lang} 
+              onNavigateToTab={(t) => setActiveTab(t)}
+            />
           )}
 
           {/* Tab 5: History Gallery */}
@@ -258,64 +263,66 @@ export default function App() {
             />
           )}
 
-          {/* Features Showcase Highlights */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 my-8">
-            <div className="glass-card p-5 rounded-2xl border border-slate-800 space-y-2">
-              <div className="w-9 h-9 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400">
-                <Zap className="w-5 h-5" />
+          {/* Features Showcase Highlights (Hidden when in chat tab for true full screen) */}
+          {activeTab !== 'chat' && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 my-8">
+              <div className="glass-card p-5 rounded-2xl border border-slate-800 space-y-2">
+                <div className="w-9 h-9 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400">
+                  <Zap className="w-5 h-5" />
+                </div>
+                <h3 className="text-sm font-bold text-slate-200">
+                  {lang === 'bn' ? '১০০% ফ্রি ও সুরক্ষিত' : '100% Free & Protected'}
+                </h3>
+                <p className="text-xs text-slate-400 leading-relaxed">
+                  {lang === 'bn'
+                    ? 'আপনার ব্যক্তিগত একাউন্টে সবকিছু নিরাপদ থাকবে। আনলিমিটেড ক্রিয়েশন কোনো চার্জ ছাড়াই।'
+                    : 'Your account is private and secure. Enjoy unlimited creation without any charge.'}
+                </p>
               </div>
-              <h3 className="text-sm font-bold text-slate-200">
-                {lang === 'bn' ? '১০০% ফ্রি ও সুরক্ষিত' : '100% Free & Protected'}
-              </h3>
-              <p className="text-xs text-slate-400 leading-relaxed">
-                {lang === 'bn'
-                  ? 'আপনার ব্যক্তিগত একাউন্টে সবকিছু নিরাপদ থাকবে। আনলিমিটেড ক্রিয়েশন কোনো চার্জ ছাড়াই।'
-                  : 'Your account is private and secure. Enjoy unlimited creation without any charge.'}
-              </p>
-            </div>
 
-            <div className="glass-card p-5 rounded-2xl border border-slate-800 space-y-2">
-              <div className="w-9 h-9 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400">
-                <Palette className="w-5 h-5" />
+              <div className="glass-card p-5 rounded-2xl border border-slate-800 space-y-2">
+                <div className="w-9 h-9 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400">
+                  <Palette className="w-5 h-5" />
+                </div>
+                <h3 className="text-sm font-bold text-slate-200">
+                  {lang === 'bn' ? '৮K রেজোলিউশন ও সাইজ' : '8K Styles & Sizes'}
+                </h3>
+                <p className="text-xs text-slate-400 leading-relaxed">
+                  {lang === 'bn'
+                    ? 'অ্যানিমে, ৩ডি পিক্সার, ফটোরিয়ালিস্টিক, সাইবারপাঙ্ক ও ১৬:৯, ৯:১৬ ফ্রেম।'
+                    : 'Multiple artistic styles including 3D Pixar, Anime, Photorealistic and 9:16 portrait.'}
+                </p>
               </div>
-              <h3 className="text-sm font-bold text-slate-200">
-                {lang === 'bn' ? '৮K রেজোলিউশন ও সাইজ' : '8K Styles & Sizes'}
-              </h3>
-              <p className="text-xs text-slate-400 leading-relaxed">
-                {lang === 'bn'
-                  ? 'অ্যানিমে, ৩ডি পিক্সার, ফটোরিয়ালিস্টিক, সাইবারপাঙ্ক ও ১৬:৯, ৯:১৬ ফ্রেম।'
-                  : 'Multiple artistic styles including 3D Pixar, Anime, Photorealistic and 9:16 portrait.'}
-              </p>
-            </div>
 
-            <div className="glass-card p-5 rounded-2xl border border-slate-800 space-y-2">
-              <div className="w-9 h-9 rounded-xl bg-pink-500/10 border border-pink-500/20 flex items-center justify-center text-pink-400">
-                <Mic className="w-5 h-5" />
+              <div className="glass-card p-5 rounded-2xl border border-slate-800 space-y-2">
+                <div className="w-9 h-9 rounded-xl bg-pink-500/10 border border-pink-500/20 flex items-center justify-center text-pink-400">
+                  <Mic className="w-5 h-5" />
+                </div>
+                <h3 className="text-sm font-bold text-slate-200">
+                  {lang === 'bn' ? 'বাংলা ও বহুভাষী ভয়েস' : 'Bangla & Multi-lingual'}
+                </h3>
+                <p className="text-xs text-slate-400 leading-relaxed">
+                  {lang === 'bn'
+                    ? 'সুস্পষ্ট বাংলা উচ্চারণ, গতি ও পিচ নিয়ন্ত্রণ এবং সরাসরি অডিও ডাউনলোড সুবিধা।'
+                    : 'Natural Bangla and English accents with speed, pitch controls and audio file download.'}
+                </p>
               </div>
-              <h3 className="text-sm font-bold text-slate-200">
-                {lang === 'bn' ? 'বাংলা ও বহুভাষী ভয়েস' : 'Bangla & Multi-lingual'}
-              </h3>
-              <p className="text-xs text-slate-400 leading-relaxed">
-                {lang === 'bn'
-                  ? 'সুস্পষ্ট বাংলা উচ্চারণ, গতি ও পিচ নিয়ন্ত্রণ এবং সরাসরি অডিও ডাউনলোড সুবিধা।'
-                  : 'Natural Bangla and English accents with speed, pitch controls and audio file download.'}
-              </p>
-            </div>
 
-            <div className="glass-card p-5 rounded-2xl border border-slate-800 space-y-2">
-              <div className="w-9 h-9 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
-                <MessageSquare className="w-5 h-5" />
+              <div className="glass-card p-5 rounded-2xl border border-slate-800 space-y-2">
+                <div className="w-9 h-9 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
+                  <MessageSquare className="w-5 h-5" />
+                </div>
+                <h3 className="text-sm font-bold text-slate-200">
+                  {lang === 'bn' ? 'তাৎক্ষণিক সঠিক উত্তর' : 'Instant AI Q&A'}
+                </h3>
+                <p className="text-xs text-slate-400 leading-relaxed">
+                  {lang === 'bn'
+                    ? 'গল্প লেখা, পড়াশোনা, টেকনোলজি বা যেকোনো সাধারণ জ্ঞানের সঠিক উত্তর।'
+                    : 'Ask any question on science, study, tech or life and get accurate instant replies.'}
+                </p>
               </div>
-              <h3 className="text-sm font-bold text-slate-200">
-                {lang === 'bn' ? 'তাৎক্ষণিক সঠিক উত্তর' : 'Instant AI Q&A'}
-              </h3>
-              <p className="text-xs text-slate-400 leading-relaxed">
-                {lang === 'bn'
-                  ? 'গল্প লেখা, পড়াশোনা, টেকনোলজি বা যেকোনো সাধারণ জ্ঞানের সঠিক উত্তর।'
-                  : 'Ask any question on science, study, tech or life and get accurate instant replies.'}
-              </p>
             </div>
-          </div>
+          )}
         </main>
 
         {/* Footer with Google AdSense Compliant Links */}
