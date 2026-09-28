@@ -112,6 +112,22 @@ function resolveServerDirectAnswer(query: string): string | null {
     }
   }
 
+  // Saudi Arabia Ruler / Government
+  if (
+    q.includes('সৌদি') &&
+    (q.includes('শাসন') || q.includes('শাসক') || q.includes('বাদশাহ') || q.includes('প্রধানমন্ত্রী') || q.includes('রাজা') || q.includes('সরকার'))
+  ) {
+    return `সৌদি আরব একটি **পরম রাজতন্ত্র** (Absolute Monarchy) দ্বারা শাসিত রাষ্ট্র। দেশটির বর্তমান শাসনব্যবস্থা ও শীর্ষ নেতৃত্ব নিম্নরূপ:
+
+👑 **১. রাষ্ট্রপ্রধান (বাদশাহ):**
+* **বাদশাহ সালমান বিন আব্দুল আজিজ আল সৌদ** (Salman bin Abdulaziz Al Saud)। তিনি ২০১৫ সালের ২৩ জানুয়ারি থেকে সৌদি আরবের বাদশাহ হিসেবে দায়িত্ব পালন করছেন।
+
+👑 **২. প্রধানমন্ত্রী ও যুবরাজ (ক্রাউন প্রিন্স):**
+* **মোহাম্মদ বিন সালমান আল সৌদ** (Mohammed bin Salman - MBS)। তিনি সৌদি আরবের বর্তমান প্রধানমন্ত্রী এবং যুবরাজ। বাদশাহ সালমানের শারীরিক অসুস্থতার কারণে কার্যত তিনিই এখন দেশটির দৈনন্দিন প্রশাসন ও রাষ্ট্রীয় নীতিনির্ধারণের মূল চালিকাশক্তি।
+
+🏛️ **সারসংক্ষেপ:** সৌদি আরবের শাসনক্ষমতা মূলত রাজকীয় পরিবার **'আল সৌদ'**-এর হাতে ন্যস্ত।`;
+  }
+
   // Bangladesh
   if (q.includes('বাংলাদেশ')) {
     if (q.includes('রাজধানী')) {
@@ -181,10 +197,10 @@ app.post('/api/chat', async (req, res) => {
       return res.json({ reply: directAns });
     }
 
-    // Try reliable Gemini models in order of availability
+    // Try reliable Gemini models in order of availability (gemini-3.1-flash-lite first due to generous quota)
     const candidateModels = [
-      'gemini-3.8-flash',
       'gemini-3.1-flash-lite',
+      'gemini-3.8-flash',
       'gemini-flash-latest',
       'gemini-3.1-pro-preview',
     ];
