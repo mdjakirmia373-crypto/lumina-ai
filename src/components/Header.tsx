@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import { Language, UserAccount, AppTab } from '../types';
 import { LumiqraLogo } from './LumiqraLogo';
+import { isOwnerUser } from '../utils/adminAuth';
 
 interface HeaderProps {
   lang: Language;
@@ -33,6 +34,8 @@ export const Header: React.FC<HeaderProps> = ({
   onLogout,
   onToggleSidebar,
 }) => {
+  const isOwner = isOwnerUser(currentUser?.email);
+
   return (
     <header className="border-b border-slate-800/80 bg-slate-950/80 sticky top-0 z-30 backdrop-blur-md">
       <div className="w-full px-4 py-3 flex items-center justify-between">
@@ -63,19 +66,21 @@ export const Header: React.FC<HeaderProps> = ({
             <span>100% Free</span>
           </div>
 
-          {/* Admin Analytics Quick Icon */}
-          <button
-            onClick={() => onTabChange('admin')}
-            className={`flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl border text-xs font-semibold transition cursor-pointer ${
-              activeTab === 'admin'
-                ? 'bg-indigo-600 text-white border-indigo-500 shadow-md shadow-indigo-600/30'
-                : 'bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-white border-slate-800'
-            }`}
-            title={lang === 'bn' ? 'অ্যাডমিন ড্যাশবোর্ড ও ভিজিটর মেট্রিক্স' : 'Admin & Analytics'}
-          >
-            <BarChart3 className="w-3.5 h-3.5 text-indigo-400" />
-            <span className="hidden md:inline">{lang === 'bn' ? 'অ্যাডমিন' : 'Admin'}</span>
-          </button>
+          {/* Admin Analytics Quick Icon (ONLY visible to verified owner) */}
+          {isOwner && (
+            <button
+              onClick={() => onTabChange('admin')}
+              className={`flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl border text-xs font-semibold transition cursor-pointer ${
+                activeTab === 'admin'
+                  ? 'bg-indigo-600 text-white border-indigo-500 shadow-md shadow-indigo-600/30'
+                  : 'bg-slate-900 hover:bg-slate-800 text-indigo-300 hover:text-white border-indigo-500/40'
+              }`}
+              title={lang === 'bn' ? 'অ্যাডমিন ড্যাশবোর্ড ও ভিজিটর মেট্রিক্স' : 'Admin & Analytics'}
+            >
+              <BarChart3 className="w-3.5 h-3.5 text-indigo-400" />
+              <span className="hidden md:inline">{lang === 'bn' ? 'অ্যাডমিন' : 'Admin'}</span>
+            </button>
+          )}
 
           {/* Language Switcher */}
           <button
@@ -93,22 +98,25 @@ export const Header: React.FC<HeaderProps> = ({
               <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-800 text-xs text-slate-200 font-medium">
                 <span className="w-2 h-2 rounded-full bg-emerald-400" />
                 <span className="max-w-[100px] truncate hidden sm:inline">{currentUser.name}</span>
+                {isOwner && (
+                  <span className="text-[10px] text-indigo-400 font-bold ml-1 hidden sm:inline">(Owner)</span>
+                )}
               </div>
               <button
                 onClick={onLogout}
                 className="p-1.5 rounded-xl bg-slate-900 hover:bg-red-500/20 text-slate-400 hover:text-red-300 border border-slate-800 transition cursor-pointer"
                 title={lang === 'bn' ? 'লগআউট' : 'Sign Out'}
               >
-                <LogOut className="w-3.5 h-3.5" />
+                <LogOut className="w-4 h-4" />
               </button>
             </div>
           ) : (
             <button
               onClick={onOpenAuth}
-              className="flex items-center gap-1.5 bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white px-3 sm:px-4 py-1.5 rounded-xl text-xs font-bold shadow-md shadow-indigo-600/20 transition cursor-pointer"
+              className="flex items-center gap-1.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white px-3 sm:px-4 py-1.5 rounded-xl text-xs font-semibold shadow-md shadow-indigo-600/25 transition cursor-pointer"
             >
               <User className="w-3.5 h-3.5" />
-              <span>{lang === 'bn' ? 'লগইন / সাইন আপ' : 'Login / Sign Up'}</span>
+              <span>{lang === 'bn' ? 'সাইন ইন' : 'Sign In'}</span>
             </button>
           )}
         </div>

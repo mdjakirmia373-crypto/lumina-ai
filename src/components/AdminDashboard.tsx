@@ -20,10 +20,13 @@ import {
   Globe,
   ArrowUpRight,
   Database,
-  Trash2
+  Trash2,
+  Lock,
+  AlertTriangle
 } from 'lucide-react';
 import { Language, UserAccount } from '../types';
 import { loadAnalytics, saveAnalytics, AdminStatsData, ActivityLog } from '../utils/analyticsTracker';
+import { isOwnerUser, CREATOR_EMAIL } from '../utils/adminAuth';
 
 interface AdminDashboardProps {
   lang: Language;
@@ -39,14 +42,15 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   const [stats, setStats] = useState<AdminStatsData>(() => loadAnalytics());
   const [activeSubTab, setActiveSubTab] = useState<'overview' | 'logs' | 'breakdown'>('overview');
   const [adminPin, setAdminPin] = useState('');
+  const [pinError, setPinError] = useState(false);
+
+  // Check if current user is the verified owner
+  const isOwner = isOwnerUser(currentUser?.email);
+
   const [isUnlocked, setIsUnlocked] = useState(() => {
-    // If the logged in user is the owner mdjakirmia373@gmail.com, auto-unlock
-    if (currentUser?.email?.toLowerCase().includes('mdjakirmia') || currentUser?.email?.toLowerCase().includes('jakir')) {
-      return true;
-    }
+    if (isOwner) return true;
     return sessionStorage.getItem('lumiqra_admin_unlocked') === '1';
   });
-  const [pinError, setPinError] = useState(false);
 
   // Refresh stats periodically and listen to live events
   useEffect(() => {
@@ -69,18 +73,21 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
     };
   }, []);
 
-  // Check user email
+  // Auto-unlock ONLY if verified owner email is logged in
   useEffect(() => {
-    if (currentUser?.email?.toLowerCase().includes('mdjakirmia') || currentUser?.email?.toLowerCase().includes('jakir')) {
+    if (isOwner) {
       setIsUnlocked(true);
       sessionStorage.setItem('lumiqra_admin_unlocked', '1');
+    } else {
+      setIsUnlocked(false);
+      sessionStorage.removeItem('lumiqra_admin_unlocked');
     }
-  }, [currentUser]);
+  }, [currentUser, isOwner]);
 
+  // Master Secret PIN fallback: 9841 (Private to Jakir Hossain only)
   const handleUnlockWithPin = (e: React.FormEvent) => {
     e.preventDefault();
-    // Default master PIN for the creator (or Jakir's direct unlock)
-    if (adminPin === '1012' || adminPin === '373' || adminPin === '7860') {
+    if (adminPin === '9841' || adminPin === '7860') {
       setIsUnlocked(true);
       sessionStorage.setItem('lumiqra_admin_unlocked', '1');
       setPinError(false);
@@ -122,46 +129,61 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
     chatMessages: 0,
   };
 
+  // Block general users / customers completely
   if (!isUnlocked) {
     return (
       <div className="glass-card rounded-3xl p-6 sm:p-10 border border-slate-800 shadow-2xl max-w-lg mx-auto text-center space-y-6 animate-fade-in my-8">
-        <div className="w-16 h-16 mx-auto rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white shadow-lg shadow-indigo-500/25">
-          <KeyRound className="w-8 h-8" />
+        <div className="w-16 h-16 mx-auto rounded-2xl bg-gradient-to-br from-rose-500/20 to-indigo-600/30 border border-rose-500/30 flex items-center justify-center text-rose-400 shadow-lg shadow-rose-500/10">
+          <Lock className="w-8 h-8" />
         </div>
 
         <div>
-          <h2 className="text-2xl font-bold text-white mb-2">
-            {lang === 'bn' ? 'অ্যাডমিন কন্ট্রোল প্যানেল' : 'Creator & Admin Portal'}
+          <h2 className="text-xl sm:text-2xl font-bold text-white mb-2">
+            {lang === 'bn' ? 'অ্যাক্সেস সংরক্ষিত (Access Restricted)' : 'Restricted Admin Access'}
           </h2>
-          <p className="text-xs sm:text-sm text-slate-400">
+          <p className="text-xs sm:text-sm text-slate-400 leading-relaxed">
             {lang === 'bn' 
-              ? 'এই ড্যাশবোর্ডটি শুধু Lumiqra AI এর মালিক (Md. Jakir Hossain)-এর ব্যবহারের জন্য সুরক্ষিত।' 
-              : 'This private dashboard is restricted to the Lumiqra AI owner.'}
+              ? `এই অ্যাডমিন প্যানেলটি শুধুমাত্র সাইটের প্রতিষ্ঠাতা ও মালিক (${CREATOR_EMAIL})-এর জন্য ব্যক্তিগতভাবে সংরক্ষিত। সাধারণ গ্রাহক বা ভিজিটররা এতে প্রবেশ করতে পারবে না।` 
+              : `This admin console is exclusively reserved for the website owner (${CREATOR_EMAIL}). Unauthorized access is blocked.`}
           </p>
         </div>
 
         {currentUser?.email ? (
-          <div className="p-3 bg-slate-900/80 rounded-xl border border-slate-800 text-xs text-slate-300">
-            {lang === 'bn' ? 'লগইন আছেন:' : 'Logged in as:'} <span className="font-semibold text-blue-400">{currentUser.email}</span>
+          <div className="p-3.5 bg-slate-900/90 rounded-2xl border border-slate-800 text-xs text-slate-300 space-y-1">
+            <div className="flex items-center justify-center gap-1.5 text-amber-400 text-xs font-semibold">
+              <AlertTriangle className="w-4 h-4" />
+              <span>{lang === 'bn' ? 'অননুমোদিত অ্যাকাউন্ট' : 'Non-admin Account'}</span>
+            </div>
+            <p className="text-slate-400">
+              {lang === 'bn' ? 'বর্তমান ইমেইল:' : 'Logged in as:'} <span className="font-semibold text-rose-300">{currentUser.email}</span>
+            </p>
+            <p className="text-[11px] text-slate-500">
+              {lang === 'bn' 
+                ? 'অ্যাডমিন ড্যাশবোর্ডে ঢুকতে আপনার মালিকানা ইমেইল দিয়ে সাইন ইন করুন।' 
+                : 'Sign in with the verified owner account to unlock.'}
+            </p>
           </div>
         ) : (
-          <div className="p-3 bg-slate-900/80 rounded-xl border border-slate-800 text-xs text-slate-400">
-            {lang === 'bn' 
-              ? 'আপনার মালিকানা জিমেইল দিয়ে লগইন করলে অটোমেটিক আনলক হবে।' 
-              : 'Login with your owner email to automatically unlock.'}
+          <div className="p-3.5 bg-slate-900/90 rounded-2xl border border-slate-800 text-xs text-slate-400">
+            <p>
+              {lang === 'bn' 
+                ? 'মালিকের জিমেইল (mdjakirmia373@gmail.com) দিয়ে সাইন ইন করলে এটি অটোমেটিক আনলক হবে।' 
+                : 'Sign in with the owner email (mdjakirmia373@gmail.com) to access.'}
+            </p>
             <button
               onClick={onOpenAuth}
-              className="block mx-auto mt-2 text-blue-400 hover:underline font-semibold"
+              className="mt-3 px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs transition cursor-pointer shadow-md shadow-indigo-600/20"
             >
-              {lang === 'bn' ? 'এখানে ক্লিক করে লগইন করুন' : 'Click here to sign in'}
+              {lang === 'bn' ? 'মালিক অ্যাকাউন্ট দিয়ে সাইন ইন করুন' : 'Sign in as Owner'}
             </button>
           </div>
         )}
 
-        <form onSubmit={handleUnlockWithPin} className="space-y-4 pt-2">
+        {/* Master PIN form for Owner in case of quick device override */}
+        <form onSubmit={handleUnlockWithPin} className="space-y-4 pt-3 border-t border-slate-800/80">
           <div>
             <label className="block text-xs font-medium text-slate-400 mb-1.5 text-left">
-              {lang === 'bn' ? 'সিক্রেট অ্যাডমিন পিন (Master PIN):' : 'Enter Secret Admin PIN:'}
+              {lang === 'bn' ? 'মাস্টার সিকিউরিটি পিন (Owner Secret PIN):' : 'Owner Secret Security PIN:'}
             </label>
             <input
               type="password"
@@ -170,27 +192,23 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 setAdminPin(e.target.value);
                 setPinError(false);
               }}
-              placeholder={lang === 'bn' ? 'পিন লিখুন (যেমন: 1012)' : 'Enter PIN (e.g. 1012)'}
-              className="w-full px-4 py-3 rounded-xl bg-slate-900/90 border border-slate-700 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-center tracking-widest text-lg font-mono"
+              placeholder="••••"
+              className="w-full px-4 py-3 rounded-xl bg-slate-900/90 border border-slate-700 text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-center tracking-widest text-lg font-mono"
             />
             {pinError && (
-              <p className="text-rose-400 text-xs mt-1.5">
-                {lang === 'bn' ? 'ভুল পিন কোড! সঠিক পিন লিখুন।' : 'Incorrect PIN! Try again.'}
+              <p className="text-rose-400 text-xs mt-1.5 font-medium">
+                {lang === 'bn' ? 'ভুল পিন কোড! অ্যাক্সেস প্রত্যাখ্যাত।' : 'Incorrect PIN! Access denied.'}
               </p>
             )}
           </div>
 
           <button
             type="submit"
-            className="w-full py-3 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white font-semibold text-sm shadow-lg shadow-indigo-500/20 transition transform active:scale-95"
+            className="w-full py-3 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-semibold text-xs shadow-lg shadow-indigo-500/20 transition cursor-pointer"
           >
-            {lang === 'bn' ? 'ড্যাশবোর্ডে প্রবেশ করুন' : 'Unlock Admin Dashboard'}
+            {lang === 'bn' ? 'পিন দিয়ে যাচাই করুন' : 'Verify Security PIN'}
           </button>
         </form>
-
-        <div className="pt-2 border-t border-slate-800/80 text-[11px] text-slate-500">
-          {lang === 'bn' ? 'টিপস: পিন কোড: 1012' : 'Quick PIN: 1012'}
-        </div>
       </div>
     );
   }
@@ -221,7 +239,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
           <div className="flex items-center gap-2 self-start sm:self-center">
             <button
               onClick={() => setStats(loadAnalytics())}
-              className="p-2.5 rounded-xl bg-slate-900 border border-slate-700 text-slate-300 hover:text-white hover:bg-slate-800 transition flex items-center gap-1.5 text-xs font-medium"
+              className="p-2.5 rounded-xl bg-slate-900 border border-slate-700 text-slate-300 hover:text-white hover:bg-slate-800 transition flex items-center gap-1.5 text-xs font-medium cursor-pointer"
               title="Refresh Stats"
             >
               <RefreshCw className="w-4 h-4 text-blue-400" />
@@ -229,7 +247,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             </button>
             <button
               onClick={handleResetData}
-              className="p-2.5 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 hover:bg-rose-500/20 transition flex items-center gap-1.5 text-xs font-medium"
+              className="p-2.5 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 hover:bg-rose-500/20 transition flex items-center gap-1.5 text-xs font-medium cursor-pointer"
               title="Reset Stats"
             >
               <Trash2 className="w-4 h-4" />
@@ -242,7 +260,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
         <div className="flex items-center gap-2 mt-6 pt-4 border-t border-slate-800/80">
           <button
             onClick={() => setActiveSubTab('overview')}
-            className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold transition ${
+            className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold transition cursor-pointer ${
               activeSubTab === 'overview'
                 ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/20'
                 : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
@@ -252,316 +270,236 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
           </button>
           <button
             onClick={() => setActiveSubTab('logs')}
-            className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold transition flex items-center gap-1.5 ${
+            className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold transition flex items-center gap-1.5 cursor-pointer ${
               activeSubTab === 'logs'
                 ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/20'
                 : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
             }`}
           >
-            <Activity className="w-3.5 h-3.5 text-emerald-400" />
-            <span>{lang === 'bn' ? 'লাইভ অ্যাক্টিভিটি লগ' : 'Live Activity Logs'}</span>
-            <span className="px-1.5 py-0.5 rounded-full bg-slate-800 text-[10px] text-slate-300">
+            <Activity className="w-3.5 h-3.5" />
+            <span>{lang === 'bn' ? 'লাইভ লগ (Activity Logs)' : 'Live Logs'}</span>
+            <span className="px-1.5 py-0.2 rounded-full bg-slate-800 text-[10px] text-slate-300">
               {stats.recentLogs.length}
             </span>
           </button>
           <button
             onClick={() => setActiveSubTab('breakdown')}
-            className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold transition ${
+            className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold transition cursor-pointer ${
               activeSubTab === 'breakdown'
                 ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/20'
                 : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
             }`}
           >
-            {lang === 'bn' ? 'জনপ্রিয় ফিচার ও স্টাইল' : 'Popular Features'}
+            {lang === 'bn' ? 'বিস্তারিত ক্যাটাগরি (Breakdown)' : 'Feature Breakdown'}
           </button>
         </div>
       </div>
 
+      {/* View 1: Overview Tab */}
       {activeSubTab === 'overview' && (
         <div className="space-y-6">
-          {/* Main 6 Metric Cards */}
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4">
-            {/* Card 1: Total Visits */}
-            <div className="glass-card p-4 sm:p-5 rounded-2xl border border-slate-800/80 bg-slate-900/60 hover:border-blue-500/40 transition group">
-              <div className="flex items-center justify-between mb-3">
-                <span className="text-xs text-slate-400 font-medium">
-                  {lang === 'bn' ? 'মোট সাইট ভিজিট' : 'Total Visits'}
-                </span>
-                <div className="w-8 h-8 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400 group-hover:scale-110 transition">
+          {/* Key KPI Big Cards Grid */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+            {/* Total Visits */}
+            <div className="glass-card p-4 sm:p-5 rounded-2xl border border-slate-800 bg-slate-900/60 relative overflow-hidden group">
+              <div className="flex items-center justify-between text-slate-400 mb-2">
+                <span className="text-xs font-medium">{lang === 'bn' ? 'মোট ভিজিটর (Visits)' : 'Total Visits'}</span>
+                <div className="p-2 rounded-xl bg-blue-500/10 text-blue-400">
                   <Eye className="w-4 h-4" />
                 </div>
               </div>
-              <div className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+              <div className="text-2xl sm:text-3xl font-black text-white">
                 {stats.totalVisits.toLocaleString()}
               </div>
-              <div className="flex items-center gap-1.5 mt-2 text-[11px] text-emerald-400">
-                <TrendingUp className="w-3.5 h-3.5" />
-                <span>{lang === 'bn' ? `আজকের ভিজিট: +${todayStat.visits}` : `Today: +${todayStat.visits}`}</span>
+              <div className="text-[11px] text-emerald-400 mt-2 flex items-center gap-1">
+                <TrendingUp className="w-3 h-3" />
+                <span>আজ: +{todayStat.visits} টি ভিউ</span>
               </div>
             </div>
 
-            {/* Card 2: Unique Visitors */}
-            <div className="glass-card p-4 sm:p-5 rounded-2xl border border-slate-800/80 bg-slate-900/60 hover:border-purple-500/40 transition group">
-              <div className="flex items-center justify-between mb-3">
-                <span className="text-xs text-slate-400 font-medium">
-                  {lang === 'bn' ? 'ইউনিক ভিজিটর' : 'Unique Users'}
-                </span>
-                <div className="w-8 h-8 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400 group-hover:scale-110 transition">
+            {/* Unique Visitors */}
+            <div className="glass-card p-4 sm:p-5 rounded-2xl border border-slate-800 bg-slate-900/60 relative overflow-hidden group">
+              <div className="flex items-center justify-between text-slate-400 mb-2">
+                <span className="text-xs font-medium">{lang === 'bn' ? 'ইউনিক ইউজার' : 'Unique Users'}</span>
+                <div className="p-2 rounded-xl bg-indigo-500/10 text-indigo-400">
                   <Users className="w-4 h-4" />
                 </div>
               </div>
-              <div className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+              <div className="text-2xl sm:text-3xl font-black text-white">
                 {stats.totalUniqueVisitors.toLocaleString()}
               </div>
-              <div className="flex items-center gap-1.5 mt-2 text-[11px] text-purple-400">
-                <Globe className="w-3.5 h-3.5" />
-                <span>{lang === 'bn' ? `আজ নতুন ইউজার: +${todayStat.uniqueVisitors}` : `Today New: +${todayStat.uniqueVisitors}`}</span>
+              <div className="text-[11px] text-indigo-400 mt-2 flex items-center gap-1">
+                <span>আজ ইউনিক: {todayStat.uniqueVisitors} জন</span>
               </div>
             </div>
 
-            {/* Card 3: Voices Generated */}
-            <div className="glass-card p-4 sm:p-5 rounded-2xl border border-slate-800/80 bg-slate-900/60 hover:border-pink-500/40 transition group">
-              <div className="flex items-center justify-between mb-3">
-                <span className="text-xs text-slate-400 font-medium">
-                  {lang === 'bn' ? 'ভয়েস তৈরি করা হয়েছে' : 'Voices Generated'}
-                </span>
-                <div className="w-8 h-8 rounded-xl bg-pink-500/10 border border-pink-500/20 flex items-center justify-center text-pink-400 group-hover:scale-110 transition">
+            {/* Total Voices Generated */}
+            <div className="glass-card p-4 sm:p-5 rounded-2xl border border-slate-800 bg-slate-900/60 relative overflow-hidden group">
+              <div className="flex items-center justify-between text-slate-400 mb-2">
+                <span className="text-xs font-medium">{lang === 'bn' ? 'ভয়েস জেনারেট' : 'Voices Created'}</span>
+                <div className="p-2 rounded-xl bg-purple-500/10 text-purple-400">
                   <Mic className="w-4 h-4" />
                 </div>
               </div>
-              <div className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+              <div className="text-2xl sm:text-3xl font-black text-white">
                 {stats.totalVoicesGenerated.toLocaleString()}
               </div>
-              <div className="flex items-center gap-1.5 mt-2 text-[11px] text-pink-400">
-                <Sparkles className="w-3.5 h-3.5" />
-                <span>{lang === 'bn' ? `আজ ভয়েস তৈরি: +${todayStat.voicesGenerated}` : `Today: +${todayStat.voicesGenerated}`}</span>
+              <div className="text-[11px] text-purple-400 mt-2">
+                <span>আজ ভয়েস: +{todayStat.voicesGenerated}</span>
               </div>
             </div>
 
-            {/* Card 4: Images Generated */}
-            <div className="glass-card p-4 sm:p-5 rounded-2xl border border-slate-800/80 bg-slate-900/60 hover:border-amber-500/40 transition group">
-              <div className="flex items-center justify-between mb-3">
-                <span className="text-xs text-slate-400 font-medium">
-                  {lang === 'bn' ? 'ছবি তৈরি করা হয়েছে' : 'Images Generated'}
-                </span>
-                <div className="w-8 h-8 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 group-hover:scale-110 transition">
+            {/* Total Images Generated */}
+            <div className="glass-card p-4 sm:p-5 rounded-2xl border border-slate-800 bg-slate-900/60 relative overflow-hidden group">
+              <div className="flex items-center justify-between text-slate-400 mb-2">
+                <span className="text-xs font-medium">{lang === 'bn' ? 'এআই ছবি তৈরি' : 'Images Created'}</span>
+                <div className="p-2 rounded-xl bg-pink-500/10 text-pink-400">
                   <ImageIcon className="w-4 h-4" />
                 </div>
               </div>
-              <div className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+              <div className="text-2xl sm:text-3xl font-black text-white">
                 {stats.totalImagesGenerated.toLocaleString()}
               </div>
-              <div className="flex items-center gap-1.5 mt-2 text-[11px] text-amber-400">
-                <Sparkles className="w-3.5 h-3.5" />
-                <span>{lang === 'bn' ? `আজ ছবি তৈরি: +${todayStat.imagesGenerated}` : `Today: +${todayStat.imagesGenerated}`}</span>
-              </div>
-            </div>
-
-            {/* Card 5: Background Removed */}
-            <div className="glass-card p-4 sm:p-5 rounded-2xl border border-slate-800/80 bg-slate-900/60 hover:border-emerald-500/40 transition group">
-              <div className="flex items-center justify-between mb-3">
-                <span className="text-xs text-slate-400 font-medium">
-                  {lang === 'bn' ? 'ব্যাকগ্রাউন্ড রিমুভ' : 'BG Removals'}
-                </span>
-                <div className="w-8 h-8 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 group-hover:scale-110 transition">
-                  <Eraser className="w-4 h-4" />
-                </div>
-              </div>
-              <div className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
-                {stats.totalBgRemoved.toLocaleString()}
-              </div>
-              <div className="flex items-center gap-1.5 mt-2 text-[11px] text-emerald-400">
-                <Zap className="w-3.5 h-3.5" />
-                <span>{lang === 'bn' ? `আজ রিমুভ: +${todayStat.bgRemoved}` : `Today: +${todayStat.bgRemoved}`}</span>
-              </div>
-            </div>
-
-            {/* Card 6: AI Chat Q&A */}
-            <div className="glass-card p-4 sm:p-5 rounded-2xl border border-slate-800/80 bg-slate-900/60 hover:border-cyan-500/40 transition group">
-              <div className="flex items-center justify-between mb-3">
-                <span className="text-xs text-slate-400 font-medium">
-                  {lang === 'bn' ? 'এআই চ্যাট বার্তা' : 'AI Chat Queries'}
-                </span>
-                <div className="w-8 h-8 rounded-xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-cyan-400 group-hover:scale-110 transition">
-                  <MessageSquare className="w-4 h-4" />
-                </div>
-              </div>
-              <div className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
-                {stats.totalChatMessages.toLocaleString()}
-              </div>
-              <div className="flex items-center gap-1.5 mt-2 text-[11px] text-cyan-400">
-                <Activity className="w-3.5 h-3.5" />
-                <span>{lang === 'bn' ? `আজকের চ্যাট: +${todayStat.chatMessages}` : `Today: +${todayStat.chatMessages}`}</span>
+              <div className="text-[11px] text-pink-400 mt-2">
+                <span>আজ ছবি: +{todayStat.imagesGenerated}</span>
               </div>
             </div>
           </div>
 
-          {/* Today's Special Summary Widget */}
-          <div className="glass-card p-5 sm:p-6 rounded-2xl border border-slate-800 bg-slate-900/40">
-            <h3 className="text-sm font-semibold text-white mb-4 flex items-center gap-2">
-              <Calendar className="w-4 h-4 text-indigo-400" />
-              <span>{lang === 'bn' ? 'আজকের দিনের বিশেষ পরিসংখ্যান' : "Today's Activity Summary"}</span>
-              <span className="text-xs font-normal text-slate-400">({todayKey})</span>
-            </h3>
+          {/* Secondary Stats Row: Bg Removed + Chat Messages */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="glass-card p-5 rounded-2xl border border-slate-800 bg-slate-900/50 flex items-center justify-between">
+              <div className="flex items-center gap-3.5">
+                <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center">
+                  <Eraser className="w-6 h-6" />
+                </div>
+                <div>
+                  <p className="text-xs text-slate-400 font-medium">{lang === 'bn' ? 'ব্যাকগ্রাউন্ড রিমুভ মোট' : 'Total BG Cutouts'}</p>
+                  <p className="text-2xl font-bold text-white">{stats.totalBgRemoved}</p>
+                  <p className="text-[11px] text-slate-500">আজকে সম্পন্ন: {todayStat.bgRemoved} টি</p>
+                </div>
+              </div>
+            </div>
 
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center">
-              <div className="p-3 rounded-xl bg-slate-950/60 border border-slate-800/80">
-                <div className="text-xs text-slate-400 mb-1">{lang === 'bn' ? 'আজকের ভিজিট' : 'Visits Today'}</div>
-                <div className="text-xl font-bold text-blue-400">{todayStat.visits}</div>
-              </div>
-              <div className="p-3 rounded-xl bg-slate-950/60 border border-slate-800/80">
-                <div className="text-xs text-slate-400 mb-1">{lang === 'bn' ? 'আজকের ভয়েস' : 'Voices Today'}</div>
-                <div className="text-xl font-bold text-pink-400">{todayStat.voicesGenerated}</div>
-              </div>
-              <div className="p-3 rounded-xl bg-slate-950/60 border border-slate-800/80">
-                <div className="text-xs text-slate-400 mb-1">{lang === 'bn' ? 'আজকের ছবি' : 'Images Today'}</div>
-                <div className="text-xl font-bold text-amber-400">{todayStat.imagesGenerated}</div>
-              </div>
-              <div className="p-3 rounded-xl bg-slate-950/60 border border-slate-800/80">
-                <div className="text-xs text-slate-400 mb-1">{lang === 'bn' ? 'আজকের চ্যাট ও বিজি' : 'Chat & BG Today'}</div>
-                <div className="text-xl font-bold text-emerald-400">{todayStat.bgRemoved + todayStat.chatMessages}</div>
+            <div className="glass-card p-5 rounded-2xl border border-slate-800 bg-slate-900/50 flex items-center justify-between">
+              <div className="flex items-center gap-3.5">
+                <div className="w-12 h-12 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-400 flex items-center justify-center">
+                  <MessageSquare className="w-6 h-6" />
+                </div>
+                <div>
+                  <p className="text-xs text-slate-400 font-medium">{lang === 'bn' ? 'এআই চ্যাট মেসেজ মোট' : 'Total AI Chat Messages'}</p>
+                  <p className="text-2xl font-bold text-white">{stats.totalChatMessages}</p>
+                  <p className="text-[11px] text-slate-500">আজকে আদানপ্রদান: {todayStat.chatMessages} টি</p>
+                </div>
               </div>
             </div>
           </div>
         </div>
       )}
 
+      {/* View 2: Logs Tab */}
       {activeSubTab === 'logs' && (
-        <div className="glass-card rounded-2xl border border-slate-800 p-5 space-y-4">
-          <div className="flex items-center justify-between">
-            <h3 className="text-sm font-semibold text-white flex items-center gap-2">
-              <Activity className="w-4 h-4 text-emerald-400" />
-              <span>{lang === 'bn' ? 'লাইভ কার্যক্রম লগ (সর্বশেষ ৫০টি কাজ)' : 'Live User Activity Feed (Recent 50)'}</span>
-            </h3>
-            <span className="text-[11px] text-slate-400">
-              {lang === 'bn' ? 'প্রতি সেকেন্ডে আপডেট হয়' : 'Auto-updates'}
+        <div className="glass-card rounded-2xl border border-slate-800 bg-slate-900/60 overflow-hidden">
+          <div className="p-4 border-b border-slate-800/80 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Activity className="w-4 h-4 text-emerald-400 animate-pulse" />
+              <h3 className="text-sm font-bold text-white">
+                {lang === 'bn' ? 'সাম্প্রতিক লাইভ কার্যকলাপ (Live User Actions)' : 'Recent Real-time Activity Logs'}
+              </h3>
+            </div>
+            <span className="text-xs text-slate-400">
+              {stats.recentLogs.length} {lang === 'bn' ? 'টি অ্যাকশন রেকর্ড' : 'actions tracked'}
             </span>
           </div>
 
-          {stats.recentLogs.length === 0 ? (
-            <div className="text-center py-10 text-slate-500 text-xs">
-              {lang === 'bn' ? 'এখনও কোনো অ্যাক্টিভিটি রেকর্ড হয়নি।' : 'No activity logged yet.'}
-            </div>
-          ) : (
-            <div className="space-y-2 max-h-[420px] overflow-y-auto pr-1">
-              {stats.recentLogs.map((log) => {
-                const timeString = new Date(log.timestamp).toLocaleTimeString();
-                const dateString = new Date(log.timestamp).toLocaleDateString();
+          <div className="divide-y divide-slate-800/60 max-h-[450px] overflow-y-auto">
+            {stats.recentLogs.length === 0 ? (
+              <div className="p-8 text-center text-xs text-slate-500">
+                {lang === 'bn' ? 'এখনো কোনো সাম্প্রতিক কাজ রেকর্ড হয়নি।' : 'No activity logged yet.'}
+              </div>
+            ) : (
+              stats.recentLogs.map((log) => {
+                const date = new Date(log.timestamp);
+                const timeStr = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
 
                 let badgeColor = 'bg-blue-500/10 text-blue-400 border-blue-500/20';
-                let IconComp = Eye;
-
-                if (log.type === 'voice') {
-                  badgeColor = 'bg-pink-500/10 text-pink-400 border-pink-500/20';
-                  IconComp = Mic;
-                } else if (log.type === 'image') {
-                  badgeColor = 'bg-amber-500/10 text-amber-400 border-amber-500/20';
-                  IconComp = ImageIcon;
-                } else if (log.type === 'bg-remover') {
-                  badgeColor = 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20';
-                  IconComp = Eraser;
-                } else if (log.type === 'chat') {
-                  badgeColor = 'bg-cyan-500/10 text-cyan-400 border-cyan-500/20';
-                  IconComp = MessageSquare;
-                }
+                if (log.type === 'voice') badgeColor = 'bg-purple-500/10 text-purple-400 border-purple-500/20';
+                if (log.type === 'image') badgeColor = 'bg-pink-500/10 text-pink-400 border-pink-500/20';
+                if (log.type === 'bg-remover') badgeColor = 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20';
+                if (log.type === 'chat') badgeColor = 'bg-amber-500/10 text-amber-400 border-amber-500/20';
 
                 return (
-                  <div
-                    key={log.id}
-                    className="p-3 rounded-xl bg-slate-900/60 border border-slate-800/80 flex items-start justify-between gap-3 text-xs hover:border-slate-700 transition"
-                  >
-                    <div className="flex items-start gap-2.5">
-                      <div className={`p-1.5 rounded-lg border ${badgeColor} mt-0.5`}>
-                        <IconComp className="w-3.5 h-3.5" />
-                      </div>
-                      <div>
-                        <div className="font-medium text-slate-200">
+                  <div key={log.id} className="p-3.5 hover:bg-slate-800/40 transition flex items-center justify-between gap-3 text-xs">
+                    <div className="flex items-center gap-3 overflow-hidden">
+                      <span className={`px-2 py-0.5 rounded-lg text-[10px] font-semibold border shrink-0 ${badgeColor}`}>
+                        {log.type.toUpperCase()}
+                      </span>
+                      <div className="truncate">
+                        <p className="text-slate-200 font-medium truncate">
                           {lang === 'bn' ? log.descriptionBn : log.descriptionEn}
-                        </div>
+                        </p>
                         {log.details && (
-                          <div className="text-slate-400 text-[11px] mt-0.5 font-mono line-clamp-1">
-                            {log.details}
-                          </div>
+                          <p className="text-[11px] text-slate-500 truncate">{log.details}</p>
                         )}
                       </div>
                     </div>
 
-                    <div className="text-[10px] text-slate-500 whitespace-nowrap text-right">
-                      <div>{timeString}</div>
-                      <div>{dateString}</div>
+                    <div className="flex items-center gap-1.5 text-[11px] text-slate-500 shrink-0">
+                      <Clock className="w-3 h-3" />
+                      <span>{timeStr}</span>
                     </div>
                   </div>
                 );
-              })}
-            </div>
-          )}
+              })
+            )}
+          </div>
         </div>
       )}
 
+      {/* View 3: Feature Breakdown */}
       {activeSubTab === 'breakdown' && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {/* Top Voices */}
-          <div className="glass-card p-5 rounded-2xl border border-slate-800 space-y-3">
-            <h4 className="text-sm font-semibold text-white flex items-center gap-2">
-              <Mic className="w-4 h-4 text-pink-400" />
-              <span>{lang === 'bn' ? 'সর্বোচ্চ ব্যবহৃত ভয়েস' : 'Most Popular Voices'}</span>
+          {/* Top Voices Used */}
+          <div className="glass-card p-5 rounded-2xl border border-slate-800 bg-slate-900/60 space-y-3">
+            <h4 className="text-sm font-bold text-white flex items-center gap-2">
+              <Mic className="w-4 h-4 text-purple-400" />
+              <span>{lang === 'bn' ? 'জনপ্রিয় ভয়েসসমূহ' : 'Most Popular Voice Models'}</span>
             </h4>
-            {Object.keys(stats.topVoices).length === 0 ? (
-              <p className="text-xs text-slate-500">{lang === 'bn' ? 'কোনো ভয়েস ডেটা নেই' : 'No voice data yet'}</p>
-            ) : (
-              <div className="space-y-2">
-                {Object.entries(stats.topVoices)
-                  .sort((a, b) => b[1] - a[1])
-                  .slice(0, 5)
-                  .map(([name, count]) => (
-                    <div key={name} className="flex items-center justify-between p-2.5 rounded-xl bg-slate-900/60 border border-slate-800 text-xs">
-                      <span className="text-slate-300 font-medium truncate max-w-[200px]">{name}</span>
-                      <span className="px-2 py-0.5 rounded-md bg-pink-500/10 text-pink-400 font-semibold border border-pink-500/20">
-                        {count} {lang === 'bn' ? 'বার' : 'times'}
-                      </span>
-                    </div>
-                  ))}
-              </div>
-            )}
+            <div className="space-y-2">
+              {Object.keys(stats.topVoices).length === 0 ? (
+                <p className="text-xs text-slate-500">{lang === 'bn' ? 'কোনো ভয়েস রেকর্ড নেই' : 'No voice metrics yet'}</p>
+              ) : (
+                Object.entries(stats.topVoices).map(([voice, count]) => (
+                  <div key={voice} className="flex items-center justify-between p-2 rounded-xl bg-slate-950 text-xs">
+                    <span className="text-slate-300 font-medium truncate max-w-[200px]">{voice}</span>
+                    <span className="text-purple-400 font-bold">{count} বার</span>
+                  </div>
+                ))
+              )}
+            </div>
           </div>
 
           {/* Top Image Styles */}
-          <div className="glass-card p-5 rounded-2xl border border-slate-800 space-y-3">
-            <h4 className="text-sm font-semibold text-white flex items-center gap-2">
-              <ImageIcon className="w-4 h-4 text-amber-400" />
-              <span>{lang === 'bn' ? 'পছন্দের ছবির স্টাইল' : 'Popular Image Styles'}</span>
+          <div className="glass-card p-5 rounded-2xl border border-slate-800 bg-slate-900/60 space-y-3">
+            <h4 className="text-sm font-bold text-white flex items-center gap-2">
+              <ImageIcon className="w-4 h-4 text-pink-400" />
+              <span>{lang === 'bn' ? 'জনপ্রিয় ইমেজ স্টাইল' : 'Most Popular Image Styles'}</span>
             </h4>
-            {Object.keys(stats.topStyles).length === 0 ? (
-              <p className="text-xs text-slate-500">{lang === 'bn' ? 'কোনো স্টাইল ডেটা নেই' : 'No style data yet'}</p>
-            ) : (
-              <div className="space-y-2">
-                {Object.entries(stats.topStyles)
-                  .sort((a, b) => b[1] - a[1])
-                  .slice(0, 5)
-                  .map(([style, count]) => (
-                    <div key={style} className="flex items-center justify-between p-2.5 rounded-xl bg-slate-900/60 border border-slate-800 text-xs">
-                      <span className="text-slate-300 font-medium capitalize">{style}</span>
-                      <span className="px-2 py-0.5 rounded-md bg-amber-500/10 text-amber-400 font-semibold border border-amber-500/20">
-                        {count} {lang === 'bn' ? 'বার' : 'times'}
-                      </span>
-                    </div>
-                  ))}
-              </div>
-            )}
+            <div className="space-y-2">
+              {Object.keys(stats.topStyles).length === 0 ? (
+                <p className="text-xs text-slate-500">{lang === 'bn' ? 'কোনো স্টাইল রেকর্ড নেই' : 'No style metrics yet'}</p>
+              ) : (
+                Object.entries(stats.topStyles).map(([style, count]) => (
+                  <div key={style} className="flex items-center justify-between p-2 rounded-xl bg-slate-950 text-xs">
+                    <span className="text-slate-300 font-medium capitalize">{style}</span>
+                    <span className="text-pink-400 font-bold">{count} বার</span>
+                  </div>
+                ))
+              )}
+            </div>
           </div>
         </div>
       )}
-
-      {/* Developer / Owner Signoff */}
-      <div className="glass-card p-4 rounded-xl border border-slate-800/80 bg-slate-950/60 flex items-center justify-between text-xs text-slate-400">
-        <div className="flex items-center gap-2">
-          <Award className="w-4 h-4 text-amber-400" />
-          <span>{lang === 'bn' ? 'মালিকানা যাচাইকৃত:' : 'Verified Owner:'} <strong className="text-white">Md. Jakir Hossain</strong></span>
-        </div>
-        <div className="text-[11px] text-slate-500">
-          Lumiqra AI Analytics v2.0
-        </div>
-      </div>
     </div>
   );
 };

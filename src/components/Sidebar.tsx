@@ -13,10 +13,12 @@ import {
   Zap,
   Globe,
   BarChart3,
-  Activity
+  Activity,
+  Lock
 } from 'lucide-react';
 import { Language, UserAccount, AppTab } from '../types';
 import { LumiqraLogo } from './LumiqraLogo';
+import { isOwnerUser } from '../utils/adminAuth';
 
 interface SidebarProps {
   lang: Language;
@@ -41,7 +43,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
   isOpenMobile,
   onCloseMobile,
 }) => {
-  const navItems = [
+  const isOwner = isOwnerUser(currentUser?.email);
+
+  const baseNavItems = [
     {
       id: 'image' as const,
       labelBn: 'টেক্সট টু ইমেজ',
@@ -97,18 +101,25 @@ export const Sidebar: React.FC<SidebarProps> = ({
       activeRing: 'border-amber-500/80 bg-amber-500/10 text-white shadow-lg shadow-amber-500/15',
       iconColor: 'text-amber-400',
     },
-    {
-      id: 'admin' as const,
-      labelBn: 'অ্যাডমিন ড্যাশবোর্ড',
-      labelEn: 'Admin Analytics',
-      subBn: 'ভিজিটর ও কাজের লাইভ হিসাব',
-      subEn: 'Visitor & Activity Metrics',
-      icon: BarChart3,
-      color: 'from-indigo-600 to-purple-600',
-      activeRing: 'border-indigo-500/80 bg-indigo-500/10 text-white shadow-lg shadow-indigo-500/15',
-      iconColor: 'text-indigo-400',
-    },
   ];
+
+  // ONLY show Admin Dashboard if the logged-in user is the verified owner (mdjakirmia373@gmail.com)
+  const navItems = isOwner
+    ? [
+        ...baseNavItems,
+        {
+          id: 'admin' as const,
+          labelBn: 'অ্যাডমিন ড্যাশবোর্ড',
+          labelEn: 'Admin Analytics',
+          subBn: 'মালিকানা ও লাইভ হিসাব',
+          subEn: 'Owner Live Metrics',
+          icon: BarChart3,
+          color: 'from-indigo-600 to-purple-600',
+          activeRing: 'border-indigo-500/80 bg-indigo-500/10 text-white shadow-lg shadow-indigo-500/15',
+          iconColor: 'text-indigo-400',
+        },
+      ]
+    : baseNavItems;
 
   return (
     <>
@@ -180,8 +191,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 </div>
 
                 <ChevronRight
-                  className={`w-4 h-4 shrink-0 transition-transform duration-200 ${
-                    isActive ? 'text-white translate-x-0.5' : 'text-slate-600 opacity-0 group-hover:opacity-100'
+                  className={`w-4 h-4 transition-transform duration-200 ${
+                    isActive ? 'text-white translate-x-0.5' : 'text-slate-600 group-hover:text-slate-400'
                   }`}
                 />
               </button>
@@ -189,56 +200,60 @@ export const Sidebar: React.FC<SidebarProps> = ({
           })}
         </div>
 
-        {/* Bottom User Account & Settings Section */}
+        {/* Bottom User Account Section */}
         <div className="p-4 border-t border-slate-800/80 bg-slate-950/60 space-y-3">
-          {/* Language Switch */}
-          <div className="flex items-center justify-between px-2 text-xs">
-            <span className="text-slate-400 flex items-center gap-1.5 text-xs">
-              <Globe className="w-3.5 h-3.5 text-indigo-400" />
-              <span>{lang === 'bn' ? 'ভাষা:' : 'Lang:'}</span>
+          {currentUser ? (
+            <div className="space-y-2">
+              <div className="flex items-center justify-between p-2.5 rounded-2xl bg-slate-900/90 border border-slate-800">
+                <div className="flex items-center gap-2.5 overflow-hidden">
+                  <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-indigo-500 to-purple-600 flex items-center justify-center text-white shrink-0 font-bold text-xs">
+                    {currentUser.name.charAt(0).toUpperCase()}
+                  </div>
+                  <div className="overflow-hidden">
+                    <div className="flex items-center gap-1.5">
+                      <p className="text-xs font-bold text-slate-100 truncate">{currentUser.name}</p>
+                      {isOwner && (
+                        <span className="text-[9px] px-1.5 py-0.2 rounded bg-indigo-500/20 text-indigo-300 font-semibold border border-indigo-500/30">
+                          Owner
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-[10px] text-slate-400 truncate">{currentUser.email}</p>
+                  </div>
+                </div>
+                <button
+                  onClick={onLogout}
+                  className="p-1.5 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-slate-800 transition cursor-pointer shrink-0"
+                  title={lang === 'bn' ? 'লগআউট' : 'Sign Out'}
+                >
+                  <LogOut className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div className="space-y-2">
+              <button
+                onClick={onOpenAuth}
+                className="w-full py-2.5 px-3 rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white text-xs font-bold shadow-lg shadow-indigo-600/25 transition cursor-pointer flex items-center justify-center gap-2"
+              >
+                <User className="w-3.5 h-3.5" />
+                <span>{lang === 'bn' ? 'সাইন ইন / রেজিস্ট্রেশন' : 'Sign In / Register'}</span>
+              </button>
+            </div>
+          )}
+
+          {/* Language Switcher in Sidebar Footer */}
+          <div className="flex items-center justify-between pt-2 border-t border-slate-900 text-xs">
+            <span className="text-[11px] text-slate-500">
+              {lang === 'bn' ? 'ভাষা / Language:' : 'Language:'}
             </span>
             <button
               onClick={onToggleLang}
-              className="px-2.5 py-1 rounded-lg bg-slate-900 border border-slate-800 text-slate-300 hover:text-white font-semibold text-[11px] transition cursor-pointer"
+              className="flex items-center gap-1.5 text-xs text-indigo-400 hover:text-indigo-300 font-semibold py-1 px-2 rounded-lg hover:bg-slate-900 transition cursor-pointer"
             >
-              {lang === 'bn' ? 'English (EN)' : 'বাংলা (BN)'}
+              <Globe className="w-3.5 h-3.5" />
+              <span>{lang === 'bn' ? 'English' : 'বাংলা'}</span>
             </button>
-          </div>
-
-          {/* User Profile Card */}
-          {currentUser ? (
-            <div className="p-3 rounded-2xl bg-slate-900 border border-slate-800 space-y-2.5">
-              <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-emerald-500 to-teal-600 flex items-center justify-center text-white font-bold text-xs shadow-md">
-                  {currentUser.name.charAt(0).toUpperCase()}
-                </div>
-                <div className="min-w-0 flex-1">
-                  <p className="text-xs font-bold text-white truncate">{currentUser.name}</p>
-                  <p className="text-[10px] text-slate-400 truncate">{currentUser.email}</p>
-                </div>
-              </div>
-
-              <button
-                onClick={onLogout}
-                className="w-full py-1.5 px-3 rounded-xl bg-slate-950/80 hover:bg-red-500/20 text-slate-400 hover:text-red-300 text-[11px] font-semibold flex items-center justify-center gap-1.5 border border-slate-800 transition cursor-pointer"
-              >
-                <LogOut className="w-3 h-3" />
-                <span>{lang === 'bn' ? 'লগআউট করুন' : 'Sign Out'}</span>
-              </button>
-            </div>
-          ) : (
-            <button
-              onClick={onOpenAuth}
-              className="w-full py-2.5 px-3 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold text-xs shadow-lg shadow-indigo-600/30 flex items-center justify-center gap-1.5 transition cursor-pointer"
-            >
-              <User className="w-3.5 h-3.5" />
-              <span>{lang === 'bn' ? 'সাইন আপ / লগইন' : 'Sign Up / Login'}</span>
-            </button>
-          )}
-
-          <div className="text-[10px] text-slate-500 text-center flex items-center justify-center gap-1">
-            <ShieldCheck className="w-3 h-3 text-emerald-400" />
-            <span>{lang === 'bn' ? '১০০% ফ্রি ও এনক্রিপ্টেড' : '100% Free & Encrypted'}</span>
           </div>
         </div>
       </aside>
