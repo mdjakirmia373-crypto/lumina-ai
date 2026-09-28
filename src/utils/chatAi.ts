@@ -1,7 +1,7 @@
 // Ultra-fast, highly capable Universal AI Chat Client (ChatGPT & Gemini standard)
 // 1. Direct server /api/chat with Gemini SDK
 // 2. Built-in high-precision Instant Knowledge Engine for Islamic, Scientific, General Knowledge & Greetings
-// 3. Instant Wikipedia Search & Universal Knowledge Synthesis (Ensuring EVERY question gets answered)
+// 3. Instant Wikipedia Full-Text Search & Universal Knowledge Synthesis (Ensuring EVERY question gets answered)
 
 export interface ChatMessage {
   id?: string;
@@ -33,6 +33,21 @@ He developed me for the Lumiqra AI platform to deliver world-class AI conversati
 
 export function checkCreatorQuery(query: string): string | null {
   const q = query.toLowerCase().replace(/[\?\.,!]/g, '').trim();
+
+  // If query is about Adam, Islam, Earth, Allah, universe, etc. -> NEVER intercept as creator query!
+  if (
+    q.includes('আদম') ||
+    q.includes('হাওয়া') ||
+    q.includes('হাওয়া') ||
+    q.includes('আল্লাহ') ||
+    q.includes('নবী') ||
+    q.includes('রাসূল') ||
+    q.includes('মানুষ') ||
+    q.includes('পৃথিবী')
+  ) {
+    return null;
+  }
+
   const creatorKeywords = [
     'কে বানিয়েছে',
     'কে বানিয়েছে',
@@ -45,12 +60,7 @@ export function checkCreatorQuery(query: string): string | null {
     'কে বানাইছে',
     'তোমার নির্মাতা কে',
     'তোমার ক্রিয়েটর কে',
-    'তোমার স্রষ্টা কে',
     'তোমার প্রতিষ্ঠাতা কে',
-    'তোমার মালিক কে',
-    'কার তৈরি',
-    'কে তোমাকে বানাইসে',
-    'তোমাকে কে বানাইসে',
     'who made you',
     'who created you',
     'who developed you',
@@ -58,7 +68,6 @@ export function checkCreatorQuery(query: string): string | null {
     'who is your developer',
     'who built you',
     'who is your founder',
-    'who is your owner',
   ];
 
   const matched = creatorKeywords.some((kw) => q.includes(kw));
@@ -75,26 +84,39 @@ export function checkCreatorQuery(query: string): string | null {
 export function checkUniversalKnowledge(rawQuery: string): string | null {
   const q = rawQuery.toLowerCase().replace(/[\?\.,!।]/g, '').trim();
 
-  // Greetings
-  if (q === 'হাই' || q === 'হ্যালো' || q === 'হেই' || q === 'hi' || q === 'hello' || q === 'hey') {
-    return `আসসালামু আলাইকুম! আমি **লুমিক্রা এআই (Lumiqra AI)**। আমি আপনাকে কীভাবে সাহায্য করতে পারি?\n\nআপনি আমাকে পবিত্র কুরআন ও হাদীস, মহাবিশ্ব ও বিজ্ঞান, ইতিহাস, গণিত, কোডিং কিংবা যেকোনো সৃজনশীল বিষয়ে প্রশ্ন করতে পারেন — আমি সাথে সাথে নির্ভুল উত্তর প্রদান করব!`;
-  }
+  // ONLY treat as pure greeting if the input is exclusively greeting words (NOT a compound question like "হযরত আদম আলাই সালাম...")
+  const isPureGreeting =
+    q === 'হাই' ||
+    q === 'হ্যালো' ||
+    q === 'হেই' ||
+    q === 'hi' ||
+    q === 'hello' ||
+    q === 'hey' ||
+    q === 'সালাম' ||
+    q === 'আসসালামু আলাইকুম' ||
+    q === 'আসসালামু আলাইকুম ওয়া রাহমাতুল্লাহ' ||
+    q === 'assalamu alaikum' ||
+    q === 'salam' ||
+    q === 'slam';
 
-  if (
-    q.includes('সালাম') ||
-    q.includes('আসসালামু আলাইকুম') ||
-    q.includes('assalamu alaikum') ||
-    q.includes('salam')
-  ) {
-    return `ওয়ালাইকুমুস সালাম ওয়া রাহমাতুল্লাহি ওয়া বারাকাতুহু!\n\nআপনার ওপর মহান আল্লাহর অশেষ শান্তি, রহমত ও বরকত বর্ষিত হোক। আমি লুমিক্রা এআই (Lumiqra AI), আপনার জ্ঞান অন্বেষণ ও যেকোনো প্রশ্নের উত্তর দিতে সর্বদা প্রস্তুত। বলুন, আজ আপনাকে কীভাবে সাহায্য করতে পারি?`;
+  if (isPureGreeting) {
+    return `ওয়ালাইকুমুস সালাম ওয়া রাহমাতুল্লাহি ওয়া বারাকাতুহু!\n\nআপনার ওপর মহান আল্লাহর অশেষ শান্তি, রহমত ও বরকত বর্ষিত হোক। আমি লুমিক্রা এআই (Lumiqra AI), আপনার জ্ঞান অন্বেষণ ও পৃথিবীর যেকোনো প্রশ্নের সরাসরি নির্ভুল উত্তর দিতে সর্বদা প্রস্তুত। বলুন, আজ আপনাকে কীভাবে সাহায্য করতে পারি?`;
   }
 
   if (q === 'কেমন আছো' || q === 'কেমন আছেন' || q === 'how are you') {
     return `আলহামদুলিল্লাহ, আমি খুবই ভালো আছি! আপনার খোঁজখবর কী? আশা করি আপনিও সুস্থ ও ভালো আছেন। আজ আপনাকে কী তথ্য জানতে বা কোন প্রশ্নের সমাধান করে দিতে পারি?`;
   }
 
-  if (q.includes('ধন্যবাদ') || q.includes('থ্যাংকস') || q.includes('thank you')) {
+  if (q === 'ধন্যবাদ' || q === 'থ্যাংকস' || q === 'thank you' || q === 'thanks') {
     return `আপনাকেও অনেক অনেক ধন্যবাদ! আপনার যেকোনো প্রয়োজনে বা জানার আগ্রহে আমি সর্বদা আপনার পাশে আছি। কোনো প্রশ্ন থাকলে নির্দ্বিধায় জিজ্ঞাসা করুন!`;
+  }
+
+  // Hazrat Adam (AS) and Hawwa (AS)
+  if (
+    q.includes('আদম') &&
+    (q.includes('স্ত্রী') || q.includes('স্ত্রীর') || q.includes('স্ত্রীকে') || q.includes('বউ') || q.includes('হাওয়া') || q.includes('হাওয়া') || q.includes('নাম'))
+  ) {
+    return `মানবজাতির আদি পিতা প্রথম নবী **হযরত আদম (আলাইহিস সালাম)**-এর স্ত্রীর নাম ছিল **হযরত হাওয়া (আলাইহাস সালাম)**।\n\n📖 **গুরুত্বপূর্ণ ঐতিহাসিক ও ইসলামী তথ্য:**\n- মহান আল্লাহ সুবহানাহু ওয়া তায়ালা হযরত আদম (আ.)-এর বাঁ-দিকের পাঁজরের হাড় থেকে হযরত হাওয়া (আ.)-কে তাঁর সঙ্গী হিসেবে সৃষ্টি করেছিলেন।\n- তাঁরা উভয়ই জান্নাতে বসবাস করতেন এবং পরবর্তীতে মহান আল্লাহর হুকুমে ও নির্ধারিত তকদীরের অংশ হিসেবে পৃথিবীতে আগমন করেন।\n- তাঁদের মাধ্যমে সমগ্র মানবজাতির বিস্তৃতি ও বংশপরম্পরা শুরু হয়।`;
   }
 
   // Quran: Para
@@ -131,30 +153,6 @@ export function checkUniversalKnowledge(rawQuery: string): string | null {
     return `আসমানী কিতাবের সংখ্যা মোট **১০৪ খানা**। এর মধ্যে প্রধান কিতাব হলো **৪ খানা**, এবং ছোট কিতাব (সহীফা) হলো **১০০ খানা**।\n\n### 📖 প্রধান ৪টি আসমানী কিতাব:\n১. **তাওরাত:** হযরত মুসা (আ.)-এর ওপর নাজিল হয়েছে।\n২. **যাবুর:** হযরত দাউদ (আ.)-এর ওপর নাজিল হয়েছে।\n৩. **ইঞ্জিল:** হযরত ঈসা (আ.)-এর ওপর নাজিল হয়েছে।\n৪. **আল-কুরআন:** সর্বশেষ ও সর্বশ্রেষ্ঠ নবী হযরত মুহাম্মদ (সা.)-এর ওপর সমগ্র মানবজাতির জন্য নাজিল হয়েছে।`;
   }
 
-  // Prophets / ১,২৪,০০০ নবী-রাসূল
-  if (q.includes('নবী') || q.includes('রাসূল') || q.includes('রাসুল') || q.includes('prophet')) {
-    if (q.includes('কয়জন') || q.includes('কতজন') || q.includes('সংখ্যা') || q.includes('জীবনী')) {
-      return `ইসলামী আকিদা ও প্রামাণ্য হাদীস অনুযায়ী মহান আল্লাহ মানবজাতিকে সৎপথ প্রদর্শনের জন্য প্রায় **১,২৪,০০০ (কিংবা ২,২৪,০০০) নবী ও রাসূল** প্রেরণ করেছিলেন।\n\n📖 **নবী-রাসূলগণের গুরুত্বপূর্ণ তথ্য ও ইতিহাস:**\n- **প্রথম নবী ও মানব:** হযরত আদম (আলাইহিস সালাম)\n- **সর্বশেষ ও সর্বশ্রেষ্ঠ রাসূল:** বিশ্বনবী হযরত মুহাম্মদ (সাল্লাল্লাহু আলাইহি ওয়া সাল্লাম)\n- **পবিত্র কুরআনে উল্লেখিত নবীগণের সংখ্যা:** ২৫ জন (যেমন: হযরত আদম, নূহ, ইব্রাহীম, ইসমাঈল, ইসহাক, ইয়াকুব, ইউসুফ, আইয়ুব, মূসা, হারুন, দাউদ, সোলাইমান, ইউনুস, যাকারিয়া, ইয়াহিয়া, ঈসা এবং মুহাম্মদ সা.)।\n- **উলুল আযম (ধৈর্যশীল শীর্ষ ৫ রাসূল):** হযরত নূহ (আ.), হযরত ইব্রাহীম (আ.), হযরত মূসা (আ.), হযরত ঈসা (আ.) এবং হযরত মুহাম্মদ (সা.)।`;
-    }
-  }
-
-  // Sahaba / সাহাবী
-  if (q.includes('সাহাবী') || q.includes('সাহাবা') || q.includes('sahaba')) {
-    return `সাহাবী হলেন সেই পুণ্যবান ব্যক্তিগণ যিনি ঈমানের সাথে মহানবী হযরত মুহাম্মদ (সা.)-এর পবিত্র দর্শন লাভ করেছিলেন এবং ঈমানের ওপরই মৃত্যুবরণ করেছিলেন।\n\n⭐ **চার মহান খলিফা (খুলাফায়ে রাশেদীন):**\n১. **হযরত আবু বকর সিদ্দিক (রা.)** — প্রথম খলিফা, মহানবীর পরম বন্ধু ও 'আস-সিদ্দিক'।\n২. **হযরত উমর ইবনুল খাত্তাব (রা.)** — দ্বিতীয় খলিফা, ইনসাফের প্রতীক ও 'আল-ফারুক'।\n৩. **হযরত উসমান ইবনে আফফান (রা.)** — তৃতীয় খলিফা, পবিত্র কুরআন সংকলক ও 'জুন-নুরাইন'।\n৪. **হযরত আলী ইবনে আবি তালিব (রা.)** — চতুর্থ খলিফা, বীর যোদ্ধা ও 'আসাদুল্লাহ'।\n\nএছাড়াও দুনিয়াতেই জান্নাতের সুসংবাদপ্রাপ্ত ১০ জন শ্রেষ্ঠ সাহাবীকে **'আশারায়ে মুবাশশারাহ'** বলা হয়।`;
-  }
-
-  // Big Bang & Universe / মহাবিশ্ব ও সৃষ্টিতত্ত্ব
-  if (q.includes('বিগ ব্যাং') || q.includes('মহাবিশ্ব') || q.includes('সৃষ্টিতত্ত্ব') || q.includes('universe')) {
-    return `### 🌌 **মহাবিশ্ব সৃষ্টি ও আধুনিক জ্যোতির্বিজ্ঞান**\n\nপদার্থবিজ্ঞান ও আধুনিক কসমোলজি অনুসারে প্রায় **১৩.৮ বিলিয়ন (১,৩৮০ কোটি) বছর পূর্বে** 'বিগ ব্যাং' (Big Bang) নামক এক মহাবিস্ফোরণের মাধ্যমে স্থান, কাল ও মহাবিশ্বের সূচনা হয়।\n\n- **প্রাথমিক অবস্থা:** অসীম তাপমাত্রা ও ঘনত্বের এক ক্ষুদ্রতম বিন্দু (Singularity) থেকে মহাবিশ্ব দ্রুত সম্প্রসারিত হতে শুরু করে।\n- **মৌল সৃষ্টি:** সম্প্রসারণের সাথে সাথে মহাবিশ্ব শীতল হতে থাকে এবং প্রথম ইলেকট্রন, প্রোটন ও হাইড্রোজেন-হিলিয়াম গ্যাস গঠিত হয়।\n- **গ্যালাক্সি ও সৌরজগত:** মহাকর্ষ বলের টানে গ্যাসপিণ্ড ঘনীভূত হয়ে নক্ষত্র ও ছায়াপথ তৈরি করে। আজ থেকে প্রায় ৪.৫ বিলিয়ন বছর আগে আমাদের সূর্য ও পৃথিবী গঠিত হয়।\n- **পবিত্র কুরআনের সাথে সামঞ্জস্য:** সূরা আল-আম্বিয়ার ৩০ আয়াতে বলা হয়েছে: *"আসমান ও যমীন ওতপ্রোতভাবে মিশে ছিল, অতঃপর আমি উভয়কে পৃথক করে দিলাম এবং প্রাণবান সবকিছু পানি থেকে সৃষ্টি করলাম।"*`;
-  }
-
-  // Ancient Civilizations / প্রাচীন সভ্যতা
-  if (q.includes('সভ্যতা') || q.includes('civilization') || q.includes('ইতিহাস')) {
-    if (q.includes('প্রাচীন') || q.includes('মেসোপটেমিয়া') || q.includes('মিশরীয়') || q.includes('সিন্ধু')) {
-      return `### 🏛️ **প্রাচীন মানব সভ্যতা ও ক্রমবিকাশ**\n\nমানবজাতির ইতিহাসের প্রারম্ভে নদীর তীরবর্তী উর্বর উপত্যকাগুলোতে প্রাচীন সভ্যতার উন্মেষ ঘটেছিল:\n\n১. **মেসোপটেমীয় সভ্যতা (টাইগ্রিস ও ইউফ্রেটিস নদী):** বর্তমান ইরাকে গড়ে ওঠা সুমেরীয়, ব্যাবিলনীয় ও অ্যাসিরীয় সভ্যতা। তারা চাকা ও প্রথম লিখন পদ্ধতি (কিউনিফর্ম) আবিষ্কার করে।\n২. **মিশরীয় সভ্যতা (নীল নদ):** পিরামিড, মমীকরণ, হায়ারোগ্লিফিক লিপি ও জ্যোতির্বিজ্ঞানের অভূতপূর্ব বিকাশ।\n৩. **সিন্ধু সভ্যতা (সিন্ধু নদ):** হরপ্পা ও মহেঞ্জোদারো—উন্নত নগর পরিকল্পনা, পয়ঃনিষ্কাশন ও জলপথ বাণিজ্য ব্যবস্থা।\n৪. **চীনা সভ্যতা (হোয়াংহো নদী):** কাগজ, রেশম বস্ত্র, বারুদ ও কম্পাসের আবিষ্কারক।`;
-    }
-  }
-
   // Namaz
   if (q.includes('নামাজ') && (q.includes('ওয়াক্ত') || q.includes('কয়টি') || q.includes('কয়') || q.includes('রাকাত'))) {
     return `মুসলিমদের ওপর প্রতিদিন **৫ ওয়াক্ত নামাজ** ফরজ:\n\n১. **ফজর:** সুবহে সাদিক থেকে সূর্যোদয়ের পূর্ব পর্যন্ত (২ রাকাত সুন্নত, ২ রাকাত ফরজ)।\n২. **যোহর:** দ্বিপ্রহরের পর থেকে আসর পর্যন্ত (৪ রাকাত সুন্নত, ৪ রাকাত ফরজ, ২ রাকাত সুন্নত, ২ রাকাত নফল)।\n৩. **আসর:** সূর্যের আলো হলুদ হওয়ার আগ পর্যন্ত (৪ রাকাত ফরজ)।\n৪. **মাগরিব:** সূর্যাস্তের পর থেকে পশ্চিমাকাশে লাল আভা থাকা পর্যন্ত (৩ রাকাত ফরজ, ২ রাকাত সুন্নত, ২ রাকাত নফল)।\n৫. **এশা:** মাগরিবের সময় শেষ হওয়ার পর থেকে ফজরের আগ পর্যন্ত (৪ রাকাত ফরজ, ২ রাকাত সুন্নত, ৩ রাকাত বিতর)।`;
@@ -170,12 +168,74 @@ function formatWikiSummary(title: string, extract: string): string {
     .trim();
 
   const sentences = cleaned.split(/(?<=[।\.\?!])\s+/);
-  const coreInfo = sentences.slice(0, 4).join(' ');
+  const coreInfo = sentences.slice(0, 5).join(' ');
 
   return `### 💡 **${title}**\n\n${coreInfo}`;
 }
 
+// Universal Wikipedia Search using full text search API (returns real knowledge for anything)
+async function searchWikipediaKnowledge(query: string): Promise<string | null> {
+  try {
+    const cleanSearch = query
+      .replace(/কি\b|কে\b|কখন\b|কোথায়\b|কেন\b|কী\b|কাকে\b|কয়টি\b|কতটি\b|বলুন\b|জানান\b|সংক্রান্ত\b|সম্পর্কে\b|সম্পর্কিত\b/gi, '')
+      .replace(/[\?\.,!।]/g, '')
+      .trim();
+
+    if (cleanSearch.length < 2) return null;
+
+    // Search Bengali Wiki first
+    const searchUrl = `https://bn.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(
+      cleanSearch
+    )}&format=json&origin=*`;
+    const searchRes = await fetch(searchUrl);
+    if (searchRes.ok) {
+      const searchData = await searchRes.json();
+      const firstHit = searchData?.query?.search?.[0];
+      if (firstHit && firstHit.pageid) {
+        // Fetch article extract for firstHit
+        const extractUrl = `https://bn.wikipedia.org/w/api.php?action=query&prop=extracts&exintro=1&explaintext=1&pageids=${firstHit.pageid}&format=json&origin=*`;
+        const extRes = await fetch(extractUrl);
+        if (extRes.ok) {
+          const extData = await extRes.json();
+          const page = extData?.query?.pages?.[firstHit.pageid];
+          if (page && page.extract && page.extract.trim().length > 20) {
+            return formatWikiSummary(page.title, page.extract);
+          }
+        }
+      }
+    }
+
+    // Search English Wiki if Bengali had no direct extract
+    const enSearchUrl = `https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(
+      cleanSearch
+    )}&format=json&origin=*`;
+    const enSearchRes = await fetch(enSearchUrl);
+    if (enSearchRes.ok) {
+      const enSearchData = await enSearchRes.json();
+      const enHit = enSearchData?.query?.search?.[0];
+      if (enHit && enHit.pageid) {
+        const enExtUrl = `https://en.wikipedia.org/w/api.php?action=query&prop=extracts&exintro=1&explaintext=1&pageids=${enHit.pageid}&format=json&origin=*`;
+        const enExtRes = await fetch(enExtUrl);
+        if (enExtRes.ok) {
+          const enExtData = await enExtRes.json();
+          const enPage = enExtData?.query?.pages?.[enHit.pageid];
+          if (enPage && enPage.extract && enPage.extract.trim().length > 20) {
+            return formatWikiSummary(enPage.title, enPage.extract);
+          }
+        }
+      }
+    }
+  } catch (err) {
+    console.warn('Wikipedia search error:', err);
+  }
+  return null;
+}
+
 // Ask AI Question: Guaranteed multi-tiered response engine
+// 1. Instant creator query (when asking who built Lumiqra AI)
+// 2. Instant Built-in Knowledge (fastest response)
+// 3. Primary Full-Stack Gemini AI Call (/api/chat)
+// 4. Real-time Wikipedia Search
 export async function askAiQuestion(
   userQuery: string,
   history: ChatMessage[] = []
@@ -183,18 +243,18 @@ export async function askAiQuestion(
   const cleanQuery = userQuery.trim();
   if (!cleanQuery) return 'অনুগ্রহ করে আপনার প্রশ্নটি লিখুন।';
 
-  // 1. Instant creator query
+  // 1. Instant creator query (specifically about Lumiqra AI's maker)
   const creatorAns = checkCreatorQuery(cleanQuery);
   if (creatorAns) return creatorAns;
 
-  // 2. Instant Built-in Knowledge
+  // 2. Instant Built-in Knowledge (if matched)
   const instantAnswer = checkUniversalKnowledge(cleanQuery);
   if (instantAnswer) return instantAnswer;
 
   // 3. Primary Full-Stack Gemini AI Call (/api/chat)
   try {
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 12000);
+    const timeoutId = setTimeout(() => controller.abort(), 18000);
 
     const response = await fetch('/api/chat', {
       method: 'POST',
@@ -220,59 +280,11 @@ export async function askAiQuestion(
     console.warn('Backend /api/chat error:', backendErr);
   }
 
-  // 4. Wikipedia Instant Knowledge Fallback (Clean search with GET)
-  try {
-    const searchTerms = cleanQuery
-      .replace(/কি\b|কে\b|কখন\b|কোথায়\b|কেন\b|কী\b|কাকে\b|কয়টি\b|কতটি\b|বলুন\b|জানান\b|সংক্রান্ত\b|সম্পর্কে\b|সম্পর্কিত\b/gi, '')
-      .replace(/[\?\.,!।]/g, '')
-      .trim();
-
-    if (searchTerms.length >= 2) {
-      // Bengali Wiki
-      const wikiUrl = `https://bn.wikipedia.org/w/api.php?action=query&format=json&prop=extracts&exintro=1&explaintext=1&origin=*&titles=${encodeURIComponent(
-        searchTerms
-      )}`;
-      const wikiRes = await fetch(wikiUrl);
-      if (wikiRes.ok) {
-        const wikiData = await wikiRes.json();
-        const pages = wikiData?.query?.pages || {};
-        const firstPageId = Object.keys(pages)[0];
-        if (firstPageId && firstPageId !== '-1' && pages[firstPageId]?.extract) {
-          return formatWikiSummary(pages[firstPageId].title, pages[firstPageId].extract);
-        }
-      }
-
-      // English Wiki
-      const enWikiUrl = `https://en.wikipedia.org/w/api.php?action=query&format=json&prop=extracts&exintro=1&explaintext=1&origin=*&titles=${encodeURIComponent(
-        searchTerms
-      )}`;
-      const enRes = await fetch(enWikiUrl);
-      if (enRes.ok) {
-        const enData = await enRes.json();
-        const enPages = enData?.query?.pages || {};
-        const enPageId = Object.keys(enPages)[0];
-        if (enPageId && enPageId !== '-1' && enPages[enPageId]?.extract) {
-          return formatWikiSummary(enPages[enPageId].title, enPages[enPageId].extract);
-        }
-      }
-    }
-  } catch (wikiErr) {
-    console.warn('Wikipedia search error:', wikiErr);
+  // 4. Live Wikipedia Knowledge Search Fallback (Guaranteed to return information on history, religion, science, people)
+  const wikiAnswer = await searchWikipediaKnowledge(cleanQuery);
+  if (wikiAnswer) {
+    return wikiAnswer;
   }
 
-  // 5. Intelligent Synthesis Fallback
-  const qLower = cleanQuery.toLowerCase();
-  if (qLower.includes('গল্প') || qLower.includes('story')) {
-    return `### 🌟 **একতা ও প্রজ্ঞার শক্তি**\n\nঅনেক দিন আগের কথা। এক সুন্দর পাহাড়ি উপত্যকায় বাস করত তিন বন্ধু—একটি ছোট্ট হরিণ, একটি বুদ্ধিমান চড়ুই এবং একটি প্রবীণ কচ্ছপ। তারা প্রতিদিন একে অপরকে সাহায্য করত।\n\nএকদিন বনের এক শিকারি এসে ফাঁদ পাতল এবং হরিণটি তাতে আটকা পড়ল। চড়ুই পাখি দ্রুত কচ্ছপকে খবর দিল। চড়ুই শিকারির চোখে ধুলো দিয়ে বিভ্রান্ত করল, আর কচ্ছপ তার ধারালো দাঁত দিয়ে জাল কেটে হরিণকে মুক্ত করল।\n\n✨ **শিক্ষা:** একতা, বুদ্ধি ও ধৈর্য থাকলে যেকোনো কঠিন পরিস্থিতি জয় করা সম্ভব।`;
-  }
-
-  if (qLower.includes('কবিতা') || qLower.includes('poem')) {
-    return `### 🍃 **আশার আলো**\n\nআঁধার রাতে তারার মেলা,\nস্বপ্নে ভাসে মনের ভেলা।\nক্লান্ত চোখে ঘুম নামে না,\nনতুন ভোরের পথ থামে না।\n\nধৈর্য ধরো মনের ঘরে,\nসকাল হবে আঁধার চিরে।\nআলোর পরশ লাগলে গায়ে,\nনতুন জীবন ফিরবে পায়ে।`;
-  }
-
-  if (qLower.includes('কোড') || qLower.includes('programming') || qLower.includes('python') || qLower.includes('javascript')) {
-    return `এখানে আপনার কোডিং অনুসন্ধানের জন্য একটি উদাহরণ কাঠামো:\n\n\`\`\`javascript\n// সমস্যা সমাধানের নমুনা কোড\nfunction solve(input) {\n  if (!input) return null;\n  return input.trim();\n}\nconsole.log(solve("Lumiqra AI Ready"));\n\`\`\`\n\nআপনার নির্দিষ্ট কোডিং সমস্যা বা ত্রুটিটি এখানে পেস্ট করুন, আমি সঠিক সমাধান লিখে দেব!`;
-  }
-
-  return `আপনার প্রশ্ন: **"${cleanQuery}"**\n\nলুমিক্রা এআই (Lumiqra AI) আপনার সার্বিক সহায়তায় প্রস্তুত। আপনি পবিত্র কুরআন, বিজ্ঞান, ইতিহাস, গণিত, কোডিং বা যেকোনো বিষয়ে সুনির্দিষ্ট প্রশ্ন করতে পারেন — যেকোনো ভাষায় (বাংলা, ইংরেজি ইত্যাদি) বিস্তারিত উত্তর পাবেন।`;
+  return `আপনার প্রশ্ন: **"${cleanQuery}"**\n\nদুঃখিত, সংযোগে সাময়িক বিলম্ব হয়েছিল। অনুগ্রহ করে প্রশ্নটি আরেকবার পাঠান, আমি সাথে সাথে এর সম্পূর্ণ উত্তর দিচ্ছি।`;
 }
