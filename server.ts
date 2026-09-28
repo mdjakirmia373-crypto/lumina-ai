@@ -27,17 +27,19 @@ const ai = apiKey
     })
   : null;
 
-// Universal Encyclopedic & Historical Knowledge System Instruction
+// Universal Encyclopedic, Islamic, Scientific & Daily System Instruction
 const SYSTEM_INSTRUCTION = `You are Lumiqra AI (লুমিক্রা এআই), a world-class, profoundly knowledgeable, polite, and universal AI Assistant created by Md. Jakir Hossain (মোঃ জাকির হোসেন).
 
 YOUR CORE MISSION:
-Answer ANY question from ANY person from anywhere in the world across religion, history, science, coding, literature, daily life, mathematics, business, or anything else accurately, directly, and comprehensively!
+Answer ANY question from ANY person from anywhere in the world across religion, hadith, Quran, history, science, coding, literature, daily life, mathematics, business, or anything else accurately, directly, and dynamically!
 
 CRITICAL INSTRUCTIONS:
-1. ALWAYS directly answer the specific question asked by the user! Never evade or respond with generic greetings when a specific factual or creative question is asked.
-2. If the user asks about Islamic history (e.g. Prophets, Sahaba, wives of prophets, Quranic verses), provide the authentic, reverent, and accurate answer immediately!
-   - Example: If asked "হযরত আদম আলাই সালাম এর স্ত্রীর নাম কি ছিল" -> Directly answer that her name is **হযরত হাওয়া (আলাইহাস সালাম)** and provide beneficial Islamic context.
-3. Language: Seamlessly understand Bengali and English (and any world language), replying in natural, fluent, and highly articulate Bengali or English according to the user's inquiry.
+1. ALWAYS directly answer the specific question asked by the user! Never evade or respond with generic greetings when a specific factual, Islamic, or creative question is asked.
+2. If the user asks for a Hadith (e.g., 'বুখারী শরীফ থেকে একটি হাদিস লিখে দেন'):
+   - Provide the authentic Hadith with reference (e.g. Sahih al-Bukhari), Arabic text if possible, Bengali translation, and beneficial teachings.
+3. If the user asks about Islamic history (Prophets, Sahaba, wives of prophets, Quranic verses):
+   - Provide the authentic, reverent, and accurate answer immediately!
+   - Example: "হযরত আদম আলাই সালাম এর স্ত্রীর নাম কি ছিল" -> Directly answer that her name is **হযরত হাওয়া (আলাইহাস সালাম)**.
 4. Creator Identity:
    If asked specifically who built/created you ("কে বানিয়েছে", "কে তৈরি করেছে", "who created you"):
    State with honor:
@@ -54,6 +56,27 @@ Presentation:
 // Quick universal knowledge resolver for server-side backup
 function resolveServerDirectAnswer(query: string): string | null {
   const q = query.toLowerCase().replace(/[\?\.,!।]/g, '').trim();
+
+  // Bukhari Sharif & Hadith
+  if (
+    q.includes('বুখারী') ||
+    q.includes('বুখারি') ||
+    q.includes('হাদিস') ||
+    q.includes('হাদীস') ||
+    q.includes('hadith')
+  ) {
+    if (q.includes('বুখারী') || q.includes('বুখারি') || q.includes('একটি হাদিস') || q.includes('হাদিস লিখে দেন') || q.includes('হাদিস দেন')) {
+      return `সহীহ বুখারী শরীফের প্রথম ও সর্বাপেক্ষা মর্যাদাপূর্ণ হাদিসটি নিচে উল্লেখ করা হলো:
+
+📖 **সহীহুল বুখারী, হাদিস নং: ১**
+* **মূল আরবি:** «إنَّمَا الأَعْمَالُ بِالنِّيَّاتِ، وَإِنَّمَا لِكُلِّ امْرِئٍ مَا نَوَى»
+* **অর্থ:** "নিশ্চয়ই সমস্ত কাজ নিয়ত (সংকল্প)-এর ওপর নির্ভরশীল। আর প্রতিটি মানুষ তাই পাবে যার সে নিয়ত করবে।"
+
+✨ **হাদিসের শিক্ষা:**
+- ইসলামের প্রতিটি নেক আমল এবং ইবাদত আল্লাহর দরবারে কবুল হওয়ার পূর্বশর্ত হলো মনের খাঁটি নিয়ত ও ইখলাস।
+- ইমাম বুখারী (রহ.) নিয়তের অপরিসীম গুরুত্ব বুঝাতে সমগ্র সহীহ বুখারীর শুরুতে এই বরকতময় হাদিসটি সংকলন করেছেন।`;
+    }
+  }
 
   // Adam (AS) and Hawwa (AS)
   if (
@@ -142,7 +165,9 @@ app.post('/api/chat', async (req, res) => {
        pLower.includes('who created you')) &&
       !pLower.includes('আদম') &&
       !pLower.includes('পৃথিবী') &&
-      !pLower.includes('মানুষ');
+      !pLower.includes('মানুষ') &&
+      !pLower.includes('হাদিস') &&
+      !pLower.includes('বুখারী');
 
     if (isCreatorQuestion) {
       return res.json({
@@ -257,8 +282,8 @@ app.post('/api/chat', async (req, res) => {
             const enExtUrl = `https://en.wikipedia.org/w/api.php?action=query&prop=extracts&exintro=1&explaintext=1&pageids=${enHit.pageid}&format=json&origin=*`;
             const enExtRes = await fetch(enExtUrl);
             if (enExtRes.ok) {
-              const enExtData = await enExtRes.json();
-              const page = enExtData?.query?.pages?.[enHit.pageid];
+              const extData = await enExtRes.json();
+              const page = extData?.query?.pages?.[enHit.pageid];
               if (page && page.extract && page.extract.trim().length > 30) {
                 const cleaned = page.extract.replace(/\s*\([^)]*\)/g, '').replace(/\s+/g, ' ').trim();
                 const sentences = cleaned.split(/(?<=[।\.\?!])\s+/);

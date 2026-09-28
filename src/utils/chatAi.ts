@@ -1,8 +1,8 @@
 // Ultra-fast, highly capable Universal AI Chat Client (ChatGPT & Gemini standard)
 // 1. Instant creator query (Md. Jakir Hossain)
-// 2. Direct Built-in Instant Knowledge (Islamic, Quran, Geography, Science, Solar system)
+// 2. Direct Built-in Instant Knowledge (Hadith, Islamic, Quran, Geography, Science)
 // 3. Direct server /api/chat with Gemini SDK (3.8-flash, 3.1-flash-lite)
-// 4. Live Wikipedia Full-Text Search Knowledge Synthesis
+// 4. Live Universal Knowledge Retriever Fallback
 
 import { getDirectUniversalAnswer } from './universalKnowledge';
 
@@ -37,7 +37,7 @@ He developed me for the Lumiqra AI platform to deliver world-class AI conversati
 export function checkCreatorQuery(query: string): string | null {
   const q = query.toLowerCase().replace(/[\?\.,!]/g, '').trim();
 
-  // If query is about Adam, Islam, Earth, Allah, universe, etc. -> NEVER intercept as creator query!
+  // If query is about Adam, Islam, Earth, Allah, universe, Hadith, etc. -> NEVER intercept as creator query!
   if (
     q.includes('আদম') ||
     q.includes('হাওয়া') ||
@@ -46,7 +46,11 @@ export function checkCreatorQuery(query: string): string | null {
     q.includes('নবী') ||
     q.includes('রাসূল') ||
     q.includes('মানুষ') ||
-    q.includes('পৃথিবী')
+    q.includes('পৃথিবী') ||
+    q.includes('হাদিস') ||
+    q.includes('হাদীস') ||
+    q.includes('বুখারী') ||
+    q.includes('বুখারি')
   ) {
     return null;
   }
@@ -114,6 +118,27 @@ export function checkUniversalKnowledge(rawQuery: string): string | null {
     return `আপনাকেও অনেক অনেক ধন্যবাদ! আপনার যেকোনো প্রয়োজনে বা জানার আগ্রহে আমি সর্বদা আপনার পাশে আছি। কোনো প্রশ্ন থাকলে নির্দ্বিধায় জিজ্ঞাসা করুন!`;
   }
 
+  // Hadith and Bukhari Sharif
+  if (
+    q.includes('বুখারী') ||
+    q.includes('বুখারি') ||
+    q.includes('হাদিস') ||
+    q.includes('হাদীস') ||
+    q.includes('hadith')
+  ) {
+    if (q.includes('বুখারী') || q.includes('বুখারি') || q.includes('একটি হাদিস') || q.includes('হাদিস লিখে দেন') || q.includes('হাদিস দেন')) {
+      return `সহীহ বুখারী শরীফের প্রথম ও সর্বাপেক্ষা মর্যাদাপূর্ণ হাদিসটি নিচে উল্লেখ করা হলো:
+
+📖 **সহীহুল বুখারী, হাদিস নং: ১**
+* **মূল আরবি:** «إنَّمَا الأَعْمَالُ بِالنِّيَّاتِ، وَإِنَّمَا لِكُلِّ امْرِئٍ مَا نَوَى»
+* **অর্থ:** "নিশ্চয়ই সমস্ত কাজ নিয়ত (সংকল্প)-এর ওপর নির্ভরশীল। আর প্রতিটি মানুষ তাই পাবে যার সে নিয়ত করবে।"
+
+✨ **হাদিসের ব্যাখ্যা ও শিক্ষা:**
+- ইসলামের প্রতিটি নেক আমল এবং ইবাদত আল্লাহর দরবারে কবুল হওয়ার পূর্বশর্ত হলো মনের খাঁটি নিয়ত ও ইখলাস।
+- ইমাম বুখারী (রহ.) নিয়তের অপরিসীম গুরুত্ব বুঝাতে সমগ্র সহীহ বুখারীর শুরুতে এই বরকতময় হাদিসটি সংকলন করেছেন।`;
+    }
+  }
+
   // Hazrat Adam (AS) and Hawwa (AS)
   if (
     q.includes('আদম') &&
@@ -179,7 +204,7 @@ export function checkUniversalKnowledge(rawQuery: string): string | null {
   return null;
 }
 
-// Ask AI Question: Guaranteed multi-tiered response engine
+// Ask AI Question: Guaranteed dynamic multi-tiered response engine
 export async function askAiQuestion(
   userQuery: string,
   history: ChatMessage[] = []
@@ -191,7 +216,7 @@ export async function askAiQuestion(
   const creatorAns = checkCreatorQuery(cleanQuery);
   if (creatorAns) return creatorAns;
 
-  // 2. Instant Built-in Knowledge (fastest response)
+  // 2. Instant Built-in Knowledge (Hadith, Adam/Hawwa, Quran, Bangladesh, Sun)
   const instantAnswer = checkUniversalKnowledge(cleanQuery);
   if (instantAnswer) return instantAnswer;
 
