@@ -1,7 +1,10 @@
 // Ultra-fast, highly capable Universal AI Chat Client (ChatGPT & Gemini standard)
-// 1. Direct server /api/chat with Gemini SDK
-// 2. Built-in high-precision Instant Knowledge Engine for Islamic, Scientific, General Knowledge & Greetings
-// 3. Instant Wikipedia Full-Text Search & Universal Knowledge Synthesis (Ensuring EVERY question gets answered)
+// 1. Instant creator query (Md. Jakir Hossain)
+// 2. Direct Built-in Instant Knowledge (Islamic, Quran, Geography, Science, Solar system)
+// 3. Direct server /api/chat with Gemini SDK (3.8-flash, 3.1-flash-lite)
+// 4. Live Wikipedia Full-Text Search Knowledge Synthesis
+
+import { getDirectUniversalAnswer } from './universalKnowledge';
 
 export interface ChatMessage {
   id?: string;
@@ -84,7 +87,7 @@ export function checkCreatorQuery(query: string): string | null {
 export function checkUniversalKnowledge(rawQuery: string): string | null {
   const q = rawQuery.toLowerCase().replace(/[\?\.,!।]/g, '').trim();
 
-  // ONLY treat as pure greeting if the input is exclusively greeting words (NOT a compound question like "হযরত আদম আলাই সালাম...")
+  // ONLY treat as pure greeting if the input is exclusively greeting words
   const isPureGreeting =
     q === 'হাই' ||
     q === 'হ্যালো' ||
@@ -158,84 +161,25 @@ export function checkUniversalKnowledge(rawQuery: string): string | null {
     return `মুসলিমদের ওপর প্রতিদিন **৫ ওয়াক্ত নামাজ** ফরজ:\n\n১. **ফজর:** সুবহে সাদিক থেকে সূর্যোদয়ের পূর্ব পর্যন্ত (২ রাকাত সুন্নত, ২ রাকাত ফরজ)।\n২. **যোহর:** দ্বিপ্রহরের পর থেকে আসর পর্যন্ত (৪ রাকাত সুন্নত, ৪ রাকাত ফরজ, ২ রাকাত সুন্নত, ২ রাকাত নফল)।\n৩. **আসর:** সূর্যের আলো হলুদ হওয়ার আগ পর্যন্ত (৪ রাকাত ফরজ)।\n৪. **মাগরিব:** সূর্যাস্তের পর থেকে পশ্চিমাকাশে লাল আভা থাকা পর্যন্ত (৩ রাকাত ফরজ, ২ রাকাত সুন্নত, ২ রাকাত নফল)।\n৫. **এশা:** মাগরিবের সময় শেষ হওয়ার পর থেকে ফজরের আগ পর্যন্ত (৪ রাকাত ফরজ, ২ রাকাত সুন্নত, ৩ রাকাত বিতর)।`;
   }
 
-  return null;
-}
-
-function formatWikiSummary(title: string, extract: string): string {
-  const cleaned = extract
-    .replace(/\s*\([^)]*\)/g, '')
-    .replace(/\s+/g, ' ')
-    .trim();
-
-  const sentences = cleaned.split(/(?<=[।\.\?!])\s+/);
-  const coreInfo = sentences.slice(0, 5).join(' ');
-
-  return `### 💡 **${title}**\n\n${coreInfo}`;
-}
-
-// Universal Wikipedia Search using full text search API (returns real knowledge for anything)
-async function searchWikipediaKnowledge(query: string): Promise<string | null> {
-  try {
-    const cleanSearch = query
-      .replace(/কি\b|কে\b|কখন\b|কোথায়\b|কেন\b|কী\b|কাকে\b|কয়টি\b|কতটি\b|বলুন\b|জানান\b|সংক্রান্ত\b|সম্পর্কে\b|সম্পর্কিত\b/gi, '')
-      .replace(/[\?\.,!।]/g, '')
-      .trim();
-
-    if (cleanSearch.length < 2) return null;
-
-    // Search Bengali Wiki first
-    const searchUrl = `https://bn.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(
-      cleanSearch
-    )}&format=json&origin=*`;
-    const searchRes = await fetch(searchUrl);
-    if (searchRes.ok) {
-      const searchData = await searchRes.json();
-      const firstHit = searchData?.query?.search?.[0];
-      if (firstHit && firstHit.pageid) {
-        // Fetch article extract for firstHit
-        const extractUrl = `https://bn.wikipedia.org/w/api.php?action=query&prop=extracts&exintro=1&explaintext=1&pageids=${firstHit.pageid}&format=json&origin=*`;
-        const extRes = await fetch(extractUrl);
-        if (extRes.ok) {
-          const extData = await extRes.json();
-          const page = extData?.query?.pages?.[firstHit.pageid];
-          if (page && page.extract && page.extract.trim().length > 20) {
-            return formatWikiSummary(page.title, page.extract);
-          }
-        }
-      }
+  // Bangladesh
+  if (q.includes('বাংলাদেশ')) {
+    if (q.includes('রাজধানী')) {
+      return `বাংলাদেশের রাজধানী হলো **ঢাকা**।`;
     }
-
-    // Search English Wiki if Bengali had no direct extract
-    const enSearchUrl = `https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(
-      cleanSearch
-    )}&format=json&origin=*`;
-    const enSearchRes = await fetch(enSearchUrl);
-    if (enSearchRes.ok) {
-      const enSearchData = await enSearchRes.json();
-      const enHit = enSearchData?.query?.search?.[0];
-      if (enHit && enHit.pageid) {
-        const enExtUrl = `https://en.wikipedia.org/w/api.php?action=query&prop=extracts&exintro=1&explaintext=1&pageids=${enHit.pageid}&format=json&origin=*`;
-        const enExtRes = await fetch(enExtUrl);
-        if (enExtRes.ok) {
-          const enExtData = await enExtRes.json();
-          const enPage = enExtData?.query?.pages?.[enHit.pageid];
-          if (enPage && enPage.extract && enPage.extract.trim().length > 20) {
-            return formatWikiSummary(enPage.title, enPage.extract);
-          }
-        }
-      }
+    if (q.includes('স্বাধীনতা') || q.includes('স্বাধীন')) {
+      return `বাংলাদেশ **১৯৭১ সালের ২৬ মার্চ** স্বাধীনতার ঘোষণা দেয় এবং দীর্ঘ ৯ মাসের রক্তক্ষয়ী মুক্তিযুদ্ধের পর **১৬ ডিসেম্বর ১৯৭১** চূড়ান্ত বিজয় অর্জনের মাধ্যমে একটি স্বাধীন সার্বভৌম রাষ্ট্র হিসেবে প্রতিষ্ঠিত হয়।`;
     }
-  } catch (err) {
-    console.warn('Wikipedia search error:', err);
   }
+
+  // Sun
+  if (q.includes('সূর্য') && (q.includes('উদিত') || q.includes('উঠে') || q.includes('উঠা') || q.includes('পূর্ব'))) {
+    return `সূর্য সর্বদা **পূর্ব দিকে** উদিত হয় এবং **পশ্চিম দিকে** অস্ত যায়।`;
+  }
+
   return null;
 }
 
 // Ask AI Question: Guaranteed multi-tiered response engine
-// 1. Instant creator query (when asking who built Lumiqra AI)
-// 2. Instant Built-in Knowledge (fastest response)
-// 3. Primary Full-Stack Gemini AI Call (/api/chat)
-// 4. Real-time Wikipedia Search
 export async function askAiQuestion(
   userQuery: string,
   history: ChatMessage[] = []
@@ -247,14 +191,14 @@ export async function askAiQuestion(
   const creatorAns = checkCreatorQuery(cleanQuery);
   if (creatorAns) return creatorAns;
 
-  // 2. Instant Built-in Knowledge (if matched)
+  // 2. Instant Built-in Knowledge (fastest response)
   const instantAnswer = checkUniversalKnowledge(cleanQuery);
   if (instantAnswer) return instantAnswer;
 
   // 3. Primary Full-Stack Gemini AI Call (/api/chat)
   try {
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 18000);
+    const timeoutId = setTimeout(() => controller.abort(), 20000);
 
     const response = await fetch('/api/chat', {
       method: 'POST',
@@ -280,11 +224,11 @@ export async function askAiQuestion(
     console.warn('Backend /api/chat error:', backendErr);
   }
 
-  // 4. Live Wikipedia Knowledge Search Fallback (Guaranteed to return information on history, religion, science, people)
-  const wikiAnswer = await searchWikipediaKnowledge(cleanQuery);
-  if (wikiAnswer) {
-    return wikiAnswer;
+  // 4. Live Universal Knowledge Retriever Fallback (Guaranteed to return information on history, religion, science, people)
+  const directUniversalAnswer = await getDirectUniversalAnswer(cleanQuery);
+  if (directUniversalAnswer) {
+    return directUniversalAnswer;
   }
 
-  return `আপনার প্রশ্ন: **"${cleanQuery}"**\n\nদুঃখিত, সংযোগে সাময়িক বিলম্ব হয়েছিল। অনুগ্রহ করে প্রশ্নটি আরেকবার পাঠান, আমি সাথে সাথে এর সম্পূর্ণ উত্তর দিচ্ছি।`;
+  return `আপনার প্রশ্ন: **"${cleanQuery}"**\n\nসার্ভারে সংযোগ নিতে সাময়িক বিলম্ব হয়েছে। অনুগ্রহ করে মেসেজটি পুনরায় পাঠান, আমি সাথে সাথে এর উত্তর প্রদান করছি।`;
 }

@@ -55,6 +55,7 @@ Presentation:
 function resolveServerDirectAnswer(query: string): string | null {
   const q = query.toLowerCase().replace(/[\?\.,!।]/g, '').trim();
 
+  // Adam (AS) and Hawwa (AS)
   if (
     q.includes('আদম') &&
     (q.includes('স্ত্রী') || q.includes('স্ত্রীর') || q.includes('বউ') || q.includes('হাওয়া') || q.includes('হাওয়া') || q.includes('নাম'))
@@ -62,6 +63,7 @@ function resolveServerDirectAnswer(query: string): string | null {
     return `মানবজাতির আদি পিতা প্রথম নবী **হযরত আদম (আলাইহিস সালাম)**-এর স্ত্রীর নাম ছিল **হযরত হাওয়া (আলাইহাস সালাম)**।\n\n📖 **প্রামাণ্য ঐতিহাসিক ও ইসলামী বিবরণ:**\n- মহান আল্লাহ সুবহানাহু ওয়া তায়ালা হযরত আদম (আ.)-এর বাঁ-দিকের পাঁজরের হাড় থেকে হযরত হাওয়া (আ.)-কে তাঁর জীবনসঙ্গিনী হিসেবে সৃষ্টি করেছিলেন।\n- তাঁরা উভয়েই জান্নাতে বসবাস করতেন এবং পরবর্তীতে মহান আল্লাহর নির্ধারিত তকদীর ও হুকুমে পৃথিবীতে আগমন করেন।\n- তাঁদের মাধ্যমে সমগ্র মানবজাতির বিস্তৃতি ও বংশপরম্পরা শুরু হয়।`;
   }
 
+  // Prophets
   if (q.includes('নবী') || q.includes('রাসূল') || q.includes('রাসুল')) {
     if (q.includes('প্রথম')) {
       return `মানবজাতির প্রথম নবী ও প্রথম মানুষ হলেন **হযরত আদম (আলাইহিস সালাম)**।`;
@@ -74,6 +76,7 @@ function resolveServerDirectAnswer(query: string): string | null {
     }
   }
 
+  // Quran
   if (q.includes('কুরআন') || q.includes('কোরআন')) {
     if (q.includes('পারা') || q.includes('জুয')) {
       return `পবিত্র কুরআনুল কারীমে মোট **৩০টি পারা (জুয)** রয়েছে।`;
@@ -86,10 +89,29 @@ function resolveServerDirectAnswer(query: string): string | null {
     }
   }
 
+  // Bangladesh
+  if (q.includes('বাংলাদেশ')) {
+    if (q.includes('রাজধানী')) {
+      return `বাংলাদেশের রাজধানী হলো **ঢাকা**।`;
+    }
+    if (q.includes('স্বাধীনতা') || q.includes('স্বাধীন')) {
+      return `বাংলাদেশ **১৯৭১ সালের ২৬ মার্চ** স্বাধীনতার ঘোষণা দেয় এবং দীর্ঘ ৯ মাসের রক্তক্ষয়ী মুক্তিযুদ্ধের পর **১৬ ডিসেম্বর ১৯৭১** চূড়ান্ত বিজয় অর্জনের মাধ্যমে একটি স্বাধীন ও সার্বভৌম রাষ্ট্র হিসেবে প্রতিষ্ঠিত হয়।`;
+    }
+    if (q.includes('মুদ্রা') || q.includes('টাকা')) {
+      return `বাংলাদেশের মুদ্রার নাম হলো **টাকা (BDT - ৳)**।`;
+    }
+  }
+
+  // Rivers
   if (q.includes('নদী') || q.includes('নদ')) {
     if (q.includes('বড়') || q.includes('দীর্ঘতম') || q.includes('লম্বা')) {
-      return `বিশ্বের দীর্ঘতম নদী হলো **নীল নদ (Nile River)**, যার দৈর্ঘ্য প্রায় ৬,৬৫৩ কিলোমিটার (আফ্রিকা মহাদেশ)।\n\nআর জলপ্রবাহ ও আয়তনের দিক থেকে বিশ্বের বৃহত্তম নদী হলো **আমাজন নদী (Amazon River)** (দক্ষিণ আমেরিকা)।`;
+      return `বিশ্বের দীর্ঘতম নদী হলো **নীল নদ (Nile River)**, যার দৈর্ঘ্য প্রায় ৬,৬৫৩ কিলোমিটার (আফ্রিকা মহাদেশ)। আর জলপ্রবাহ ও আয়তনের দিক থেকে বৃহত্তম নদী হলো **আমাজন নদী (Amazon River)**।`;
     }
+  }
+
+  // Sun
+  if (q.includes('সূর্য') && (q.includes('উদিত') || q.includes('উঠে') || q.includes('উঠা') || q.includes('পূর্ব'))) {
+    return `সূর্য সর্বদা **পূর্ব দিকে** উদিত হয় এবং **পশ্চিম দিকে** অস্ত যায়।`;
   }
 
   return null;
@@ -128,10 +150,16 @@ app.post('/api/chat', async (req, res) => {
       });
     }
 
+    // Direct Instant knowledge check
+    const directAns = resolveServerDirectAnswer(cleanPrompt);
+    if (directAns) {
+      return res.json({ reply: directAns });
+    }
+
     // Try reliable Gemini models in order of availability
     const candidateModels = [
-      'gemini-3.1-flash-lite',
       'gemini-3.8-flash',
+      'gemini-3.1-flash-lite',
       'gemini-flash-latest',
       'gemini-3.1-pro-preview',
     ];
@@ -185,13 +213,7 @@ app.post('/api/chat', async (req, res) => {
       }
     }
 
-    // If Gemini API is experiencing 503 high traffic spikes, fallback to direct knowledge
-    const directAns = resolveServerDirectAnswer(cleanPrompt);
-    if (directAns) {
-      return res.json({ reply: directAns });
-    }
-
-    // Try real-time Wikipedia search on server
+    // Dynamic Wikipedia Knowledge Search (Ensures any topic in science, history, world is answered)
     try {
       const cleanSearch = cleanPrompt
         .replace(/কি\b|কে\b|কখন\b|কোথায়\b|কেন\b|কী\b|কাকে\b|কয়টি\b|কতটি\b|বলুন\b|জানান\b|সংক্রান্ত\b|সম্পর্কে\b|সম্পর্কিত\b/gi, '')
@@ -199,6 +221,7 @@ app.post('/api/chat', async (req, res) => {
         .trim();
 
       if (cleanSearch.length >= 2) {
+        // Bengali Wikipedia
         const searchUrl = `https://bn.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(
           cleanSearch
         )}&format=json&origin=*`;
@@ -215,7 +238,31 @@ app.post('/api/chat', async (req, res) => {
               if (page && page.extract && page.extract.trim().length > 30) {
                 const cleaned = page.extract.replace(/\s*\([^)]*\)/g, '').replace(/\s+/g, ' ').trim();
                 const sentences = cleaned.split(/(?<=[।\.\?!])\s+/);
-                const core = sentences.slice(0, 6).join(' ');
+                const core = sentences.slice(0, 5).join(' ');
+                return res.json({ reply: `### 💡 **${page.title}**\n\n${core}` });
+              }
+            }
+          }
+        }
+
+        // English Wikipedia
+        const enSearchUrl = `https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(
+          cleanSearch
+        )}&format=json&origin=*`;
+        const enRes = await fetch(enSearchUrl);
+        if (enRes.ok) {
+          const enData = await enRes.json();
+          const enHit = enData?.query?.search?.[0];
+          if (enHit && enHit.pageid) {
+            const enExtUrl = `https://en.wikipedia.org/w/api.php?action=query&prop=extracts&exintro=1&explaintext=1&pageids=${enHit.pageid}&format=json&origin=*`;
+            const enExtRes = await fetch(enExtUrl);
+            if (enExtRes.ok) {
+              const enExtData = await enExtRes.json();
+              const page = enExtData?.query?.pages?.[enHit.pageid];
+              if (page && page.extract && page.extract.trim().length > 30) {
+                const cleaned = page.extract.replace(/\s*\([^)]*\)/g, '').replace(/\s+/g, ' ').trim();
+                const sentences = cleaned.split(/(?<=[।\.\?!])\s+/);
+                const core = sentences.slice(0, 5).join(' ');
                 return res.json({ reply: `### 💡 **${page.title}**\n\n${core}` });
               }
             }
@@ -227,7 +274,7 @@ app.post('/api/chat', async (req, res) => {
     }
 
     return res.json({
-      reply: `আপনার প্রশ্ন: **"${cleanPrompt}"**\n\nসার্ভারে ক্ষণিকের জন্য উচ্চ ট্রাফিক চাপ ছিল। অনুগ্রহ করে মেসেজটি পুনরায় পাঠান, আমি সাথে সাথে এর যথাযথ উত্তর প্রদান করছি।`,
+      reply: `আপনার প্রশ্ন: **"${cleanPrompt}"**\n\nসার্ভারে সংযোগ নিতে সাময়িক বিলম্ব হয়েছে। অনুগ্রহ করে মেসেজটি পুনরায় পাঠান, আমি সাথে সাথে এর যথাযথ উত্তর প্রদান করছি।`,
     });
   } catch (error: any) {
     console.error('Chat endpoint error:', error);
