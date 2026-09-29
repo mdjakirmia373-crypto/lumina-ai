@@ -91,31 +91,21 @@ export function checkCreatorQuery(query: string): string | null {
 export function checkUniversalKnowledge(rawQuery: string): string | null {
   const q = rawQuery.toLowerCase().replace(/[\?\.,!।]/g, '').trim();
 
-  // ONLY treat as pure greeting if the input is exclusively greeting words
-  const isPureGreeting =
-    q === 'হাই' ||
-    q === 'হ্যালো' ||
-    q === 'হেই' ||
-    q === 'hi' ||
-    q === 'hello' ||
-    q === 'hey' ||
-    q === 'সালাম' ||
-    q === 'আসসালামু আলাইকুম' ||
-    q === 'আসসালামু আলাইকুম ওয়া রাহমাতুল্লাহ' ||
-    q === 'assalamu alaikum' ||
-    q === 'salam' ||
-    q === 'slam';
+  // Simple, friendly greeting response matching user's specific greeting
+  if (q === 'হাই' || q === 'hi' || q === 'হ্যালো' || q === 'hello' || q === 'হেই' || q === 'hey') {
+    return 'হ্যালো! আপনাকে কীভাবে সাহায্য করতে পারি?';
+  }
 
-  if (isPureGreeting) {
-    return `ওয়ালাইকুমুস সালাম ওয়া রাহমাতুল্লাহি ওয়া বারাকাতুহু!\n\nআপনার ওপর মহান আল্লাহর অশেষ শান্তি, রহমত ও বরকত বর্ষিত হোক। আমি লুমিক্রা এআই (Lumiqra AI), আপনার জ্ঞান অন্বেষণ ও পৃথিবীর যেকোনো প্রশ্নের সরাসরি নির্ভুল উত্তর দিতে সর্বদা প্রস্তুত। বলুন, আজ আপনাকে কীভাবে সাহায্য করতে পারি?`;
+  if (q === 'সালাম' || q === 'আসসালামু আলাইকুম' || q === 'assalamu alaikum' || q === 'salam') {
+    return 'ওয়ালাইকুমুস সালাম! আপনাকে কীভাবে সাহায্য করতে পারি?';
   }
 
   if (q === 'কেমন আছো' || q === 'কেমন আছেন' || q === 'how are you') {
-    return `আলহামদুলিল্লাহ, আমি খুবই ভালো আছি! আপনার খোঁজখবর কী? আশা করি আপনিও সুস্থ ও ভালো আছেন। আজ আপনাকে কী তথ্য জানতে বা কোন প্রশ্নের সমাধান করে দিতে পারি?`;
+    return 'আলহামদুলিল্লাহ, আমি ভালো আছি! আপনি কেমন আছেন? আজ আপনাকে কী তথ্য বা কাজে সাহায্য করতে পারি?';
   }
 
   if (q === 'ধন্যবাদ' || q === 'থ্যাংকস' || q === 'thank you' || q === 'thanks') {
-    return `আপনাকেও অনেক অনেক ধন্যবাদ! আপনার যেকোনো প্রয়োজনে বা জানার আগ্রহে আমি সর্বদা আপনার পাশে আছি। কোনো প্রশ্ন থাকলে নির্দ্বিধায় জিজ্ঞাসা করুন!`;
+    return 'আপনাকেও অনেক ধন্যবাদ! আপনার যেকোনো প্রয়োজনে আমি পাশে আছি।';
   }
 
   // Hadith and Bukhari Sharif
@@ -187,8 +177,14 @@ export function checkUniversalKnowledge(rawQuery: string): string | null {
   }
 
   // Bangladesh
-  if (q.includes('বাংলাদেশ')) {
-    if (q.includes('রাজধানী')) {
+  if (q.includes('বাংলাদেশ') || q.includes('bangladesh')) {
+    if (q.includes('রাষ্ট্রপতি') || q.includes('প্রেসিডেন্ট') || q.includes('president')) {
+      return `বাংলাদেশের বর্তমান রাষ্ট্রপতি হলেন **মোহাম্মদ সাহাবুদ্দিন** (Mohammed Shahabuddin)। তিনি বাংলাদেশের ২২তম রাষ্ট্রপতি হিসেবে ২০২৩ সালের ২৪ এপ্রিল দায়িত্ব গ্রহণ করেন।`;
+    }
+    if (q.includes('প্রধান উপদেষ্টা') || q.includes('ইউনূস') || q.includes('ইউনুস') || q.includes('অন্তর্বর্তী')) {
+      return `বাংলাদেশের বর্তমান অন্তর্বর্তীকালীন সরকারের প্রধান উপদেষ্টা হলেন নোবেল বিজয়ী অর্থনীতিবিদ **ড. মুহাম্মদ ইউনূস** (Dr. Muhammad Yunus)। ২০২৪ সালের ৮ আগস্ট তিনি এ দায়িত্ব গ্রহণ করেন।`;
+    }
+    if (q.includes('রাজধানী') || q.includes('capital')) {
       return `বাংলাদেশের রাজধানী হলো **ঢাকা**।`;
     }
     if (q.includes('স্বাধীনতা') || q.includes('স্বাধীন')) {
@@ -255,5 +251,5 @@ export async function askAiQuestion(
     return directUniversalAnswer;
   }
 
-  return `আপনার প্রশ্ন: **"${cleanQuery}"**\n\nসার্ভারে সংযোগ নিতে সাময়িক বিলম্ব হয়েছে। অনুগ্রহ করে মেসেজটি পুনরায় পাঠান, আমি সাথে সাথে এর উত্তর প্রদান করছি।`;
+  return `আমার কাছে এই বিষয়টি সম্পর্কিত সঠিক ও সর্বশেষ তথ্য নেই।`;
 }

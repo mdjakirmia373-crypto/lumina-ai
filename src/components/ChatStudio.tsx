@@ -10,6 +10,8 @@ import {
   RefreshCw, 
   Plus,
   Mic,
+  Volume2,
+  VolumeX,
   Image as ImageIcon,
   Paperclip,
   PanelLeftClose,
@@ -100,6 +102,7 @@ export const ChatStudio: React.FC<ChatStudioProps> = ({
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [speakingId, setSpeakingId] = useState<string | null>(null);
   const [isListening, setIsListening] = useState(false);
   const [attachedImage, setAttachedImage] = useState<string | null>(null);
 
@@ -134,10 +137,18 @@ export const ChatStudio: React.FC<ChatStudioProps> = ({
     localStorage.setItem(ACTIVE_CHAT_ID_KEY, activeChatId);
   }, [activeChatId]);
 
-  // Scroll to bottom when messages change
+  // Auto-scroll to bottom when messages or loading state changes
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [activeConversation.messages, isLoading]);
+
+  // Auto-adjust textarea height on input change
+  useEffect(() => {
+    if (textareaRef.current) {
+      textareaRef.current.style.height = 'auto';
+      textareaRef.current.style.height = `${Math.min(textareaRef.current.scrollHeight, 140)}px`;
+    }
+  }, [input]);
 
   // Voice speech-to-text listener
   const handleVoiceInput = () => {
@@ -348,6 +359,105 @@ export const ChatStudio: React.FC<ChatStudioProps> = ({
     setCopiedId(id);
     setTimeout(() => setCopiedId(null), 2000);
   };
+
+  // Universal Multi-Language Text to Speech (TTS) / Read Aloud
+  const handleSpeak = (id: string, text: string) => {
+    if (!('speechSynthesis' in window)) {
+      alert(lang === 'bn' ? 'আপনার ব্রাউজারে স্পিচ সিন্থেসিস সাপোর্ট নেই।' : 'Text-to-speech is not supported in this browser.');
+      return;
+    }
+
+    // Toggle: if already speaking this message, stop it immediately
+    if (speakingId === id) {
+      window.speechSynthesis.cancel();
+      setSpeakingId(null);
+      return;
+    }
+
+    // Cancel any previous speech
+    window.speechSynthesis.cancel();
+
+    // Clean markdown, symbols, links, code blocks for crystal-clear natural speech
+    const cleanText = text
+      .replace(/```[\s\S]*?```/g, '') // remove large code blocks
+      .replace(/`[^`]+`/g, '')
+      .replace(/[*#_~>\[\]\(\)\{\}\\]/g, '')
+      .replace(/https?:\/\/\S+/g, '')
+      .trim();
+
+    if (!cleanText) return;
+
+    // Detect language using Unicode ranges and common linguistic patterns
+    const detectLanguageCode = (str: string): string => {
+      // Bengali
+      if (/[\u0980-\u09FF]/.test(str)) return 'bn-BD';
+      // Arabic / Urdu
+      if (/[\u0600-\u06FF\u0750-\u077F]/.test(str)) {
+        if (/[\u0679\u0686\u0698\u0691\u06AF\u06BA\u06BE\u06C1\u06D2]/.test(str)) return 'ur-PK';
+        return 'ar-SA';
+      }
+      // Hindi / Devanagari
+      if (/[\u0900-\u097F]/.test(str)) return 'hi-IN';
+      // Chinese
+      if (/[\u4E00-\u9FFF]/.test(str)) return 'zh-CN';
+      // Japanese
+      if (/[\u3040-\u309F\u30A0-\u30FF]/.test(str)) return 'ja-JP';
+      // Korean
+      if (/[\uAC00-\uD7AF]/.test(str)) return 'ko-KR';
+      // Russian / Cyrillic
+      if (/[\u0400-\u04FF]/.test(str)) return 'ru-RU';
+      // French detection
+      if (/\b(le|la|les|un|une|des|est|sont|dans|avec|pour|qui|que)\b/i.test(str)) return 'fr-FR';
+      // Spanish detection
+      if (/\b(el|la|los|las|un|una|es|son|por|para|con|que|cómo)\b/i.test(str)) return 'es-ES';
+      // German detection
+      if (/\b(der|die|das|und|ist|sind|nicht|mit|für|auf)\b/i.test(str)) return 'de-DE';
+      
+      // Default to English
+      return 'en-US';
+    };
+
+    const targetLocale = detectLanguageCode(cleanText);
+    const utterance = new SpeechSynthesisUtterance(cleanText);
+    utterance.lang = targetLocale;
+    utterance.rate = 1.0;
+    utterance.pitch = 1.0;
+
+    // Auto-match the highest quality voice from browser synthesis matching detected locale
+    const availableVoices = window.speechSynthesis.getVoices();
+    if (availableVoices && availableVoices.length > 0) {
+      const langPrefix = targetLocale.split('-')[0].toLowerCase();
+      const matchedVoice = availableVoices.find(
+        (v) => v.lang.toLowerCase() === targetLocale.toLowerCase()
+      ) || availableVoices.find(
+        (v) => v.lang.toLowerCase().startsWith(langPrefix)
+      );
+
+      if (matchedVoice) {
+        utterance.voice = matchedVoice;
+      }
+    }
+
+    utterance.onend = () => {
+      setSpeakingId(null);
+    };
+
+    utterance.onerror = () => {
+      setSpeakingId(null);
+    };
+
+    setSpeakingId(id);
+    window.speechSynthesis.speak(utterance);
+  };
+
+  // Cleanup speech synthesis on unmount
+  useEffect(() => {
+    return () => {
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+      }
+    };
+  }, []);
 
   // Helper to format timestamps
   const formatTime = (ts: number) => {
@@ -670,31 +780,61 @@ export const ChatStudio: React.FC<ChatStudioProps> = ({
                         <div>{msg.content}</div>
                       </div>
 
-                      {/* Message Footer: Timestamp and Copy button */}
+                      {/* Message Footer: Timestamp, Copy button and Read Aloud button */}
                       <div
-                        className={`flex items-center gap-2 text-[10px] text-slate-500 px-1 ${
+                        className={`flex items-center gap-3 text-[10px] text-slate-500 px-1 ${
                           isUser ? 'justify-end' : 'justify-start'
                         }`}
                       >
                         <span>{formatTime(msg.timestamp)}</span>
                         {!isUser && (
-                          <button
-                            onClick={() => handleCopy(msg.id, msg.content)}
-                            className="flex items-center gap-1 hover:text-slate-300 transition p-0.5 rounded cursor-pointer"
-                            title="Copy response"
-                          >
-                            {copiedId === msg.id ? (
-                              <>
-                                <Check className="w-3 h-3 text-emerald-400" />
-                                <span className="text-emerald-400">{lang === 'bn' ? 'কপি হয়েছে' : 'Copied'}</span>
-                              </>
-                            ) : (
-                              <>
-                                <Copy className="w-3 h-3" />
-                                <span>{lang === 'bn' ? 'কপি' : 'Copy'}</span>
-                              </>
-                            )}
-                          </button>
+                          <div className="flex items-center gap-2">
+                            {/* Copy Button */}
+                            <button
+                              onClick={() => handleCopy(msg.id, msg.content)}
+                              className="flex items-center gap-1 hover:text-slate-200 transition py-0.5 px-1.5 rounded-md hover:bg-slate-800/60 cursor-pointer"
+                              title={lang === 'bn' ? 'উত্তর কপি করুন' : 'Copy response'}
+                            >
+                              {copiedId === msg.id ? (
+                                <>
+                                  <Check className="w-3.5 h-3.5 text-emerald-400" />
+                                  <span className="text-emerald-400 font-medium">{lang === 'bn' ? 'কপি হয়েছে' : 'Copied'}</span>
+                                </>
+                              ) : (
+                                <>
+                                  <Copy className="w-3.5 h-3.5" />
+                                  <span>{lang === 'bn' ? 'কপি' : 'Copy'}</span>
+                                </>
+                              )}
+                            </button>
+
+                            {/* Text-to-Speech / Read Aloud Button */}
+                            <button
+                              onClick={() => handleSpeak(msg.id, msg.content)}
+                              className={`flex items-center gap-1 transition py-0.5 px-1.5 rounded-md cursor-pointer ${
+                                speakingId === msg.id
+                                  ? 'text-indigo-400 bg-indigo-500/15 border border-indigo-500/30'
+                                  : 'hover:text-slate-200 hover:bg-slate-800/60'
+                              }`}
+                              title={
+                                speakingId === msg.id
+                                  ? (lang === 'bn' ? 'পড়া বন্ধ করুন' : 'Stop reading')
+                                  : (lang === 'bn' ? 'পড়ে শোনান' : 'Read aloud')
+                              }
+                            >
+                              {speakingId === msg.id ? (
+                                <>
+                                  <VolumeX className="w-3.5 h-3.5 text-indigo-400 animate-pulse" />
+                                  <span className="text-indigo-400 font-medium">{lang === 'bn' ? 'থামুন' : 'Stop'}</span>
+                                </>
+                              ) : (
+                                <>
+                                  <Volume2 className="w-3.5 h-3.5" />
+                                  <span>{lang === 'bn' ? 'শুনুন' : 'Listen'}</span>
+                                </>
+                              )}
+                            </button>
+                          </div>
                         )}
                       </div>
                     </div>
