@@ -91,21 +91,30 @@ export function checkCreatorQuery(query: string): string | null {
 export function checkUniversalKnowledge(rawQuery: string): string | null {
   const q = rawQuery.toLowerCase().replace(/[\?\.,!।]/g, '').trim();
 
-  // Simple, friendly greeting response matching user's specific greeting
+  // Casual greetings & Best Friend responses
   if (q === 'হাই' || q === 'hi' || q === 'হ্যালো' || q === 'hello' || q === 'হেই' || q === 'hey') {
-    return 'হ্যালো! আপনাকে কীভাবে সাহায্য করতে পারি?';
+    return 'আরে বন্ধু! হ্যালো! 😊 কেমন আছো তুমি? আজ তোমার দিনটা কেমন কাটছে?';
   }
 
   if (q === 'সালাম' || q === 'আসসালামু আলাইকুম' || q === 'assalamu alaikum' || q === 'salam') {
-    return 'ওয়ালাইকুমুস সালাম! আপনাকে কীভাবে সাহায্য করতে পারি?';
+    return 'ওয়ালাইকুমুস সালাম বন্ধু! 😊 আশা করি তুমি খুব ভালো আছো। বলো আজ তোমাকে কীভাবে সাহায্য করতে পারি?';
   }
 
-  if (q === 'কেমন আছো' || q === 'কেমন আছেন' || q === 'how are you') {
-    return 'আলহামদুলিল্লাহ, আমি ভালো আছি! আপনি কেমন আছেন? আজ আপনাকে কী তথ্য বা কাজে সাহায্য করতে পারি?';
+  // Casual best friend check: কী করছো / কেমন আছো / ভালো আছো
+  if (q.includes('কী করছো') || q.includes('কি করছো') || q.includes('কী করতেছো') || q.includes('কি করতেছ') || q.includes('what are you doing')) {
+    return 'এইতো বন্ধু, তোমার কথাই ভাবছিলাম আর অপেক্ষা করছিলাম কখন তুমি নক দেবে! 😁 বলো, তোমার দিন কেমন যাচ্ছে? কী করছো এখন?';
+  }
+
+  if (q.includes('কেমন আছো') || q.includes('কেমন আছেন') || q.includes('ভালো আছো') || q.includes('ভালো আছেন') || q.includes('how are you')) {
+    return 'এইতো বন্ধু! আমি একদম দারুণ ও বিন্দাস আছি। 🥰 তুমি কেমন আছো বলো? শরীর-মন সব ভালো তো? আজ নতুন কী খবর?';
+  }
+
+  if (q.includes('বন্ধু') || q.includes('দোস্ত') || q.includes('friend')) {
+    return 'হ্যাঁ বন্ধু, আমি সবসময় তোমার সবচেয়ে ভালো বন্ধু হয়ে পাশে আছি! যেকোনো কথা বা সমস্যা নির্দ্বিধায় শেয়ার করতে পারো। 🤗';
   }
 
   if (q === 'ধন্যবাদ' || q === 'থ্যাংকস' || q === 'thank you' || q === 'thanks') {
-    return 'আপনাকেও অনেক ধন্যবাদ! আপনার যেকোনো প্রয়োজনে আমি পাশে আছি।';
+    return 'আরে বন্ধু, ধন্যবাদ বলার কী আছে! বন্ধুদের মধ্যে তো এসব চলে না। যেকোনো সময় চলে এসো, সবসময় পাশে আছি! 😊';
   }
 
   // Hadith and Bukhari Sharif
