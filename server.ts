@@ -285,17 +285,37 @@ app.post('/api/chat', async (req, res) => {
             });
           }
 
-          const response = await ai.models.generateContent({
-            model: modelName,
-            contents: contents,
-            config: {
-              systemInstruction: SYSTEM_INSTRUCTION,
-              temperature: 0.7,
-            },
-          });
+          // Config with Google Search Grounding enabled for Real-Time Live Internet Knowledge
+          const configWithSearch: any = {
+            systemInstruction: SYSTEM_INSTRUCTION,
+            temperature: 0.65,
+            tools: [{ googleSearch: {} }],
+          };
 
-          if (response && response.text && response.text.trim().length > 0) {
-            return res.json({ reply: response.text.trim() });
+          try {
+            const response = await ai.models.generateContent({
+              model: modelName,
+              contents: contents,
+              config: configWithSearch,
+            });
+
+            if (response && response.text && response.text.trim().length > 0) {
+              return res.json({ reply: response.text.trim() });
+            }
+          } catch (searchToolErr: any) {
+            // If the specific model tier doesn't accept googleSearch or encounters a tool issue, retry cleanly without tools
+            const responseFallback = await ai.models.generateContent({
+              model: modelName,
+              contents: contents,
+              config: {
+                systemInstruction: SYSTEM_INSTRUCTION,
+                temperature: 0.65,
+              },
+            });
+
+            if (responseFallback && responseFallback.text && responseFallback.text.trim().length > 0) {
+              return res.json({ reply: responseFallback.text.trim() });
+            }
           }
         } catch (err: any) {
           console.warn(`Failed with model ${modelName}:`, err.message || err);
