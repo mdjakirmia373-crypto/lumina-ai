@@ -1,4 +1,4 @@
-// Lumiqra Chat Service Worker for PWA Installation & Offline Support
+// Lumiqra Chat Service Worker for PWA Installation & Offline Caching
 const CACHE_NAME = 'lumiqra-chat-v1';
 const ASSETS_TO_CACHE = [
   '/',
@@ -31,10 +31,10 @@ self.addEventListener('activate', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
-  // Only handle GET requests; pass through others
+  // Only handle GET requests
   if (event.request.method !== 'GET') return;
 
-  // Pass API requests directly to the network
+  // Pass API requests directly to network
   const url = new URL(event.request.url);
   if (url.pathname.startsWith('/api/')) {
     return;
@@ -42,14 +42,14 @@ self.addEventListener('fetch', (event) => {
 
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {
-      if (cachedResponse) {
-        return cachedResponse;
-      }
-      return fetch(event.request).catch(() => {
-        if (event.request.mode === 'navigate') {
-          return caches.match('/');
-        }
-      });
+      return (
+        cachedResponse ||
+        fetch(event.request).catch(() => {
+          if (event.request.mode === 'navigate') {
+            return caches.match('/');
+          }
+        })
+      );
     })
   );
 });
