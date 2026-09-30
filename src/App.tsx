@@ -11,6 +11,7 @@ import { BgRemoverStudio } from './components/BgRemoverStudio';
 import { HistoryGallery } from './components/HistoryGallery';
 import { AdminDashboard } from './components/AdminDashboard';
 import { Footer } from './components/Footer';
+import { InstallBanner } from './components/InstallBanner';
 import { Language, GeneratedImage, VoiceHistoryItem, UserAccount, AppTab } from './types';
 import { trackVisit } from './utils/analyticsTracker';
 import { 
@@ -144,6 +145,9 @@ export default function App() {
 
   return (
     <div className="bg-slate-950 text-slate-100 min-h-screen flex flex-col font-sans selection:bg-indigo-500 selection:text-white">
+      {/* PWA Install Notification Bar */}
+      <InstallBanner />
+
       {/* Sign Up / Login Mandatory Modal for First-Time or Returning Users */}
       <AuthModal
         lang={lang}
