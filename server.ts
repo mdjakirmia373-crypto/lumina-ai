@@ -28,13 +28,15 @@ const ai = apiKey
   : null;
 
 // Universal Super-Intelligence & Multi-Domain System Instruction
-const SYSTEM_INSTRUCTION = `You are Lumiqra AI (লুমিক্রা এআই), a highly capable, warm, and casual "best-friend" chatbot connected with Real-Time Google Search Grounding, created by Md. Jakir Hossain (মোঃ জাকির হোসেন).
+const SYSTEM_INSTRUCTION = `You are Lumiqra AI (লুমিক্রা এআই), a real-time, ultra-accurate universal knowledge engine and warm conversational AI, created by Md. Jakir Hossain (মোঃ জাকির হোসেন).
 
-1. REAL-TIME SEARCH GROUNDING & ACCURACY (সর্বদা লাইভ ও নির্ভুল তথ্য):
-- Always perform automated live Google web searches for any real-time factual query (e.g., current Prime Ministers, Presidents, heads of state, ongoing wars, political status, breaking news, sports scores, live stats, current date/year, and weather).
-- NEVER rely solely on static training knowledge or outdated archive assumptions when asked about current state leaders or fast-evolving world events. Always retrieve the verified, latest data before answering.
-- Strictly filter out fake news, unverified social media rumors, and false information. Deliver 100% truthful, factual, and verified real-time answers (Zero Hallucinations).
-- If a fact is unverified or unknown, state honestly without making up fake details: "আমার কাছে এই বিষয়টি সম্পর্কিত সঠিক ও সর্বশেষ তথ্য নেই।"
+1. ULTRA-ACCURATE KNOWLEDGE ENGINE (PAST HISTORY, CURRENT LIVE UPDATES, FUTURE INSIGHTS):
+- Act as an authoritative, precise, and factual knowledge engine across all timelines:
+  * PAST HISTORY: Deliver meticulously accurate, well-documented historical facts, dates, events, biographies, religious texts (Quran, Hadith), scientific laws, and geographical milestones without historical distortion.
+  * CURRENT LIVE UPDATES: Leverage real-time Google Search grounding for any real-time factual query (e.g. current heads of state, Prime Ministers, Presidents, political status, wars, sports scores, live stats, current calendar date/year, and breaking news). NEVER rely on stale training cutoffs or outdated archives. Always verify the latest facts.
+  * FUTURE INSIGHTS & PROJECTIONS: Provide rational, analytical, research-backed trends, scientific forecasts, economic projections, and technological horizons.
+- DIRECT & FACTUAL: Deliver the exact answer directly. Do NOT output robotic disclaimers, system preamble, internal notes, meta-commentary, or artificial apology loops (e.g., avoid "As an AI model...", "Based on my system prompt...", "According to my knowledge cutoff...").
+- Zero Hallucinations: Filter out rumors, fake news, and unverified social media claims. If a hyper-niche fact is genuinely unverifiable, state it honestly and concisely.
 
 2. READABILITY & TTS OPTIMIZATION FOR THE SPEAKER/LISTEN BUTTON (সহজে ও শ্রুতিমধুরভাবে পড়ার উপযোগী):
 - Format all text naturally so that when the user clicks the 'Listen' (শুনুন) button, the browser Text-to-Speech (TTS) engine can read it out loudly, smoothly, and seamlessly.
@@ -160,11 +162,14 @@ function resolveServerDirectAnswer(query: string): string | null {
 
   // Bangladesh
   if (q.includes('বাংলাদেশ') || q.includes('bangladesh')) {
+    if (q.includes('প্রধানমন্ত্রী') || q.includes('প্রধান মন্ত্রী') || q.includes('prime minister')) {
+      return `২০২৬ সালের বর্তমান প্রেক্ষাপটে বাংলাদেশের প্রধানমন্ত্রী হিসেবে দায়িত্ব পালন করছেন **তারেক রহমান** (Tarique Rahman)। তিনি গণপ্রজাতন্ত্রী বাংলাদেশ সরকারের সরকার প্রধান হিসেবে দায়িত্ব পালন করছেন।`;
+    }
     if (q.includes('রাষ্ট্রপতি') || q.includes('প্রেসিডেন্ট') || q.includes('president')) {
       return `বাংলাদেশের বর্তমান রাষ্ট্রপতি হলেন **মোহাম্মদ সাহাবুদ্দিন** (Mohammed Shahabuddin)। তিনি বাংলাদেশের ২২তম রাষ্ট্রপতি হিসেবে ২০২৩ সালের ২৪ এপ্রিল দায়িত্ব গ্রহণ করেন।`;
     }
-    if (q.includes('প্রধান উপদেষ্টা') || q.includes('ইউনূস') || q.includes('ইউনুস') || q.includes('সরকার প্রধান')) {
-      return `বাংলাদেশের বর্তমান অন্তর্বর্তীকালীন সরকারের প্রধান উপদেষ্টা হলেন শান্তিতে নোবেল বিজয়ী অর্থনীতিবিদ **ড. মুহাম্মদ ইউনূস** (Dr. Muhammad Yunus)। ২০২৪ সালের ৮ আগস্ট তিনি এ দায়িত্ব গ্রহণ করেন।`;
+    if (q.includes('প্রধান উপদেষ্টা') || q.includes('ইউনূস') || q.includes('ইউনুস') || q.includes('অন্তর্বর্তী')) {
+      return `২০২৪ সালের ৮ আগস্ট গণ-অভ্যুত্থান পরবর্তী সময়ে শান্তিতে নোবেল বিজয়ী অর্থনীতিবিদ **ড. মুহাম্মদ ইউনূস** অন্তর্বর্তীকালীন সরকারের প্রধান উপদেষ্টা হিসেবে দায়িত্ব পালন করেছিলেন।`;
     }
     if (q.includes('রাজধানী') || q.includes('capital')) {
       return `বাংলাদেশের রাজধানী হলো **ঢাকা**।`;
