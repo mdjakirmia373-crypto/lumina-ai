@@ -163,7 +163,7 @@ export async function getDirectUniversalAnswer(cleanQuery: string): Promise<stri
           const enExtRes = await fetch(enExtUrl);
           if (enExtRes.ok) {
             const extData = await enExtRes.json();
-            const page = enExtData?.query?.pages?.[enHit.pageid];
+            const page = extData?.query?.pages?.[enHit.pageid];
             if (page && page.extract && page.extract.trim().length > 30) {
               const cleaned = page.extract.replace(/\s*\([^)]*\)/g, '').replace(/\s+/g, ' ').trim();
               const sentences = cleaned.split(/(?<=[।\.\?!])\s+/);
