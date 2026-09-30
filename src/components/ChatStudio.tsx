@@ -377,12 +377,15 @@ export const ChatStudio: React.FC<ChatStudioProps> = ({
     // Cancel any previous speech
     window.speechSynthesis.cancel();
 
-    // Clean markdown, symbols, links, code blocks for crystal-clear natural speech
+    // Clean markdown, code blocks, excessive symbols, and table syntax for crystal-clear natural speech
     const cleanText = text
       .replace(/```[\s\S]*?```/g, '') // remove large code blocks
-      .replace(/`[^`]+`/g, '')
-      .replace(/[*#_~>\[\]\(\)\{\}\\]/g, '')
-      .replace(/https?:\/\/\S+/g, '')
+      .replace(/`[^`]+`/g, '') // remove inline code
+      .replace(/\|[^\n]+\|/g, ' ') // remove table rows with pipes
+      .replace(/[-=]{3,}/g, ' ') // remove divider lines
+      .replace(/[*#_~>\[\]\(\)\{\}\\^]/g, '') // remove markdown symbols
+      .replace(/https?:\/\/\S+/g, '') // remove raw URLs
+      .replace(/\s+/g, ' ') // normalize whitespace
       .trim();
 
     if (!cleanText) return;
