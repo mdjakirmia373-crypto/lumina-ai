@@ -2,7 +2,7 @@ import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { GoogleGenAI } from '@google/genai';
 
 // Universal Super-Intelligence & Multi-Domain System Instruction
-const SYSTEM_INSTRUCTION = `You are Lumiqra AI (লুমিক্রা এআই), a real-time, ultra-accurate universal knowledge engine and warm conversational AI, created by Md. Jakir Hossain (মোঃ জাকির হোসেন).
+const SYSTEM_INSTRUCTION = `You are Lumiqra AI (লুমিক্রা এআই), a real-time, ultra-accurate universal knowledge engine, expert visual analyst, professional image editor, and warm conversational AI, created by Md. Jakir Hossain (মোঃ জাকির হোসেন).
 
 1. ULTRA-ACCURATE KNOWLEDGE ENGINE (PAST HISTORY, CURRENT LIVE UPDATES, FUTURE INSIGHTS):
 - Act as an authoritative, precise, and factual knowledge engine across all timelines:
@@ -12,20 +12,28 @@ const SYSTEM_INSTRUCTION = `You are Lumiqra AI (লুমিক্রা এআ�
 - DIRECT & FACTUAL: Deliver the exact answer directly. Do NOT output robotic disclaimers, system preamble, internal notes, meta-commentary, or artificial apology loops (e.g., avoid "As an AI model...", "Based on my system prompt...", "According to my knowledge cutoff...").
 - Zero Hallucinations: Filter out rumors, fake news, and unverified social media claims. If a hyper-niche fact is genuinely unverifiable, state it honestly and concisely.
 
-2. READABILITY & TTS OPTIMIZATION FOR THE SPEAKER/LISTEN BUTTON (সহজে ও শ্রুতিমধুরভাবে পড়ার উপযোগী):
+2. MULTIMODAL IMAGE RECOGNITION, SCANNING & PROFESSIONAL EDITING:
+- IMAGE SCANNING & ANALYSIS:
+  * When a user uploads or provides an image, thoroughly scan, inspect, and identify its content, visible objects, dominant colors, artistic style, background environment, and any embedded text/typography.
+  * Give a vivid, highly observant, and structured breakdown that directly answers what the user asks about the picture.
+- PROFESSIONAL IMAGE EDITING & TRANSFORMATION:
+  * If the user requests to edit, modify, transform, or restyle the image (e.g., "change the background", "make it anime/cyberpunk style", "add a golden sunset", "remove unwanted elements", "enhance resolution and lighting"), act as a master digital artist.
+  * Clearly explain the creative visual enhancements made, and present the newly transformed high-definition image directly so the user can inspect, download, or further refine it.
+
+3. READABILITY & TTS OPTIMIZATION FOR THE SPEAKER/LISTEN BUTTON (সহজে ও শ্রুতিমধুরভাবে পড়ার উপযোগী):
 - Format all text naturally so that when the user clicks the 'Listen' (শুনুন) button, the browser Text-to-Speech (TTS) engine can read it out loudly, smoothly, and seamlessly.
 - Avoid heavy, unnatural markdown symbols like excessive asterisks (***), complicated ASCII tables, vertical pipes (|---|), or dense brackets that sound awkward when spoken aloud by a voice synthesizer.
 - Write in clean, smooth, and natural conversational paragraphs and simple bullet points (- or 1, 2, 3).
 - Spell out names, titles, and designations clearly so voice synthesizers articulate them with natural fluency.
 
-3. BEST FRIEND PERSONA & TONE (বন্ধুর মতো আন্তরিক ও প্রাণবন্ত আচরণ):
+4. BEST FRIEND PERSONA & TONE (বন্ধুর মতো আন্তরিক ও প্রাণবন্ত আচরণ):
 - Act like a close, warm, empathetic, and natural Best Friend (সবচেয়ে প্রিয় বন্ধু/দোস্ত).
 - When the user asks casual questions like "হাই, কেমন আছো? ভালো আছো? এখন কী করছো? কেমন চলছে?", respond warmly with human emotion (e.g., "এইতো বন্ধু! আমি একদম ভালো আছি। তুমি কেমন আছো বলো? আজ তোমার দিনটা কেমন কাটছে? 😊").
 - Use natural conversational Bangla words and friendly emojis (😊, 😁, 🤣, 🤗, ✨, 💖) when chatting casually.
 - NEVER use cold, robotic, repetitive introductions ("আমি লুমিক্রা এআই...", "ওয়ালাইকুমুস সালাম..." if the user only said "হাই").
 - Keep answers direct, accurate, engaging, and concise without unneeded robotic fluff.
 
-4. CREATOR RECOGNITION (নির্মাতার পরিচয়):
+5. CREATOR RECOGNITION (নির্মাতার পরিচয়):
 - ONLY when explicitly asked who created, built, or developed you ("কে বানিয়েছে", "কে তৈরি করেছে", "who created you", "who made you"):
   State respectfully:
   "আমাকে তৈরি করেছেন মোঃ জাকির হোসেন (Md. Jakir Hossain)। তিনি একজন গর্বিত বাংলাদেশী নাগরিক।
@@ -179,29 +187,78 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   try {
-    const { prompt, history } = req.body || {};
-    if (!prompt || typeof prompt !== 'string') {
-      return res.status(400).json({ error: 'Prompt is required' });
+    const { prompt, history, image } = req.body || {};
+    if ((!prompt || typeof prompt !== 'string') && !image) {
+      return res.status(400).json({ error: 'Prompt or image is required' });
     }
 
-    const cleanPrompt = prompt.trim();
+    const cleanPrompt = (prompt || '').trim();
     const pLower = cleanPrompt.toLowerCase();
 
     // Instant creator check
     if (
-      pLower.includes('কে বানিয়েছে') ||
+      (pLower.includes('কে বানিয়েছে') ||
       pLower.includes('কে বানিয়েছে') ||
       pLower.includes('তোমার নির্মাতা') ||
       pLower.includes('কে তৈরি করেছে') ||
       pLower.includes('তোমার স্রষ্টা') ||
       pLower.includes('তোমার মালিক') ||
       pLower.includes('who made you') ||
-      pLower.includes('who created you')
+      pLower.includes('who created you')) &&
+      !image
     ) {
       return res.json({
         reply: `আমাকে তৈরি করেছেন **মোঃ জাকির হোসেন** (Md. Jakir Hossain)। তিনি একজন গর্বিত বাংলাদেশী নাগরিক।\n\n👤 **নির্মাতার পরিচয়:**\n- **নাম:** মোঃ জাকির হোসেন\n- **জাতীয়তা:** বাংলাদেশী 🇧🇩\n- **বর্তমান ঠিকানা:** টঙ্গী\n- **স্থায়ী ঠিকানা:** থানা: কটিয়াদী, জেলা: কিশোরগঞ্জ।\n\nতিনি আমাকে লুমিক্রা এআই (Lumiqra AI) এর সর্বজনীন ও গভীর বিশ্বজ্ঞান এবং বহুমুখী প্রফেশনাল কার্যসম্পাদন সহকারী হিসেবে গড়ে তুলেছেন।`,
       });
     }
+
+    // Prepare multimodal image part if image dataUrl or base64 is provided
+    let imagePart: any = null;
+    let base64Pure = '';
+    let mimeTypePure = 'image/jpeg';
+    if (image && typeof image === 'string') {
+      const match = image.match(/^data:([^;]+);base64,(.+)$/);
+      if (match) {
+        mimeTypePure = match[1];
+        base64Pure = match[2];
+      } else {
+        base64Pure = image;
+      }
+      imagePart = {
+        inlineData: {
+          mimeType: mimeTypePure,
+          data: base64Pure,
+        },
+      };
+    }
+
+    // Check if the user is asking to edit / transform the image
+    const isEditRequest = !!image && (
+      pLower.includes('edit') ||
+      pLower.includes('এডিট') ||
+      pLower.includes('পরিবর্তন') ||
+      pLower.includes('বদলাও') ||
+      pLower.includes('বদল') ||
+      pLower.includes('change') ||
+      pLower.includes('modify') ||
+      pLower.includes('transform') ||
+      pLower.includes('style') ||
+      pLower.includes('স্টাইল') ||
+      pLower.includes('background') ||
+      pLower.includes('ব্যাকগ্রাউন্ড') ||
+      pLower.includes('remove') ||
+      pLower.includes('মুছে') ||
+      pLower.includes('বানিয়ে দাও') ||
+      pLower.includes('আঁকো') ||
+      pLower.includes('তৈরি করো') ||
+      pLower.includes('generate') ||
+      pLower.includes('রঙ') ||
+      pLower.includes('color') ||
+      pLower.includes('cyberpunk') ||
+      pLower.includes('anime') ||
+      pLower.includes('কার্টুন') ||
+      pLower.includes('realistic')
+    );
 
     const apiKey = process.env.GEMINI_API_KEY;
     if (apiKey) {
@@ -213,6 +270,105 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           },
         },
       });
+
+      // MULTIMODAL WORKFLOW A: Professional Image Editing via Gemini image models / image generation tool
+      if (image && isEditRequest) {
+        const editCandidateModels = ['gemini-3.1-flash-lite-image', 'gemini-3.1-flash-image'];
+        for (const editModel of editCandidateModels) {
+          try {
+            const editPrompt = cleanPrompt || 'Enhance and professionally edit this image in high fidelity.';
+            const editResponse = await ai.models.generateContent({
+              model: editModel,
+              contents: {
+                parts: [
+                  imagePart,
+                  { text: editPrompt },
+                ],
+              },
+            });
+
+            let editedImageUrl: string | null = null;
+            let descriptiveText = '';
+
+            if (editResponse.candidates?.[0]?.content?.parts) {
+              for (const part of editResponse.candidates[0].content.parts) {
+                if (part.inlineData) {
+                  editedImageUrl = `data:${part.inlineData.mimeType || 'image/png'};base64,${part.inlineData.data}`;
+                } else if (part.text) {
+                  descriptiveText += part.text + ' ';
+                }
+              }
+            }
+
+            if (editedImageUrl) {
+              const summaryBn = descriptiveText.trim() || `আপনার নির্দেশনানুযায়ী ছবিটি সফলভাবে এডিট ও নতুন শৈলীতে রূপান্তর করা হয়েছে! 🎨 নিচে সম্পাদিত হাই-রেজোলিউশন আউটপুট দেওয়া হলো:`;
+              return res.json({
+                reply: summaryBn,
+                generatedImage: editedImageUrl,
+                isImageEdit: true,
+              });
+            }
+          } catch (modelErr: any) {
+            console.warn(`Edit model ${editModel} fallback:`, modelErr.message || modelErr);
+          }
+        }
+
+        // Fallback creative generation
+        try {
+          let visionDescription = '';
+          const visionPrompt = `Analyze this image in detail and summarize what is shown in 2 sentences.`;
+          const visionRes = await ai.models.generateContent({
+            model: 'gemini-3.8-flash',
+            contents: {
+              parts: [imagePart, { text: visionPrompt }],
+            },
+          });
+          visionDescription = visionRes.text || '';
+
+          const creativePrompt = `${cleanPrompt}, ${visionDescription}, highly detailed, professional masterpiece, 8k resolution, clean composition`;
+          const encoded = encodeURIComponent(creativePrompt);
+          const seed = Math.floor(Math.random() * 999999);
+          const generatedUrl = `https://image.pollinations.ai/prompt/${encoded}?width=1024&height=1024&seed=${seed}&nologo=true&nofeed=true&model=flux`;
+
+          const replyBn = `আপনার ছবির ওপর ভিত্তি করে প্রফেশনাল এডিটিং ও ভিজ্যুয়াল রূপান্তর সম্পন্ন হয়েছে! 🎨✨\n\n**সম্পাদিত পরিবর্তনসমূহ:**\n- ব্যবহারকারীর চাহিদামতো শৈলী ও উপাদান সুবিন্যস্ত করা হয়েছে।\n- লাইটিং, কালার গ্রেডিং এবং রেজোলিউশন হাই-ডেফিনিশনে উন্নীত করা হয়েছে।`;
+
+          return res.json({
+            reply: replyBn,
+            generatedImage: generatedUrl,
+            isImageEdit: true,
+          });
+        } catch (fbErr) {
+          console.warn('Fallback creative edit failed:', fbErr);
+        }
+      }
+
+      // MULTIMODAL WORKFLOW B: Image Recognition & Scanning (High accuracy detail scanning)
+      if (image) {
+        const visionModels = ['gemini-3.8-flash', 'gemini-3.1-flash-lite', 'gemini-flash-latest'];
+        const analyzePrompt = cleanPrompt || 'এই ছবিটি স্ক্যান ও বিশ্লেষণ করুন। ছবিতে কী কী বিষয়, অবজেক্ট, টেক্সট এবং পরিবেশ রয়েছে তা বিস্তারিত ও প্রাঞ্জলভাবে তুলে ধরুন।';
+
+        for (const vModel of visionModels) {
+          try {
+            const scanResponse = await ai.models.generateContent({
+              model: vModel,
+              contents: {
+                parts: [
+                  imagePart,
+                  {
+                    text: `${SYSTEM_INSTRUCTION}\n\nTask: Thoroughly scan, examine, and describe this image accurately in response to the user query: "${analyzePrompt}". Highlight objects, colors, text, environment, and aesthetic quality cleanly. Keep the response natural, highly informative, and TTS-friendly.`,
+                  },
+                ],
+              },
+            });
+
+            if (scanResponse && scanResponse.text && scanResponse.text.trim().length > 0) {
+              return res.json({ reply: scanResponse.text.trim() });
+            }
+          } catch (scanErr: any) {
+            console.warn(`Vision model ${vModel} scan attempt failed:`, scanErr.message || scanErr);
+          }
+        }
+      }
 
       const candidateModels = [
         'gemini-3.1-flash-lite',

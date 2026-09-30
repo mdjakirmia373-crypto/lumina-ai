@@ -14,6 +14,7 @@ import {
   VolumeX,
   Image as ImageIcon,
   Paperclip,
+  Download,
   PanelLeftClose,
   PanelLeftOpen,
   MessageSquare,
@@ -52,6 +53,8 @@ export interface ChatMessageItem {
   content: string;
   timestamp: number;
   imageUrl?: string;
+  generatedImageUrl?: string;
+  isImageEdit?: boolean;
 }
 
 export interface ChatConversation {
@@ -300,12 +303,17 @@ export const ChatStudio: React.FC<ChatStudioProps> = ({
 
     try {
       let replyText = '';
-      if (userImg) {
-        replyText = lang === 'bn'
-          ? `আপনার ছবিটি সফলভাবে গৃহীত হয়েছে! 🎨\n\n**ছবির ওপর যা যা করতে পারেন:**\n1. **ব্যাকগ্রাউন্ড রিমুভ:** আপনি 'Bg Remover' স্টুডিওতে এটি ব্যবহার করে মুহূর্তেই ব্যাকগ্রাউন্ড মুছে ফেলতে পারেন।\n2. **নতুন স্টাইলে এআই রূপান্তর:** এই ছবিকে আরও উন্নত বা ভিন্ন আর্ট স্টাইলে রূপান্তর করতে প্রম্পট লিখুন।\n\nআপনি এই ছবিতে ঠিক কী পরিবর্তন করতে চান? (যেমন: ব্যাকগ্রাউন্ড বদলানো, আলো বাড়ানো, অথবা সাইবারপাঙ্ক স্টাইল দেওয়া)`
-          : `Image successfully received! 🎨\n\n**What you can do with this image:**\n1. **Remove Background:** Open 'Bg Remover' studio to remove backdrop instantly.\n2. **AI Style Transfer:** Tell me how you would like to edit or transform this artwork.\n\nWhat specific edits would you like to make to this image?`;
-      } else {
-        replyText = await askAiQuestion(userText, historyForContext);
+      let generatedImageUrl: string | undefined = undefined;
+      let isImageEdit: boolean | undefined = undefined;
+
+      const aiResponse = await askAiQuestion(userText, historyForContext, userImg);
+
+      if (typeof aiResponse === 'string') {
+        replyText = aiResponse;
+      } else if (aiResponse && typeof aiResponse === 'object') {
+        replyText = aiResponse.reply;
+        generatedImageUrl = aiResponse.generatedImage;
+        isImageEdit = aiResponse.isImageEdit;
       }
 
       const aiMsg: ChatMessageItem = {
@@ -313,6 +321,8 @@ export const ChatStudio: React.FC<ChatStudioProps> = ({
         role: 'assistant',
         content: replyText,
         timestamp: Date.now(),
+        generatedImageUrl,
+        isImageEdit,
       };
 
       setConversations((prev) =>
@@ -510,7 +520,7 @@ export const ChatStudio: React.FC<ChatStudioProps> = ({
             className="hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-800/90 hover:bg-slate-700/90 text-indigo-300 border border-indigo-500/30 text-xs font-medium transition cursor-pointer"
           >
             <Layers className="w-3.5 h-3.5 text-indigo-400" />
-            <span>{lang === 'bn' ? '১২টি বিশেষ ক্ষেত্র ও ক্ষমতা' : '12 Core Capabilities'}</span>
+            <span>{lang === 'bn' ? '১৩টি বিশেষ ক্ষেত্র ও ক্ষমতা' : '13 Core Capabilities'}</span>
           </button>
 
           <div className="h-4 w-px bg-slate-800 mx-1 hidden sm:block"></div>
@@ -770,12 +780,53 @@ export const ChatStudio: React.FC<ChatStudioProps> = ({
                       >
                         {/* Attached Image inside User Message if exists */}
                         {msg.imageUrl && (
-                          <div className="mb-2.5 rounded-xl overflow-hidden border border-white/20 max-w-[200px]">
+                          <div className="mb-2.5 rounded-xl overflow-hidden border border-white/20 max-w-[220px]">
                             <img
                               src={msg.imageUrl}
                               alt="User uploaded attachment"
-                              className="w-full h-auto object-cover max-h-48"
+                              className="w-full h-auto object-cover max-h-52"
                             />
+                          </div>
+                        )}
+
+                        {/* Generated/Edited Image inside Assistant Message if exists */}
+                        {msg.generatedImageUrl && (
+                          <div className="mb-3 rounded-2xl overflow-hidden border border-indigo-500/40 bg-slate-950/60 shadow-lg group/img">
+                            <div className="relative">
+                              <img
+                                src={msg.generatedImageUrl}
+                                alt="AI Edited artwork"
+                                className="w-full max-w-[340px] h-auto object-cover max-h-80 rounded-t-2xl"
+                              />
+                              <div className="absolute top-2 right-2 flex items-center gap-1.5 opacity-90 group-hover/img:opacity-100 transition">
+                                <a
+                                  href={msg.generatedImageUrl}
+                                  download={`lumiqra_art_${Date.now()}.png`}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="p-1.5 rounded-lg bg-black/70 hover:bg-black text-white text-xs backdrop-blur-sm border border-white/20 transition flex items-center gap-1 shadow-md"
+                                  title={lang === 'bn' ? 'ডাউনলোড করুন' : 'Download Image'}
+                                >
+                                  <Download className="w-3.5 h-3.5" />
+                                </a>
+                              </div>
+                            </div>
+                            <div className="p-2.5 bg-slate-900/90 border-t border-slate-800 flex items-center justify-between text-[11px] text-slate-300">
+                              <span className="flex items-center gap-1 text-indigo-400 font-medium">
+                                <Sparkles className="w-3.5 h-3.5" />
+                                <span>{lang === 'bn' ? 'এআই এডিটেড আর্টওয়ার্ক' : 'AI Edited Output'}</span>
+                              </span>
+                              <div className="flex items-center gap-2">
+                                {onNavigateToTab && (
+                                  <button
+                                    onClick={() => onNavigateToTab('bg-remover')}
+                                    className="text-[10px] text-emerald-400 hover:text-emerald-300 transition underline underline-offset-2 cursor-pointer"
+                                  >
+                                    {lang === 'bn' ? 'Bg রিমুভার' : 'BG Remover'}
+                                  </button>
+                                )}
+                              </div>
+                            </div>
                           </div>
                         )}
 
@@ -907,8 +958,8 @@ export const ChatStudio: React.FC<ChatStudioProps> = ({
                 rows={1}
                 placeholder={
                   lang === 'bn'
-                    ? 'যেকোনো বিষয়ে প্রশ্ন লিখুন, কোড সমাধান চান বা লেখা তৈরি করতে বলুন...'
-                    : 'Ask anything, request code, translation or content...'
+                    ? 'যেকোনো প্রশ্ন লিখুন, অথবা ছবি আপলোড করে স্ক্যান বা এডিট করতে বলুন...'
+                    : 'Ask anything, or upload an image to scan & edit...'
                 }
                 className="w-full bg-transparent border-0 text-xs sm:text-sm text-slate-100 placeholder-slate-500 focus:outline-none resize-none py-1.5 max-h-32"
               />

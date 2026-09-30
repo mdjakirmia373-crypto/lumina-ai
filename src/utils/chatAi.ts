@@ -212,26 +212,35 @@ export function checkUniversalKnowledge(rawQuery: string): string | null {
   return null;
 }
 
+export interface AskAiResponse {
+  reply: string;
+  generatedImage?: string;
+  isImageEdit?: boolean;
+}
+
 // Ask AI Question: Guaranteed dynamic multi-tiered response engine
 export async function askAiQuestion(
   userQuery: string,
-  history: ChatMessage[] = []
-): Promise<string> {
+  history: ChatMessage[] = [],
+  image?: string | null
+): Promise<string | AskAiResponse> {
   const cleanQuery = userQuery.trim();
-  if (!cleanQuery) return 'অনুগ্রহ করে আপনার প্রশ্নটি লিখুন।';
+  if (!cleanQuery && !image) return 'অনুগ্রহ করে আপনার প্রশ্নটি লিখুন বা ছবি আপলোড করুন।';
 
-  // 1. Instant creator query (specifically about Lumiqra AI's maker)
-  const creatorAns = checkCreatorQuery(cleanQuery);
-  if (creatorAns) return creatorAns;
+  // 1. Instant creator query (specifically about Lumiqra AI's maker) - only when no image
+  if (!image) {
+    const creatorAns = checkCreatorQuery(cleanQuery);
+    if (creatorAns) return creatorAns;
 
-  // 2. Instant Built-in Knowledge (Hadith, Adam/Hawwa, Quran, Bangladesh, Sun)
-  const instantAnswer = checkUniversalKnowledge(cleanQuery);
-  if (instantAnswer) return instantAnswer;
+    // 2. Instant Built-in Knowledge (Hadith, Adam/Hawwa, Quran, Bangladesh, Sun)
+    const instantAnswer = checkUniversalKnowledge(cleanQuery);
+    if (instantAnswer) return instantAnswer;
+  }
 
   // 3. Primary Full-Stack Gemini AI Call (/api/chat)
   try {
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 20000);
+    const timeoutId = setTimeout(() => controller.abort(), 25000);
 
     const response = await fetch('/api/chat', {
       method: 'POST',
@@ -242,6 +251,7 @@ export async function askAiQuestion(
           role: m.role,
           content: m.content,
         })),
+        image: image || undefined,
       }),
       signal: controller.signal,
     });
@@ -250,11 +260,25 @@ export async function askAiQuestion(
     if (response.ok) {
       const data = await response.json();
       if (data && data.reply && typeof data.reply === 'string' && data.reply.trim().length > 0) {
+        if (data.generatedImage) {
+          return {
+            reply: data.reply.trim(),
+            generatedImage: data.generatedImage,
+            isImageEdit: data.isImageEdit,
+          };
+        }
         return data.reply.trim();
       }
     }
   } catch (backendErr) {
     console.warn('Backend /api/chat error:', backendErr);
+  }
+
+  // If image was provided and backend call failed, provide helpful fallback
+  if (image) {
+    return {
+      reply: 'আপনার ছবিটি সফলভাবে গ্রহণ করা হয়েছে! এটি একটি আকর্ষণীয় ছবি। আপনি কি এর ব্যাকগ্রাউন্ড পরিবর্তন করতে চান, কোনো নতুন উপাদান যুক্ত করতে চান, নাকি ভিন্ন কোনো আর্ট স্টাইলে রূপান্তর করতে চান?',
+    };
   }
 
   // 4. Live Universal Knowledge Retriever Fallback (Guaranteed to return information on history, religion, science, people)

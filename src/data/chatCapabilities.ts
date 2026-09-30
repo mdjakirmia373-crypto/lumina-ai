@@ -22,6 +22,43 @@ export interface CapabilityCategory {
 
 export const CHAT_CAPABILITY_CATEGORIES: CapabilityCategory[] = [
   {
+    id: 'image_recognition_editing',
+    icon: '📸',
+    badgeBn: 'ছবি স্ক্যান ও প্রফেশনাল এডিট',
+    badgeEn: 'Vision & Image Editing',
+    titleBn: 'মাল্টিমোডাল ছবি বিশ্লেষণ ও প্রফেশনাল এডিটিং',
+    titleEn: 'Multimodal Image Scanning & Pro Editing',
+    descBn: 'যেকোনো ছবি স্ক্যান করে নির্ভুল বিবরণ, অবজেক্ট শনাক্তকরণ, টেক্সট রিডিং এবং প্রফেশনাল এআই রূপান্তর/এডিটিং',
+    descEn: 'Scan images for ultra-accurate description, OCR text reading, object detection & pro AI image transformation',
+    color: 'from-fuchsia-600 to-rose-600',
+    items: [
+      {
+        titleBn: 'ছবি স্ক্যান ও বিস্তারিত বিবরণ',
+        titleEn: 'Scan & Describe Image Details',
+        promptBn: 'এই ছবিটি স্ক্যান করে এর মূল বিষয়বস্তু, চারপাশের পরিবেশ, দৃশ্যমান বস্তু এবং আলোর বিন্যাস বিশ্লেষণ করে দিন।',
+        promptEn: 'Scan and analyze this image thoroughly. Describe the objects, background environment, lighting, and composition.',
+      },
+      {
+        titleBn: 'ছবির ব্যাকগ্রাউন্ড প্রফেশনাল পরিবর্তন',
+        titleEn: 'Transform Background Environment',
+        promptBn: 'এই ছবির ব্যাকগ্রাউন্ড পরিবর্তন করে একটি আধুনিক সাইবারপাঙ্ক নিয়ন সিটি অথবা মনোরম সূর্যাস্তের সমুদ্রসৈকত দিন।',
+        promptEn: 'Edit this image by replacing the background with a cinematic golden-hour sunset and dramatic atmospheric lighting.',
+      },
+      {
+        titleBn: 'আর্ট স্টাইল রূপান্তর (Anime / 3D Render)',
+        titleEn: 'Art Style Transformation',
+        promptBn: 'এই ছবির মূল চরিত্র ঠিক রেখে এটিকে একটি প্রিমিয়াম অ্যানিমে (Anime) বা 3D পিক্সার স্টাইলের মাস্টারপিসে রূপান্তর করুন।',
+        promptEn: 'Transform this photo into a high-detail anime digital painting while preserving facial features and emotion.',
+      },
+      {
+        titleBn: 'ছবি থেকে টেক্সট ও উপাদান নিষ্কাশন (OCR)',
+        titleEn: 'Extract Text & Document Scan',
+        promptBn: 'এই ছবিতে থাকা সমস্ত লেখা ও টেক্সট নির্ভুলভাবে পড়ে টাইপ করে বাংলায় অর্থসহ বুঝিয়ে দিন।',
+        promptEn: 'Extract and transcribe all printed or handwritten text visible in this image accurately.',
+      },
+    ],
+  },
+  {
     id: 'chat_qa',
     icon: '💬',
     badgeBn: 'চ্যাট ও প্রশ্নোত্তর',
