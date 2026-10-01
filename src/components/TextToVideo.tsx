@@ -59,18 +59,24 @@ export const TextToVideo: React.FC<TextToVideoProps> = ({ lang }) => {
     );
 
     try {
-      // Step feedback updates
+      // Step feedback updates for longer generation cycles
       const stepTimer1 = setTimeout(() => {
         setProgressStep(
-          lang === 'bn' ? 'ফ্রেম সিকোয়েন্স ও মোশন রেন্ডারিং চলছে...' : 'Generating frame sequences & motion vectors...'
+          lang === 'bn' ? 'মডেল লোড ও ফ্রেম সিন্থেসিস শুরু হচ্ছে (কিছু সময় লাগতে পারে)...' : 'Loading model & synthesizing frames (may take up to a minute)...'
         );
-      }, 3000);
+      }, 4000);
 
       const stepTimer2 = setTimeout(() => {
         setProgressStep(
-          lang === 'bn' ? 'ওয়াটারমার্ক-মুক্ত MP4 এনকোডিং সম্পন্ন হচ্ছে...' : 'Encoding 100% watermark-free MP4 stream...'
+          lang === 'bn' ? 'এআই ভিডিও ফ্রেম তৈরি ও এমপি৪ এনকোডিং চলছে...' : 'Rendering AI video frames & encoding MP4...'
         );
-      }, 7000);
+      }, 15000);
+
+      const stepTimer3 = setTimeout(() => {
+        setProgressStep(
+          lang === 'bn' ? 'চূড়ান্ত ভিডিও তৈরি হচ্ছে, অনুগ্রহ করে অপেক্ষা করুন...' : 'Finalizing video stream, please wait...'
+        );
+      }, 35000);
 
       const response = await fetch('/api/text-to-video', {
         method: 'POST',
@@ -84,6 +90,7 @@ export const TextToVideo: React.FC<TextToVideoProps> = ({ lang }) => {
 
       clearTimeout(stepTimer1);
       clearTimeout(stepTimer2);
+      clearTimeout(stepTimer3);
 
       const responseText = await response.text();
       let data: any = null;
@@ -96,29 +103,27 @@ export const TextToVideo: React.FC<TextToVideoProps> = ({ lang }) => {
         console.error('Failed to parse server response:', responseText, parseErr);
         throw new Error(
           lang === 'bn' 
-            ? 'সার্ভার থেকে সঠিক ফরম্যাটে ডেটা পাওয়া যায়নি। অনুগ্রহ করে আবার চেষ্টা করুন।' 
-            : 'Invalid response from server. Please try again.'
+            ? 'ভিডিও তৈরি হতে সময় লাগছে, অনুগ্রহ করে কিছুক্ষণ পর আবার চেষ্টা করুন।' 
+            : 'Video generation is taking longer. Please try again in a few moments.'
         );
       }
 
       if (!response.ok || !data || !data.videoUrl) {
-        const errorMsg = data?.error || (
-          lang === 'bn' 
-            ? 'ভিডিও তৈরি করতে সমস্যা হয়েছে। অনুগ্রহ করে আবার চেষ্টা করুন।' 
-            : 'Failed to generate video. Please try again.'
-        );
-        throw new Error(errorMsg);
+        const fallbackMsg = lang === 'bn' 
+          ? 'ভিডিও তৈরি হতে সময় লাগছে, অনুগ্রহ করে কিছুক্ষণ পর আবার চেষ্টা করুন।' 
+          : 'Video generation is taking longer. Please try again in a few moments.';
+        throw new Error(data?.error || fallbackMsg);
       }
 
       setVideoUrl(data.videoUrl);
       setProgressStep('');
     } catch (err: any) {
       console.error('Video generation error:', err);
+      const isTimeoutOrFailure = err?.name === 'AbortError' || err?.message?.includes('timeout') || err?.message?.includes('Failed to fetch');
       setError(
-        err.message ||
-          (lang === 'bn'
-            ? 'ভিডিও তৈরি করতে সমস্যা হয়েছে। অনুগ্রহ করে আবার চেষ্টা করুন।'
-            : 'Failed to generate video. Please try again.')
+        isTimeoutOrFailure
+          ? (lang === 'bn' ? 'ভিডিও তৈরি হতে সময় লাগছে, অনুগ্রহ করে কিছুক্ষণ পর আবার চেষ্টা করুন।' : 'Video generation is taking longer. Please try again in a few moments.')
+          : (err.message || (lang === 'bn' ? 'ভিডিও তৈরি হতে সময় লাগছে, অনুগ্রহ করে কিছুক্ষণ পর আবার চেষ্টা করুন।' : 'Failed to generate video. Please try again.'))
       );
     } finally {
       setIsGenerating(false);

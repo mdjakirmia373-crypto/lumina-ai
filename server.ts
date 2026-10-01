@@ -565,79 +565,79 @@ app.post('/api/text-to-video', async (req, res) => {
     const cleanPrompt = prompt.trim();
     console.log(`[Text-To-Video] Generating video: "${cleanPrompt}", duration: ${duration}s, ratio: ${aspectRatio}`);
 
-    // If Hugging Face token is provided in environment or user secret
+    // Hugging Face API key & model
     const hfToken = process.env.HUGGINGFACE_TOKEN || process.env.HF_TOKEN || ['hf', 'ThLhnUPKQOEgtiogdfmnHFxIFnxqJoCTHs'].join('_');
-    if (hfToken) {
-      try {
-        // Use AbortController with 45s timeout to allow model cold-starts without hanging forever
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 45000);
+    const hfEndpoints = [
+      'https://api-inference.huggingface.co/models/damo-vilab/text-to-video-ms-1.7m',
+      'https://router.huggingface.co/hf-inference/models/damo-vilab/text-to-video-ms-1.7m',
+    ];
 
-        const hfRes = await fetch(
-          'https://api-inference.huggingface.co/models/cerspense/zeroscope_v2_576w',
-          {
-            headers: {
-              Authorization: `Bearer ${hfToken}`,
-              'Content-Type': 'application/json',
-              'x-wait-for-model': 'true', // Instruct Hugging Face router to wait for model to load and render
+    let generatedVideoBase64: string | null = null;
+    let lastError: string | null = null;
+
+    for (const endpoint of hfEndpoints) {
+      try {
+        // Set fetch timeout or server wait time to 90 seconds
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 90000);
+
+        const hfRes = await fetch(endpoint, {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${hfToken}`,
+            'Content-Type': 'application/json',
+            'x-wait-for-model': 'true',
+            'x-use-cache': 'false',
+          },
+          body: JSON.stringify({
+            inputs: cleanPrompt,
+            options: {
+              wait_for_model: true,
+              use_cache: false,
             },
-            method: 'POST',
-            body: JSON.stringify({ 
-              inputs: cleanPrompt,
-              options: { wait_for_model: true }
-            }),
-            signal: controller.signal,
-          }
-        );
+          }),
+          signal: controller.signal,
+        });
 
         clearTimeout(timeoutId);
 
         const contentType = hfRes.headers.get('content-type') || '';
 
-        // If Hugging Face returned video binary data successfully
         if (hfRes.ok && (contentType.includes('video') || contentType.includes('application/octet-stream') || contentType.includes('binary'))) {
           const videoBlob = await hfRes.arrayBuffer();
           if (videoBlob && videoBlob.byteLength > 1000) {
-            const base64Video = Buffer.from(videoBlob).toString('base64');
-            return res.json({
-              videoUrl: `data:video/mp4;base64,${base64Video}`,
-              duration,
-              aspectRatio,
-              source: 'huggingface',
-            });
+            generatedVideoBase64 = Buffer.from(videoBlob).toString('base64');
+            break;
           }
         }
 
-        // If HF returned JSON error (e.g. model loading 503 or quota 429)
-        if (contentType.includes('application/json')) {
-          const errJson = await hfRes.json().catch(() => null);
-          console.warn('[Text-To-Video] HF returned non-video JSON response:', errJson);
-        } else {
-          const textRes = await hfRes.text().catch(() => '');
-          console.warn('[Text-To-Video] HF non-video response:', textRes.slice(0, 200));
-        }
-      } catch (hfErr: any) {
-        console.warn('Hugging Face video generation failed or timed out:', hfErr?.message || hfErr);
+        const errText = await hfRes.text().catch(() => '');
+        console.warn(`[Text-To-Video] HF endpoint ${endpoint} returned status ${hfRes.status}:`, errText.slice(0, 150));
+        lastError = errText;
+      } catch (err: any) {
+        console.warn(`[Text-To-Video] Attempt on ${endpoint} failed:`, err?.message || err);
+        lastError = err?.message || 'Connection error';
       }
     }
 
-    // Guaranteed high quality direct MP4 render fallback (No watermarks, zero CORS issues, instant playback)
-    const isVertical = aspectRatio === '9:16';
-    let videoStreamUrl = isVertical ? '/videos/preview_9_16.mp4' : '/videos/preview_16_9.mp4';
-
-    if (cleanPrompt.toLowerCase().includes('cat') || cleanPrompt.toLowerCase().includes('বিড়াল') || cleanPrompt.toLowerCase().includes('animal')) {
-      videoStreamUrl = isVertical ? '/videos/sample_vertical.mp4' : '/videos/sample.mp4';
+    if (generatedVideoBase64) {
+      return res.json({
+        videoUrl: `data:video/mp4;base64,${generatedVideoBase64}`,
+        duration,
+        aspectRatio,
+        prompt: cleanPrompt,
+      });
     }
 
-    return res.json({
-      videoUrl: videoStreamUrl,
-      duration,
-      aspectRatio,
-      prompt: cleanPrompt,
+    // Direct failure response as requested: no mock/rainbow fallback
+    console.error('[Text-To-Video] Video generation could not be completed:', lastError);
+    return res.status(503).json({
+      error: 'ভিডিও তৈরি হতে সময় লাগছে, অনুগ্রহ করে কিছুক্ষণ পর আবার চেষ্টা করুন।',
+      details: lastError,
     });
   } catch (error: any) {
     console.error('Text to video error:', error);
-    res.status(500).json({ error: error.message || 'Failed to generate video' });
+    res.status(500).json({ error: 'ভিডিও তৈরি হতে সময় লাগছে, অনুগ্রহ করে কিছুক্ষণ পর আবার চেষ্টা করুন।' });
   }
 });
 
