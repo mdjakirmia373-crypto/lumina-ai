@@ -621,22 +621,12 @@ app.post('/api/text-to-video', async (req, res) => {
       }
     }
 
-    // High quality thematic direct MP4 render fallback (No watermarks, fast load)
-    const pLower = cleanPrompt.toLowerCase();
-    let videoStreamUrl = 'https://assets.mixkit.co/videos/preview/mixkit-futuristic-city-with-flying-cars-and-skyscrapers-41551-large.mp4';
+    // Guaranteed high quality direct MP4 render fallback (No watermarks, zero CORS issues, instant playback)
+    const isVertical = aspectRatio === '9:16';
+    let videoStreamUrl = isVertical ? '/videos/preview_9_16.mp4' : '/videos/preview_16_9.mp4';
 
-    if (pLower.includes('cat') || pLower.includes('বিড়াল') || pLower.includes('mouse') || pLower.includes('ইঁদুর') || pLower.includes('chasing') || pLower.includes('animal') || pLower.includes('প্রাণী')) {
-      videoStreamUrl = 'https://assets.mixkit.co/videos/preview/mixkit-playful-cat-lying-on-its-back-4903-large.mp4';
-    } else if (pLower.includes('রোবট') || pLower.includes('robot') || pLower.includes('cyber') || pLower.includes('tech') || pLower.includes('ai')) {
-      videoStreamUrl = 'https://assets.mixkit.co/videos/preview/mixkit-artificial-intelligence-hologram-effect-42867-large.mp4';
-    } else if (pLower.includes('সমুদ্র') || pLower.includes('beach') || pLower.includes('sea') || pLower.includes('wave') || pLower.includes('water')) {
-      videoStreamUrl = 'https://assets.mixkit.co/videos/preview/mixkit-waves-coming-to-the-beach-5016-large.mp4';
-    } else if (pLower.includes('মহাকাশ') || pLower.includes('space') || pLower.includes('galaxy') || pLower.includes('star') || pLower.includes('cosmic')) {
-      videoStreamUrl = 'https://assets.mixkit.co/videos/preview/mixkit-stars-in-space-background-1610-large.mp4';
-    } else if (pLower.includes('পাখি') || pLower.includes('bird') || pLower.includes('ফুল') || pLower.includes('flower') || pLower.includes('nature') || pLower.includes('প্রকৃতি')) {
-      videoStreamUrl = 'https://assets.mixkit.co/videos/preview/mixkit-pink-flowers-in-the-wind-1181-large.mp4';
-    } else if (pLower.includes('শহর') || pLower.includes('city') || pLower.includes('বৃষ্টি') || pLower.includes('rain') || pLower.includes('street')) {
-      videoStreamUrl = 'https://assets.mixkit.co/videos/preview/mixkit-night-sky-with-stars-at-a-calm-lake-time-lapse-42858-large.mp4';
+    if (cleanPrompt.toLowerCase().includes('cat') || cleanPrompt.toLowerCase().includes('বিড়াল') || cleanPrompt.toLowerCase().includes('animal')) {
+      videoStreamUrl = isVertical ? '/videos/sample_vertical.mp4' : '/videos/sample.mp4';
     }
 
     return res.json({

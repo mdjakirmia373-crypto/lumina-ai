@@ -336,23 +336,28 @@ export const TextToVideo: React.FC<TextToVideoProps> = ({ lang }) => {
           }`}>
             <video
               key={videoUrl}
-              src={videoUrl}
               controls
               autoPlay
               muted
               loop
               playsInline
               preload="auto"
-              onError={() => {
-                console.warn('Video failed to render in HTML5 player');
+              onLoadedData={() => {
+                setError(null);
+              }}
+              onError={(e) => {
+                console.warn('Video failed to render in HTML5 player:', e);
                 setError(
                   lang === 'bn' 
-                    ? 'ভিডিওটি প্লে করতে সমস্যা হয়েছে। অনুগ্রহ করে আবার তৈরি করুন বা ডাউনলোড করে দেখুন।' 
-                    : 'Video playback encountered an error. Please try generating again or download the file.'
+                    ? 'ভিডিওটি প্লে করতে ব্রাউজারে সমস্যা হয়েছে। নিচের ডাউনলোড বাটনে ক্লিক করে সরাসরি ভিডিওটি দেখতে পারেন।' 
+                    : 'Browser playback issue. You can click the download button below to view the clean MP4 directly.'
                 );
               }}
               className="w-full h-auto object-contain max-h-[500px]"
-            />
+            >
+              <source src={videoUrl} type="video/mp4" />
+              Your browser does not support HTML5 video.
+            </video>
           </div>
 
           {/* Actions */}
