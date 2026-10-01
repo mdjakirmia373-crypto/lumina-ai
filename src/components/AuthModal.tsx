@@ -137,8 +137,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({
       <div className="relative w-full max-w-md p-6 sm:p-8 rounded-3xl bg-slate-900 border border-slate-800 shadow-2xl space-y-6">
         {/* Glow Header */}
         <div className="text-center space-y-2">
-          <div className="w-14 h-14 mx-auto rounded-2xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-purple-600 flex items-center justify-center text-white shadow-xl shadow-indigo-600/30 ring-1 ring-white/20">
-            <Sparkles className="w-7 h-7 animate-pulse" />
+          <div className="w-16 h-16 mx-auto rounded-2xl p-1 bg-slate-950 border border-cyan-500/30 flex items-center justify-center shadow-xl shadow-cyan-500/20">
+            <img src="/icon-192.png" alt="Lumiqra Logo" className="w-full h-full object-contain rounded-xl" />
           </div>
           <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight">
             {mode === 'signup'
