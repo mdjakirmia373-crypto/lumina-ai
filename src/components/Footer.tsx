@@ -19,8 +19,8 @@ export const Footer: React.FC<FooterProps> = ({ lang, onOpenPolicy }) => {
             <LumiqraLogo size="sm" />
             <p className="text-slate-400 max-w-sm text-[12px] leading-relaxed">
               {lang === 'bn'
-                ? 'Lumiqra AI (লুমিক্রা এআই) — বাংলা ও ইংরেজির জন্য ১০০% ফ্রি এআই ইমেজ জেনারেটর, ভয়েসওভার ও স্মার্ট চ্যাট সহকারী।'
-                : 'Lumiqra AI — 100% Free AI Image, Voice & Universal Chat Assistant for creators worldwide.'}
+                ? 'Lumiqra AI (লুমিক্রা এআই) — বাংলা ও ইংরেজির জন্য ১০০% ফ্রি এআই ইমেজ জেনারেটর, ১০ সেকেন্ডের ভিডিও স্টুডিও, ভয়েসওভার ও স্মার্ট চ্যাট সহকারী।'
+                : 'Lumiqra AI — 100% Free AI Image, 10s Video Studio, Voice & Universal Chat Assistant for creators worldwide.'}
             </p>
           </div>
 

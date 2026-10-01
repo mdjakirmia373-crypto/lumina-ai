@@ -8,6 +8,8 @@ import { ImageStudio } from './components/ImageStudio';
 import { VoiceStudio } from './components/VoiceStudio';
 import { ChatStudio } from './components/ChatStudio';
 import { BgRemoverStudio } from './components/BgRemoverStudio';
+import { ChatInterface } from './components/ChatInterface';
+import { TextToVideo } from './components/TextToVideo';
 import { HistoryGallery } from './components/HistoryGallery';
 import { AdminDashboard } from './components/AdminDashboard';
 import { Footer } from './components/Footer';
@@ -197,11 +199,11 @@ export default function App() {
               <h1 className="text-3xl sm:text-4xl md:text-5xl font-black leading-tight tracking-tight">
                 {lang === 'bn' ? (
                   <>
-                    সহজেই তৈরি করুন <span className="gradient-text">এআই ইমেজ, ভয়েস ও চ্যাট</span>
+                    সহজেই তৈরি করুন <span className="gradient-text">এআই ইমেজ, ভিডিও, ভয়েস ও চ্যাট</span>
                   </>
                 ) : (
                   <>
-                    Effortlessly Generate <span className="gradient-text">AI Images, Voice & Chat</span>
+                    Effortlessly Generate <span className="gradient-text">AI Images, Videos, Voice & Chat</span>
                   </>
                 )}
               </h1>
@@ -238,15 +240,23 @@ export default function App() {
             <BgRemoverStudio lang={lang} />
           )}
 
-          {/* Tab 4: AI Chat Q&A Studio */}
+          {/* Tab 4: Full-Screen AI Chat Interface (NO AVATARS / NO EMAIL BADGES) */}
           {activeTab === 'chat' && (
-            <ChatStudio 
-              lang={lang} 
-              onNavigateToTab={(t) => setActiveTab(t)}
-            />
+            <div className="fixed inset-0 z-40 bg-slate-950">
+              <ChatInterface 
+                lang={lang} 
+                onNavigateToTab={(t) => setActiveTab(t)}
+                onSelectImageForStudio={handleSelectImageFromHistory}
+              />
+            </div>
           )}
 
-          {/* Tab 5: History Gallery */}
+          {/* Tab 5: Watermark-Free 10-Second Text-to-Video Generator */}
+          {activeTab === 'video' && (
+            <TextToVideo lang={lang} />
+          )}
+
+          {/* Tab 6: History Gallery */}
           {activeTab === 'history' && (
             <HistoryGallery
               lang={lang}
