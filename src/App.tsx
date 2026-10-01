@@ -242,7 +242,7 @@ export default function App() {
 
           {/* Tab 4: Full-Screen AI Chat Interface (NO AVATARS / NO EMAIL BADGES) */}
           {activeTab === 'chat' && (
-            <div className="fixed inset-0 z-40 bg-slate-950">
+            <div className="fixed inset-0 z-50 bg-slate-950 w-full h-[100dvh] overflow-hidden">
               <ChatInterface 
                 lang={lang} 
                 onNavigateToTab={(t) => setActiveTab(t)}

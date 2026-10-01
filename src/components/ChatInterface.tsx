@@ -22,7 +22,8 @@ import {
   ChevronDown,
   X,
   Video,
-  ArrowLeft
+  ArrowLeft,
+  Menu
 } from 'lucide-react';
 import { Language, GeneratedImage, AppTab } from '../types';
 import { askAiQuestion } from '../utils/chatAi';
@@ -65,7 +66,12 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
   const [copiedId, setCopiedId] = useState<string | null>(null);
-  const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(true);
+  const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(() => {
+    if (typeof window !== 'undefined') {
+      return window.innerWidth >= 768;
+    }
+    return false;
+  });
   const [isListening, setIsListening] = useState<boolean>(false);
   const [isSpeakingId, setIsSpeakingId] = useState<string | null>(null);
   const [searchFilter, setSearchFilter] = useState<string>('');
@@ -432,13 +438,24 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
 
   return (
     <div className="relative flex w-full h-[100dvh] bg-slate-950 text-slate-100 overflow-hidden select-none">
+      {/* Mobile Backdrop Overlay - closes sidebar on tap */}
+      {isSidebarOpen && (
+        <div
+          onClick={() => setIsSidebarOpen(false)}
+          className="fixed inset-0 z-40 bg-black/70 backdrop-blur-sm md:hidden animate-fade-in"
+        />
+      )}
+
       {/* ======================================================== */}
       {/* 1. COLLAPSIBLE CONVERSATION & MODE SIDEBAR               */}
       {/* ======================================================== */}
+      {/* On mobile: FIXED drawer overlay; on md+: flex flow */}
       <aside
-        className={`${
-          isSidebarOpen ? 'w-72 sm:w-80' : 'w-0'
-        } transition-all duration-300 ease-in-out border-r border-slate-800/80 bg-slate-950/90 backdrop-blur-xl flex flex-col shrink-0 overflow-hidden z-20`}
+        className={`fixed inset-y-0 left-0 z-50 md:static md:z-20 w-72 sm:w-80 h-full border-r border-slate-800/80 bg-slate-950/98 md:bg-slate-950/90 backdrop-blur-xl flex flex-col shrink-0 transition-transform md:transition-all duration-300 ease-in-out ${
+          isSidebarOpen
+            ? 'translate-x-0 md:w-72 sm:md:w-80'
+            : '-translate-x-full md:translate-x-0 md:w-0 md:border-r-0'
+        } overflow-hidden shadow-2xl md:shadow-none`}
       >
         {/* Sidebar Header: Brand & New Chat */}
         <div className="p-3.5 border-b border-slate-800/80 space-y-2.5">
@@ -449,7 +466,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
             </div>
             <button
               onClick={() => setIsSidebarOpen(false)}
-              className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition"
+              className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition cursor-pointer"
               title="Close Sidebar"
             >
               <PanelLeftClose className="w-4 h-4" />
@@ -465,7 +482,10 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
               <span>{lang === 'bn' ? 'চ্যাট এআই' : 'Chat AI'}</span>
             </button>
             <button
-              onClick={() => onNavigateToTab?.('video')}
+              onClick={() => {
+                setIsSidebarOpen(false);
+                onNavigateToTab?.('video');
+              }}
               className="py-1.5 px-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800/60 transition font-medium flex items-center justify-center gap-1.5 cursor-pointer"
             >
               <Video className="w-3.5 h-3.5 text-pink-400" />
@@ -475,7 +495,10 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
 
           {/* New Chat Button */}
           <button
-            onClick={handleCreateNewChat}
+            onClick={() => {
+              handleCreateNewChat();
+              if (window.innerWidth < 768) setIsSidebarOpen(false);
+            }}
             className="w-full py-2 px-3 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white text-xs font-semibold flex items-center justify-center gap-2 shadow-md shadow-indigo-600/25 transition cursor-pointer"
           >
             <Plus className="w-4 h-4" />
@@ -494,7 +517,10 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
             return (
               <div
                 key={conv.id}
-                onClick={() => setActiveConversationId(conv.id)}
+                onClick={() => {
+                  setActiveConversationId(conv.id);
+                  if (window.innerWidth < 768) setIsSidebarOpen(false);
+                }}
                 className={`group relative flex items-center justify-between p-2.5 rounded-xl text-xs font-medium transition cursor-pointer ${
                   isActive
                     ? 'bg-indigo-600/20 text-white border border-indigo-500/40'
@@ -512,7 +538,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
 
                 <button
                   onClick={(e) => handleDeleteConversation(conv.id, e)}
-                  className="opacity-0 group-hover:opacity-100 p-1 rounded hover:bg-rose-500/20 hover:text-rose-400 text-slate-400 transition shrink-0"
+                  className="opacity-0 group-hover:opacity-100 p-1 rounded hover:bg-rose-500/20 hover:text-rose-400 text-slate-400 transition shrink-0 cursor-pointer"
                   title="Delete chat"
                 >
                   <Trash2 className="w-3.5 h-3.5" />
@@ -526,7 +552,10 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
         <div className="p-3 border-t border-slate-800/80 bg-slate-950 text-[11px] text-slate-400 flex items-center justify-between">
           <span>{lang === 'bn' ? 'লুমিক্রা মাল্টিভার্স এআই' : 'Lumiqra AI Suite'}</span>
           <button
-            onClick={() => onNavigateToTab?.('image')}
+            onClick={() => {
+              setIsSidebarOpen(false);
+              onNavigateToTab?.('image');
+            }}
             className="hover:text-indigo-400 text-slate-300 transition cursor-pointer"
           >
             {lang === 'bn' ? 'ছবি তৈরি' : 'Images'} →
@@ -537,43 +566,45 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
       {/* ======================================================== */}
       {/* 2. MAIN CHAT VIEWPORT (NO AVATARS / NO EMAIL BADGES)     */}
       {/* ======================================================== */}
-      <main className="flex-1 flex flex-col h-full overflow-hidden relative bg-slate-950">
+      <main className="w-full flex-1 flex flex-col h-full min-w-0 overflow-hidden relative bg-slate-950">
         {/* Top Header Bar inside Chat */}
-        <div className="h-12 border-b border-slate-800/80 bg-slate-950/70 backdrop-blur-md px-4 flex items-center justify-between shrink-0">
-          <div className="flex items-center gap-2">
-            {!isSidebarOpen && (
-              <button
-                onClick={() => setIsSidebarOpen(true)}
-                className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition mr-1"
-                title="Open Sidebar"
-              >
-                <PanelLeftOpen className="w-4 h-4" />
-              </button>
-            )}
+        <div className="h-12 border-b border-slate-800/80 bg-slate-950/70 backdrop-blur-md px-3 sm:px-4 flex items-center justify-between shrink-0">
+          <div className="flex items-center gap-2 min-w-0">
+            {/* Hamburger Button to toggle sidebar on mobile & desktop */}
+            <button
+              onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+              className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition cursor-pointer"
+              title={isSidebarOpen ? 'Close Sidebar' : 'Open Sidebar'}
+            >
+              {isSidebarOpen ? <PanelLeftClose className="w-4 h-4 hidden md:block" /> : <PanelLeftOpen className="w-4 h-4 hidden md:block" />}
+              <Menu className="w-4 h-4 md:hidden" />
+            </button>
+
             <button
               onClick={() => onNavigateToTab?.('image')}
-              className="flex items-center gap-1.5 py-1 px-2 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-300 hover:text-white text-xs font-medium transition cursor-pointer"
+              className="flex items-center gap-1.5 py-1 px-2 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-300 hover:text-white text-xs font-medium transition cursor-pointer shrink-0"
               title="Back to Studio Home"
             >
               <ArrowLeft className="w-3.5 h-3.5" />
               <span className="hidden sm:inline">{lang === 'bn' ? 'স্টুডিও হোম' : 'Studio Home'}</span>
             </button>
-            <h2 className="text-xs sm:text-sm font-bold text-slate-200 truncate max-w-[150px] sm:max-w-xs ml-1">
+            <h2 className="text-xs sm:text-sm font-bold text-slate-200 truncate max-w-[130px] sm:max-w-xs ml-1">
               {activeConversation?.title || 'Lumiqra Chat'}
             </h2>
           </div>
 
-          <div className="flex items-center gap-2 text-xs">
+          <div className="flex items-center gap-1.5 sm:gap-2 text-xs">
             <button
               onClick={() => onNavigateToTab?.('video')}
-              className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-pink-500/10 hover:bg-pink-500/20 text-pink-300 border border-pink-500/30 transition cursor-pointer font-medium"
+              className="flex items-center gap-1.5 px-2 sm:px-2.5 py-1 rounded-lg bg-pink-500/10 hover:bg-pink-500/20 text-pink-300 border border-pink-500/30 transition cursor-pointer font-medium text-xs"
+              title={lang === 'bn' ? 'টেক্সট টু ভিডিও' : 'Text to Video'}
             >
               <Video className="w-3.5 h-3.5" />
-              <span>{lang === 'bn' ? 'টেক্সট টু ভিডিও' : 'Text to Video'}</span>
+              <span className="hidden sm:inline">{lang === 'bn' ? 'টেক্সট টু ভিডিও' : 'Text to Video'}</span>
             </button>
             <button
               onClick={handleCreateNewChat}
-              className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition"
+              className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition cursor-pointer"
               title="New Chat"
             >
               <Plus className="w-4 h-4" />
