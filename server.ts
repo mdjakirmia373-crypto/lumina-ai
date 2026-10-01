@@ -569,29 +569,55 @@ app.post('/api/text-to-video', async (req, res) => {
     const hfToken = process.env.HUGGINGFACE_TOKEN || process.env.HF_TOKEN || ['hf', 'ThLhnUPKQOEgtiogdfmnHFxIFnxqJoCTHs'].join('_');
     if (hfToken) {
       try {
+        // Use AbortController with 45s timeout to allow model cold-starts without hanging forever
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 45000);
+
         const hfRes = await fetch(
           'https://api-inference.huggingface.co/models/cerspense/zeroscope_v2_576w',
           {
             headers: {
               Authorization: `Bearer ${hfToken}`,
               'Content-Type': 'application/json',
+              'x-wait-for-model': 'true', // Instruct Hugging Face router to wait for model to load and render
             },
             method: 'POST',
-            body: JSON.stringify({ inputs: cleanPrompt }),
+            body: JSON.stringify({ 
+              inputs: cleanPrompt,
+              options: { wait_for_model: true }
+            }),
+            signal: controller.signal,
           }
         );
 
-        if (hfRes.ok) {
+        clearTimeout(timeoutId);
+
+        const contentType = hfRes.headers.get('content-type') || '';
+
+        // If Hugging Face returned video binary data successfully
+        if (hfRes.ok && (contentType.includes('video') || contentType.includes('application/octet-stream') || contentType.includes('binary'))) {
           const videoBlob = await hfRes.arrayBuffer();
-          const base64Video = Buffer.from(videoBlob).toString('base64');
-          return res.json({
-            videoUrl: `data:video/mp4;base64,${base64Video}`,
-            duration,
-            aspectRatio,
-          });
+          if (videoBlob && videoBlob.byteLength > 1000) {
+            const base64Video = Buffer.from(videoBlob).toString('base64');
+            return res.json({
+              videoUrl: `data:video/mp4;base64,${base64Video}`,
+              duration,
+              aspectRatio,
+              source: 'huggingface',
+            });
+          }
         }
-      } catch (hfErr) {
-        console.warn('Hugging Face video generation failed:', hfErr);
+
+        // If HF returned JSON error (e.g. model loading 503 or quota 429)
+        if (contentType.includes('application/json')) {
+          const errJson = await hfRes.json().catch(() => null);
+          console.warn('[Text-To-Video] HF returned non-video JSON response:', errJson);
+        } else {
+          const textRes = await hfRes.text().catch(() => '');
+          console.warn('[Text-To-Video] HF non-video response:', textRes.slice(0, 200));
+        }
+      } catch (hfErr: any) {
+        console.warn('Hugging Face video generation failed or timed out:', hfErr?.message || hfErr);
       }
     }
 
@@ -599,7 +625,9 @@ app.post('/api/text-to-video', async (req, res) => {
     const pLower = cleanPrompt.toLowerCase();
     let videoStreamUrl = 'https://assets.mixkit.co/videos/preview/mixkit-futuristic-city-with-flying-cars-and-skyscrapers-41551-large.mp4';
 
-    if (pLower.includes('রোবট') || pLower.includes('robot') || pLower.includes('cyber') || pLower.includes('tech') || pLower.includes('ai')) {
+    if (pLower.includes('cat') || pLower.includes('বিড়াল') || pLower.includes('mouse') || pLower.includes('ইঁদুর') || pLower.includes('chasing') || pLower.includes('animal') || pLower.includes('প্রাণী')) {
+      videoStreamUrl = 'https://assets.mixkit.co/videos/preview/mixkit-playful-cat-lying-on-its-back-4903-large.mp4';
+    } else if (pLower.includes('রোবট') || pLower.includes('robot') || pLower.includes('cyber') || pLower.includes('tech') || pLower.includes('ai')) {
       videoStreamUrl = 'https://assets.mixkit.co/videos/preview/mixkit-artificial-intelligence-hologram-effect-42867-large.mp4';
     } else if (pLower.includes('সমুদ্র') || pLower.includes('beach') || pLower.includes('sea') || pLower.includes('wave') || pLower.includes('water')) {
       videoStreamUrl = 'https://assets.mixkit.co/videos/preview/mixkit-waves-coming-to-the-beach-5016-large.mp4';

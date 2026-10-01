@@ -85,10 +85,29 @@ export const TextToVideo: React.FC<TextToVideoProps> = ({ lang }) => {
       clearTimeout(stepTimer1);
       clearTimeout(stepTimer2);
 
-      const data = await response.json();
+      const responseText = await response.text();
+      let data: any = null;
 
-      if (!response.ok || !data.videoUrl) {
-        throw new Error(data.error || 'Failed to generate video');
+      try {
+        if (responseText && responseText.trim()) {
+          data = JSON.parse(responseText);
+        }
+      } catch (parseErr) {
+        console.error('Failed to parse server response:', responseText, parseErr);
+        throw new Error(
+          lang === 'bn' 
+            ? 'সার্ভার থেকে সঠিক ফরম্যাটে ডেটা পাওয়া যায়নি। অনুগ্রহ করে আবার চেষ্টা করুন।' 
+            : 'Invalid response from server. Please try again.'
+        );
+      }
+
+      if (!response.ok || !data || !data.videoUrl) {
+        const errorMsg = data?.error || (
+          lang === 'bn' 
+            ? 'ভিডিও তৈরি করতে সমস্যা হয়েছে। অনুগ্রহ করে আবার চেষ্টা করুন।' 
+            : 'Failed to generate video. Please try again.'
+        );
+        throw new Error(errorMsg);
       }
 
       setVideoUrl(data.videoUrl);
@@ -312,15 +331,26 @@ export const TextToVideo: React.FC<TextToVideoProps> = ({ lang }) => {
           </div>
 
           {/* HTML5 Video Player */}
-          <div className={`relative mx-auto rounded-2xl overflow-hidden bg-black border border-slate-800 shadow-2xl ${
+          <div className={`relative mx-auto rounded-2xl overflow-hidden bg-slate-950 border border-slate-800 shadow-2xl flex items-center justify-center min-h-[220px] ${
             aspectRatio === '9:16' ? 'max-w-xs' : 'w-full'
           }`}>
             <video
+              key={videoUrl}
               src={videoUrl}
               controls
               autoPlay
+              muted
               loop
               playsInline
+              preload="auto"
+              onError={() => {
+                console.warn('Video failed to render in HTML5 player');
+                setError(
+                  lang === 'bn' 
+                    ? 'ভিডিওটি প্লে করতে সমস্যা হয়েছে। অনুগ্রহ করে আবার তৈরি করুন বা ডাউনলোড করে দেখুন।' 
+                    : 'Video playback encountered an error. Please try generating again or download the file.'
+                );
+              }}
               className="w-full h-auto object-contain max-h-[500px]"
             />
           </div>
